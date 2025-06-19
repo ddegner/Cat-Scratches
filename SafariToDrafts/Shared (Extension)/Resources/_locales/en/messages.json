@@ -1,0 +1,10 @@
+{
+    "extension_name": {
+        "message": "SafariToDrafts",
+        "description": "The display name for the extension."
+    },
+    "extension_description": {
+        "message": "The fastest and most elegant way to capture web content and send it directly to Drafts app. Perfect for researchers, writers, and students who want a seamless, keyboard-driven workflow.",
+        "description": "Description of what the extension does."
+    }
+}

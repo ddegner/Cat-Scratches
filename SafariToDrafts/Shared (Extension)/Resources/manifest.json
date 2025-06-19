@@ -1,0 +1,63 @@
+{
+    "manifest_version": 3,
+    "default_locale": "en",
+
+    "name": "__MSG_extension_name__",
+    "description": "__MSG_extension_description__",
+    "version": "1.0",
+
+    "icons": {
+        "48": "images/icon-48.png",
+        "96": "images/icon-96.png",
+        "128": "images/icon-128.png",
+        "256": "images/icon-256.png",
+        "512": "images/icon-512.png"
+    },
+
+    "background": {
+        "scripts": [ "background.js" ],
+        "persistent": false
+    },
+
+    "content_scripts": [{
+        "js": [ "turndown.js", "content.js" ],
+        "matches": [ "<all_urls>" ],
+        "run_at": "document_end",
+        "all_frames": false
+    }],
+
+    "action": {
+        "default_icon": "images/toolbar-icon.svg",
+        "default_popup": "popup.html",
+        "default_title": "SafariToDrafts - Capture content to Drafts"
+    },
+
+    "commands": {
+        "create_draft_command": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+D",
+                "mac": "Command+Shift+D"
+            },
+            "description": "Create Draft from Selection/Page"
+        }
+    },
+
+    "permissions": [ 
+        "activeTab",
+        "scripting",
+        "tabs"
+    ],
+
+    "host_permissions": [
+        "<all_urls>"
+    ],
+
+    "web_accessible_resources": [{
+        "resources": ["*"],
+        "matches": ["<all_urls>"]
+    }],
+
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self'"
+    }
+}
