@@ -7,18 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7F5714AC2E0322670079AEB5 /* SafariToDrafts Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F5714AB2E0322670079AEB5 /* SafariToDrafts Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7F5714B62E0322670079AEB5 /* SafariToDrafts Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F5714B52E0322670079AEB5 /* SafariToDrafts Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7F5714AD2E0322670079AEB5 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7F5714712E0322650079AEB5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7F5714AA2E0322670079AEB5;
-			remoteInfo = "SafariToDrafts Extension (iOS)";
-		};
 		7F5714B72E0322670079AEB5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7F5714712E0322650079AEB5 /* Project object */;
@@ -29,17 +21,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		7F5714DF2E0322670079AEB5 /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				7F5714AC2E0322670079AEB5 /* SafariToDrafts Extension.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		7F5714E92E0322670079AEB5 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -54,39 +35,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7F57148D2E0322670079AEB5 /* SafariToDrafts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafariToDrafts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F57149F2E0322670079AEB5 /* SafariToDrafts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafariToDrafts.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7F5714AB2E0322670079AEB5 /* SafariToDrafts Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "SafariToDrafts Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F5714B52E0322670079AEB5 /* SafariToDrafts Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "SafariToDrafts Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7F5714DA2E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "SafariToDrafts (iOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"/Localized: Resources/Main.html",
-				Assets.xcassets,
-				Resources/Icon.png,
-				Resources/Script.js,
-				Resources/Style.css,
-				ViewController.swift,
-			);
-			target = 7F57148C2E0322670079AEB5 /* SafariToDrafts (iOS) */;
-		};
-		7F5714DE2E0322670079AEB5 /* Exceptions for "iOS (Extension)" folder in "SafariToDrafts Extension (iOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 7F5714AA2E0322670079AEB5 /* SafariToDrafts Extension (iOS) */;
-		};
-		7F5714E32E0322670079AEB5 /* Exceptions for "iOS (App)" folder in "SafariToDrafts (iOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 7F57148C2E0322670079AEB5 /* SafariToDrafts (iOS) */;
-		};
 		7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "SafariToDrafts (macOS)" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -106,20 +59,6 @@
 			);
 			target = 7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */;
 		};
-		7F5714ED2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "SafariToDrafts Extension (iOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Resources/_locales,
-				Resources/background.js,
-				Resources/content.js,
-				Resources/images,
-				Resources/manifest.json,
-				Resources/popup.html,
-				Resources/popup.js,
-				SafariWebExtensionHandler.swift,
-			);
-			target = 7F5714AA2E0322670079AEB5 /* SafariToDrafts Extension (iOS) */;
-		};
 		7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "SafariToDrafts Extension (macOS)" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -134,20 +73,12 @@
 			);
 			target = 7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */;
 		};
-		7F5715052E0324900079AEB5 /* Exceptions for "macOS (Extension)" folder in "SafariToDrafts Extension (iOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				turndown.js,
-			);
-			target = 7F5714AA2E0322670079AEB5 /* SafariToDrafts Extension (iOS) */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7F5714752E0322660079AEB5 /* Shared (App) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7F5714DA2E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "SafariToDrafts (iOS)" target */,
 				7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "SafariToDrafts (macOS)" target */,
 			);
 			path = "Shared (App)";
@@ -156,7 +87,6 @@
 		7F57147E2E0322670079AEB5 /* Shared (Extension) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7F5714ED2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "SafariToDrafts Extension (iOS)" target */,
 				7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "SafariToDrafts Extension (macOS)" target */,
 			);
 			explicitFolders = (
@@ -166,31 +96,14 @@
 			path = "Shared (Extension)";
 			sourceTree = "<group>";
 		};
-		7F57148F2E0322670079AEB5 /* iOS (App) */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7F5714E32E0322670079AEB5 /* Exceptions for "iOS (App)" folder in "SafariToDrafts (iOS)" target */,
-			);
-			path = "iOS (App)";
-			sourceTree = "<group>";
-		};
 		7F5714A02E0322670079AEB5 /* macOS (App) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "macOS (App)";
 			sourceTree = "<group>";
 		};
-		7F5714AF2E0322670079AEB5 /* iOS (Extension) */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7F5714DE2E0322670079AEB5 /* Exceptions for "iOS (Extension)" folder in "SafariToDrafts Extension (iOS)" target */,
-			);
-			path = "iOS (Extension)";
-			sourceTree = "<group>";
-		};
 		7F5714B92E0322670079AEB5 /* macOS (Extension) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7F5715052E0324900079AEB5 /* Exceptions for "macOS (Extension)" folder in "SafariToDrafts Extension (iOS)" target */,
 				7F5714E82E0322670079AEB5 /* Exceptions for "macOS (Extension)" folder in "SafariToDrafts Extension (macOS)" target */,
 			);
 			path = "macOS (Extension)";
@@ -199,7 +112,7 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		7F57148A2E0322670079AEB5 /* Frameworks */ = {
+		7F57149C2E0322670079AEB5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -235,9 +148,7 @@
 			children = (
 				7F5714752E0322660079AEB5 /* Shared (App) */,
 				7F57147E2E0322670079AEB5 /* Shared (Extension) */,
-				7F57148F2E0322670079AEB5 /* iOS (App) */,
 				7F5714A02E0322670079AEB5 /* macOS (App) */,
-				7F5714AF2E0322670079AEB5 /* iOS (Extension) */,
 				7F5714B92E0322670079AEB5 /* macOS (Extension) */,
 				7F57148E2E0322670079AEB5 /* Products */,
 			);
@@ -246,9 +157,7 @@
 		7F57148E2E0322670079AEB5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7F57148D2E0322670079AEB5 /* SafariToDrafts.app */,
 				7F57149F2E0322670079AEB5 /* SafariToDrafts.app */,
-				7F5714AB2E0322670079AEB5 /* SafariToDrafts Extension.appex */,
 				7F5714B52E0322670079AEB5 /* SafariToDrafts Extension.appex */,
 			);
 			name = Products;
@@ -257,30 +166,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7F57148C2E0322670079AEB5 /* SafariToDrafts (iOS) */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7F5714E02E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts (iOS)" */;
-			buildPhases = (
-				7F5714892E0322670079AEB5 /* Sources */,
-				7F57148A2E0322670079AEB5 /* Frameworks */,
-				7F57148B2E0322670079AEB5 /* Resources */,
-				7F5714DF2E0322670079AEB5 /* Embed Foundation Extensions */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				7F5714AE2E0322670079AEB5 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				7F57148F2E0322670079AEB5 /* iOS (App) */,
-			);
-			name = "SafariToDrafts (iOS)";
-			packageProductDependencies = (
-			);
-			productName = "SafariToDrafts (iOS)";
-			productReference = 7F57148D2E0322670079AEB5 /* SafariToDrafts.app */;
-			productType = "com.apple.product-type.application";
-		};
 		7F57149E2E0322670079AEB5 /* SafariToDrafts (macOS) */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7F5714EA2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts (macOS)" */;
@@ -304,28 +189,6 @@
 			productName = "SafariToDrafts (macOS)";
 			productReference = 7F57149F2E0322670079AEB5 /* SafariToDrafts.app */;
 			productType = "com.apple.product-type.application";
-		};
-		7F5714AA2E0322670079AEB5 /* SafariToDrafts Extension (iOS) */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7F5714DB2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts Extension (iOS)" */;
-			buildPhases = (
-				7F5714A72E0322670079AEB5 /* Sources */,
-				7F5714A82E0322670079AEB5 /* Frameworks */,
-				7F5714A92E0322670079AEB5 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				7F5714AF2E0322670079AEB5 /* iOS (Extension) */,
-			);
-			name = "SafariToDrafts Extension (iOS)";
-			packageProductDependencies = (
-			);
-			productName = "SafariToDrafts Extension (iOS)";
-			productReference = 7F5714AB2E0322670079AEB5 /* SafariToDrafts Extension.appex */;
-			productType = "com.apple.product-type.app-extension";
 		};
 		7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */ = {
 			isa = PBXNativeTarget;
@@ -359,13 +222,7 @@
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
-					7F57148C2E0322670079AEB5 = {
-						CreatedOnToolsVersion = 16.4;
-					};
 					7F57149E2E0322670079AEB5 = {
-						CreatedOnToolsVersion = 16.4;
-					};
-					7F5714AA2E0322670079AEB5 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 					7F5714B42E0322670079AEB5 = {
@@ -387,30 +244,14 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7F57148C2E0322670079AEB5 /* SafariToDrafts (iOS) */,
 				7F57149E2E0322670079AEB5 /* SafariToDrafts (macOS) */,
-				7F5714AA2E0322670079AEB5 /* SafariToDrafts Extension (iOS) */,
 				7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		7F57148B2E0322670079AEB5 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		7F57149D2E0322670079AEB5 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F5714A92E0322670079AEB5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -427,21 +268,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		7F5714892E0322670079AEB5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		7F57149B2E0322670079AEB5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F5714A72E0322670079AEB5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -458,11 +285,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		7F5714AE2E0322670079AEB5 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 7F5714AA2E0322670079AEB5 /* SafariToDrafts Extension (iOS) */;
-			targetProxy = 7F5714AD2E0322670079AEB5 /* PBXContainerItemProxy */;
-		};
 		7F5714B82E0322670079AEB5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */;
@@ -471,144 +293,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		7F5714DC2E0322670079AEB5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "SafariToDrafts Extension";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts.Extension;
-				PRODUCT_NAME = "SafariToDrafts Extension";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		7F5714DD2E0322670079AEB5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "SafariToDrafts Extension";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts.Extension;
-				PRODUCT_NAME = "SafariToDrafts Extension";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		7F5714E12E0322670079AEB5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = SafariToDrafts;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-					"-framework",
-					WebKit,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts;
-				PRODUCT_NAME = SafariToDrafts;
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		7F5714E22E0322670079AEB5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = SafariToDrafts;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-					"-framework",
-					WebKit,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts;
-				PRODUCT_NAME = SafariToDrafts;
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
 		7F5714E62E0322670079AEB5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -867,24 +551,6 @@
 			buildConfigurations = (
 				7F5714EF2E0322670079AEB5 /* Debug */,
 				7F5714F02E0322670079AEB5 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7F5714DB2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts Extension (iOS)" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7F5714DC2E0322670079AEB5 /* Debug */,
-				7F5714DD2E0322670079AEB5 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7F5714E02E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts (iOS)" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7F5714E12E0322670079AEB5 /* Debug */,
-				7F5714E22E0322670079AEB5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
