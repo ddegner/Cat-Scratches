@@ -27,7 +27,7 @@
     }],
 
     "action": {
-        "default_icon": "images/toolbar-icon.svg",
+        "default_icon": "images/toolbar-icon.png",
         "default_popup": "popup.html",
         "default_title": "SafariToDrafts - Capture content to Drafts"
     },
