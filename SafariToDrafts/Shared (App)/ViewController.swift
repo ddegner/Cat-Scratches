@@ -54,6 +54,9 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
                 } else {
                     webView.evaluateJavaScript("show('mac', \(state.isEnabled), false)")
                 }
+                
+                // Automatically open Safari preferences and quit the app
+                self.openSafariPreferencesAndQuit()
             }
         }
 #endif
@@ -65,6 +68,12 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
             return
         }
 
+        openSafariPreferencesAndQuit()
+#endif
+    }
+    
+#if os(macOS)
+    func openSafariPreferencesAndQuit() {
         SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
             guard error == nil else {
                 // Insert code to inform the user that something went wrong.
@@ -75,7 +84,7 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
                 NSApp.terminate(self)
             }
         }
-#endif
     }
+#endif
 
 }

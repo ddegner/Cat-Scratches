@@ -98,48 +98,26 @@ async function getPageContent() {
                         
                         // Social and sharing
                         'social', 'share', 'sharing', 'follow', 'subscribe', 'newsletter',
-                        'signup', 'join', 'login', 'register', 'membership',
+                        'signup', 'join', 'login', 'register',
                         
                         // Comments and user content
                         'comment', 'comments', 'discussion', 'reply', 'replies',
-                        'user-content', 'ugc', 'review', 'reviews', 'rating',
                         
                         // Related content and recommendations
-                        'related', 'recommendation', 'recommend', 'suggested', 'similar',
+                        'related', 'recommendation', 'recommended', 'suggested', 'similar',
                         'trending', 'popular', 'more-from', 'also-read', 'next-read',
-                        'continue-reading', 'read-more', 'read-next', 'up-next',
-                        'dont-miss', 'you-might', 'related-articles', 'related-posts',
-                        'related-stories', 'more-stories', 'other-stories',
+                        'read-more', 'read-next', 'up-next',
                         
                         // Widgets and extras
-                        'widget', 'sidebar', 'rail', 'aside-content', 'secondary',
-                        'supplementary', 'extras', 'tools', 'utility', 'meta',
-                        'byline-extra', 'article-meta', 'post-meta',
-                        
-                        // Newsletter and subscription
-                        'newsletter', 'subscription', 'subscribe', 'email-signup',
-                        'mailing-list', 'updates', 'notifications',
+                        'widget', 'sidebar', 'rail', 'secondary',
+                        'supplementary', 'extras',
                         
                         // Cookie and privacy
-                        'cookie', 'privacy', 'gdpr', 'consent', 'tracking',
-                        
-                        // Video and multimedia extras
-                        'video-playlist', 'gallery-nav', 'slideshow-nav', 'carousel-nav',
-                        
-                        // Tags and categories (often promotional)
-                        'tags', 'categories', 'filed-under', 'topics', 'subjects',
-                        
-                        // Author bio and social (can be promotional)
-                        'author-bio', 'author-social', 'author-follow', 'bio-box',
-                        'byline', 'author-info', 'article-byline', 'post-byline',
+                        'cookie', 'privacy', 'gdpr', 'consent',
                         
                         // Paywall and subscription prompts
                         'paywall', 'subscription-prompt', 'premium', 'member-only',
-                        'subscriber-only', 'unlock', 'continue-reading-prompt',
-                        
-                        // News site specific patterns
-                        'donate', 'donation', 'support', 'funding', 'membership',
-                        'contribution', 'sponsor', 'patron', 'sustain', 'pledge'
+                        'subscriber-only', 'unlock'
                     ];
                     
                     // Check class names and IDs against patterns
@@ -283,42 +261,42 @@ async function getPageContent() {
             
             // Try multiple strategies to find the main content
             const contentSelectors = [
-                // Most specific content areas first
-                '.article-body .content',
-                '.story-body .content', 
-                '.post-content .content',
-                'article .content',
-                '[role="main"] .content',
+                // Semantic HTML5 (highest priority) 
+                'article',
+                'main',
+                'section',
+                '[role="main"]',
+                '[role="article"]',
                 
                 // High-confidence content patterns
                 '.article-content',
                 '.post-content',
-                '.entry-content',
+                '.entry-content', 
                 '.story-body',
                 '.article-body',
                 '.post-body',
                 '.content-body',
-                
-                // Semantic HTML5 elements
-                'article',
-                'main',
-                '[role="main"]',
-                '.main-content article',
-                '.content article',
                 
                 // News-specific patterns
                 '.story-content',
                 '.article-text',
                 '.story-text',
                 '.content-text',
+                '.post-text',
                 
                 // Blog patterns
                 '.post',
                 '.entry',
                 '.blog-post',
                 '.single-post',
+                '.hentry',
                 
-                // Generic content patterns (most general)
+                // Schema.org patterns
+                '[itemtype*="Article"]',
+                '[itemtype*="BlogPosting"]', 
+                '[itemtype*="NewsArticle"]',
+                
+                // Generic content patterns (lower priority)
                 '.content',
                 '.main-content',
                 '.primary-content',
@@ -327,22 +305,60 @@ async function getPageContent() {
                 
                 // Container patterns
                 '.container article',
-                '.wrapper article',
-                '.main article'
+                '.wrapper article', 
+                '.main article',
+                'article .text',
+                'main .content',
+                
+                // Additional authoritative patterns
+                '.text',
+                '.article-wrap',
+                '.entry-wrap'
             ];
+            
+            // Collect all valid content candidates from all selectors
+            let candidates = [];
             
             for (const selector of contentSelectors) {
                 const elements = document.querySelectorAll(selector);
                 if (elements.length > 0) {
-                    // Choose the element with the most text content
-                    mainContent = Array.from(elements).reduce((prev, current) => {
+                    // Find the best element for this selector
+                    const bestForSelector = Array.from(elements).reduce((prev, current) => {
                         const prevText = (prev.textContent || '').trim().length;
                         const currentText = (current.textContent || '').trim().length;
                         return currentText > prevText ? current : prev;
                     });
-                    console.log(`Found content using selector: ${selector}`);
-                    break;
+                    
+                    // Validate this candidate
+                    const textLength = (bestForSelector.textContent || '').trim().length;
+                    if (textLength >= 100) {
+                        // Check text-to-link ratio to avoid navigation menus
+                        const linkLength = Array.from(bestForSelector.querySelectorAll('a'))
+                            .reduce((total, link) => total + (link.textContent || '').length, 0);
+                        const linkRatio = linkLength / textLength;
+                        
+                        // Only include if less than 50% of content is links
+                        if (linkRatio < 0.5) {
+                            candidates.push({
+                                element: bestForSelector,
+                                selector: selector,
+                                textLength: textLength,
+                                linkRatio: linkRatio,
+                                // Score based on selector priority (earlier = higher score) and content length
+                                score: (contentSelectors.length - contentSelectors.indexOf(selector)) * 1000 + textLength
+                            });
+                        }
+                    }
                 }
+            }
+            
+            // Pick the best candidate based on score
+            if (candidates.length > 0) {
+                const bestCandidate = candidates.reduce((prev, current) => 
+                    current.score > prev.score ? current : prev
+                );
+                mainContent = bestCandidate.element;
+                console.log(`Found content using selector: ${bestCandidate.selector} (score: ${bestCandidate.score})`);
             }
             
             if (mainContent) {
@@ -385,30 +401,16 @@ async function getPageContent() {
             .replace(/\n\s*\n\s*\n/g, '\n\n')
             .replace(/ +/g, ' ')
             .trim()
-            // Remove donation/support appeals
-            .replace(/We rely on your support.*?Donate today/gi, '')
-            .replace(/.*funded by sponsors.*member donations.*/gi, '')
-            .replace(/Make your contribution.*?thrive in \d{4}\./gi, '')
-            // Remove image credits and captions
-            .replace(/^\s*.*Getty Images.*$/gm, '')
-            .replace(/^\s*.*Corbis.*$/gm, '')
-            .replace(/^\s*Viviane Moos\/.*$/gm, '')
-            // Remove standalone author bylines
-            .replace(/^By\s*\n.*\nPublished.*$/gm, '')
-            // Remove navigation elements
-            .replace(/^News\s*$/gm, '')
-            .replace(/^\s*News\s*#/gm, '#')
+            // Remove common promotional content
+            .replace(/.*support.*donate.*today.*/gi, '')
+            .replace(/.*funded by.*donations.*/gi, '')
+            // Remove image credits 
+            .replace(/^\s*.*(Getty Images|Corbis|Photo credit|Image credit).*$/gm, '')
             // Remove HTML artifacts (for fallback mode)
-            .replace(/<!--\[-->/g, '')
-            .replace(/<!--\]-->/g, '')
+            .replace(/<!--.*?-->/g, '')
             .replace(/<[^>]*>/g, '')
-            .replace(/&[^;]+;/g, '')
-            // Remove UI framework artifacts
-            .replace(/p-button[^"]*"/g, '')
-            .replace(/flexible-link internal/g, '')
-            .replace(/--\d+:none;/g, '')
+            .replace(/&[^;]+;/g, ' ')
             // Final cleanup
-            .replace(/---\s*---/g, '---')
             .replace(/\n\s*\n\s*\n/g, '\n\n')
             .trim();
 
