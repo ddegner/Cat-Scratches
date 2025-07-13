@@ -3,6 +3,12 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // Set up event listeners
     document.getElementById('captureContent').addEventListener('click', captureContent);
+    
+    // Check permissions on load
+    checkPermissionsOnLoad();
+    
+    // Check if user has used extension before (to hide first-time tips)
+    checkFirstTimeUsage();
 });
 
 // Capture content from current page
@@ -10,6 +16,9 @@ async function captureContent() {
     try {
         // Send message to background script to capture content
         await browser.runtime.sendMessage({ action: 'captureContent' });
+        
+        // Track usage
+        await incrementUsageCount();
         
         // Close popup
         window.close();
@@ -41,7 +50,14 @@ async function captureContent() {
             window.close();
         } catch (fallbackError) {
             console.error('Fallback capture also failed:', fallbackError);
-            showError('Could not capture content. Please try again.');
+            
+            // Check if this is a permission error
+            if (fallbackError.message && fallbackError.message.includes('permission')) {
+                showError('Permission required. Enable extension for all websites in Safari settings.');
+                showPermissionInfo();
+            } else {
+                showError('Could not capture content. Please try again.');
+            }
         }
     }
 }
@@ -121,4 +137,65 @@ function showError(message) {
     setTimeout(() => {
         errorDiv.remove();
     }, 3000);
+}
+
+// Show permission info section
+function showPermissionInfo() {
+    const permissionInfo = document.getElementById('permissionInfo');
+    if (permissionInfo) {
+        permissionInfo.style.display = 'block';
+    }
+}
+
+// Check permissions when popup loads
+async function checkPermissionsOnLoad() {
+    try {
+        // Try to get the active tab to see if we have permission
+        const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+        
+        if (activeTab) {
+            // Test if we can execute a simple script
+            await browser.scripting.executeScript({
+                target: { tabId: activeTab.id },
+                func: () => true  // Simple test function
+            });
+        }
+    } catch (error) {
+        // If we can't execute script, likely a permission issue
+        if (error.message && (error.message.includes('permission') || error.message.includes('Cannot access'))) {
+            showPermissionInfo();
+        }
+    }
+}
+
+// Check if this is first time usage and manage tips accordingly
+async function checkFirstTimeUsage() {
+    try {
+        // Get usage count from storage
+        const result = await browser.storage.local.get(['usageCount']);
+        const usageCount = result.usageCount || 0;
+        
+        // Hide first-time tips after a few uses
+        if (usageCount > 3) {
+            const draftsPermissionInfo = document.getElementById('draftsPermissionInfo');
+            if (draftsPermissionInfo) {
+                draftsPermissionInfo.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        // If storage isn't available, that's okay
+        console.log('Storage not available for usage tracking');
+    }
+}
+
+// Increment usage count for tip management
+async function incrementUsageCount() {
+    try {
+        const result = await browser.storage.local.get(['usageCount']);
+        const usageCount = (result.usageCount || 0) + 1;
+        await browser.storage.local.set({ usageCount });
+    } catch (error) {
+        // If storage isn't available, that's okay
+        console.log('Storage not available for usage tracking');
+    }
 } 

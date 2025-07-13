@@ -8,7 +8,29 @@ browser.runtime.onStartup.addListener(() => {
 
 browser.runtime.onInstalled.addListener(() => {
     console.log('SafariToDrafts extension installed');
+    
+    // Check if we have permission to run on all websites
+    checkPermissions();
 });
+
+// Function to check and request permissions
+async function checkPermissions() {
+    try {
+        // In Safari, we can't actually request permissions programmatically
+        // But we can detect when we don't have them and inform the user
+        const hasPermission = await browser.permissions.contains({
+            origins: ["<all_urls>"]
+        });
+        
+        if (!hasPermission) {
+            console.log('Extension does not have permission to run on all websites');
+            // Note: Safari doesn't support requesting permissions programmatically
+            // Users must manually enable in Safari settings
+        }
+    } catch (error) {
+        console.log('Permission check not supported in Safari');
+    }
+}
 
 // Listen for popup messages
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
@@ -20,6 +42,18 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         await createDraft(data.title, data.url, data.body, isSelection);
     }
 });
+
+// Increment usage count for tip management
+async function incrementUsageCount() {
+    try {
+        const result = await browser.storage.local.get(['usageCount']);
+        const usageCount = (result.usageCount || 0) + 1;
+        await browser.storage.local.set({ usageCount });
+    } catch (error) {
+        // If storage isn't available, that's okay
+        console.log('Storage not available for usage tracking');
+    }
+}
 
 // Listen for command (keyboard shortcut)
 browser.commands.onCommand.addListener(async (command) => {
@@ -50,9 +84,18 @@ async function createDraftFromCurrentTab() {
             const pageData = results[0].result;
             const isSelection = pageData.source === 'selection';
             await createDraft(pageData.title, pageData.url, pageData.body, isSelection);
+            
+            // Track usage for tip management
+            await incrementUsageCount();
         }
     } catch (error) {
         console.error("Error creating draft:", error);
+        
+        // Check if this is a permission error
+        if (error.message && error.message.includes('permission')) {
+            console.log("Permission denied - user needs to enable extension for this website");
+            console.log("To enable on all websites: Safari → Settings → Extensions → SafariToDrafts → Allow on Every Website");
+        }
     }
 }
 
@@ -72,88 +115,210 @@ async function getPageContent() {
                 linkStyle: 'inline'
             });
             
-            // Add custom rules to filter out unwanted elements
+            // Add custom rules to filter out unwanted elements - now less aggressive
             turndownService.addRule('removeUnwanted', {
                 filter: function (node) {
-                    // Remove script tags, style tags, and JSON-LD
+                    // Remove only obvious non-content elements
                     if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE' || node.nodeName === 'NOSCRIPT') {
                         return true;
+                    }
+                    
+                    // Remove images and image-related elements
+                    if (node.nodeName === 'IMG' || node.nodeName === 'PICTURE' || node.nodeName === 'FIGURE') {
+                        return true;
+                    }
+                    
+                    // Remove figcaptions (image captions)
+                    if (node.nodeName === 'FIGCAPTION') {
+                        return true;
+                    }
+                    
+                    // Remove links to images
+                    if (node.nodeName === 'A' && node.getAttribute('href')) {
+                        const href = node.getAttribute('href').toLowerCase();
+                        if (href.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff?)(\?.*)?$/i)) {
+                            return true;
+                        }
                     }
                     
                     // Get node attributes for analysis (safely handle different types)
                     const className = (node.className ? String(node.className) : '').toLowerCase();
                     const id = (node.id ? String(node.id) : '').toLowerCase();
                     const tagName = node.tagName?.toLowerCase() || '';
-                    const textContent = (node.textContent ? String(node.textContent) : '').toLowerCase();
                     
-                    // Aggressive ad and promotional content patterns
-                    const adPatterns = [
-                        // Navigation
+                    // Comprehensive but targeted filtering patterns
+                    const unwantedPatterns = [
+                        // Navigation and page structure
                         'nav', 'header', 'footer', 'aside', 'menu', 'breadcrumb',
+                        'navigation', 'main-nav', 'primary-nav', 'site-nav',
+                        'main-header', 'site-header', 'page-header',
+                        'main-footer', 'site-footer', 'page-footer',
                         
-                        // Ads and promotions
+                        // WordPress-specific unwanted patterns
+                        'wp-admin', 'wp-login', 'wp-json', 'wp-includes',
+                        'wp-content-plugins', 'wp-sidebar', 'wp-widget',
+                        'wp-calendar', 'wp-tag-cloud', 'wp-recent-posts',
+                        'wp-recent-comments', 'wp-archives', 'wp-categories',
+                        'wp-meta', 'wp-search', 'wp-links', 'wp-rss',
+                        'widget-area', 'sidebar-', 'wp-block-latest-posts',
+                        'wp-block-latest-comments', 'wp-block-archives',
+                        'wp-block-categories', 'wp-block-tag-cloud',
+                        'entry-meta', 'post-meta', 'wp-post-meta',
+                        'entry-footer', 'post-footer', 'wp-post-footer',
+                        'post-navigation', 'nav-links', 'wp-prev-next',
+                        
+                        // Images and media
+                        'image', 'img', 'photo', 'picture', 'gallery', 'slideshow',
+                        'carousel', 'lightbox', 'media', 'video', 'audio',
+                        'caption', 'image-caption', 'photo-caption', 'media-caption',
+                        'image-credit', 'photo-credit', 'media-credit',
+                        
+                        // Bottom-of-article content (NYTimes and others)
+                        'bottom-of-article', 'article-bottom', 'story-bottom',
+                        'article-footer', 'story-footer', 'post-footer',
+                        'article-end', 'story-end', 'content-end',
+                        'author-info', 'author-bio', 'author-details', 'author-section',
+                        'byline', 'byline-info', 'contributors', 'contributor-info',
+                        'see-more-on', 'more-on', 'topics-covered', 'story-topics',
+                        'share-article', 'share-story', 'share-full-article',
+                        'article-sharing', 'story-sharing', 'share-this-article',
+                        'article-tools', 'story-tools', 'content-tools',
+                        'about-author', 'author-profile', 'writer-bio',
+                        
+                        // Ads and promotions  
                         'ad', 'ads', 'advertisement', 'advertising', 'sponsor', 'sponsored',
                         'promo', 'promotion', 'promotional', 'banner', 'popup', 'modal',
                         'overlay', 'interstitial', 'affiliate', 'marketing',
+                        'google-ad', 'doubleclick', 'adsystem', 'ad-container', 
+                        'ad-wrapper', 'ad-placement', 'sponsored-content', 'native-ad',
                         
-                        // Social and sharing
+                        // Social sharing and engagement
                         'social', 'share', 'sharing', 'follow', 'subscribe', 'newsletter',
-                        'signup', 'join', 'login', 'register',
+                        'signup', 'join', 'login', 'register', 'social-share', 
+                        'share-buttons', 'sharing-buttons', 'social-links', 'follow-buttons',
                         
                         // Comments and user content
                         'comment', 'comments', 'discussion', 'reply', 'replies',
+                        'comments-section', 'comment-form', 'disqus',
                         
-                        // Related content and recommendations
-                        'related', 'recommendation', 'recommended', 'suggested', 'similar',
-                        'trending', 'popular', 'more-from', 'also-read', 'next-read',
-                        'read-more', 'read-next', 'up-next',
+                        // Related content (be selective - only obvious non-article patterns)
+                        'related-articles', 'recommended-articles', 'more-stories',
+                        'trending-now', 'popular-stories', 'you-might-like',
+                        'also-read', 'next-read', 'read-more', 'read-next', 'up-next',
+                        'more-from',
                         
-                        // Widgets and extras
+                        // Widgets and sidebars
                         'widget', 'sidebar', 'rail', 'secondary',
                         'supplementary', 'extras',
                         
-                        // Cookie and privacy
-                        'cookie', 'privacy', 'gdpr', 'consent',
+                        // Newsletter and subscription specific
+                        'newsletter-signup', 'email-signup', 'subscription-form',
+                        'newsletter-promo', 'subscription-nag',
                         
-                        // Paywall and subscription prompts
-                        'paywall', 'subscription-prompt', 'premium', 'member-only',
-                        'subscriber-only', 'unlock'
+                        // Cookie and privacy notices
+                        'cookie', 'privacy', 'gdpr', 'consent',
+                        'cookie-banner', 'privacy-notice', 'gdpr-notice', 'consent-banner'
+                        
+                        // Note: Removed overly broad paywall patterns like 'premium', 'member-only'
+                        // as these might appear in legitimate article content
                     ];
                     
                     // Check class names and IDs against patterns
-                    for (const pattern of adPatterns) {
+                    for (const pattern of unwantedPatterns) {
                         if (className.includes(pattern) || id.includes(pattern)) {
                             return true;
                         }
                     }
                     
-                    // Remove specific problematic selectors
+                    // Remove specific problematic selectors - comprehensive but targeted
                     const unwantedSelectors = [
+                        // Images and media elements
+                        'img', 'picture', 'figure', 'figcaption',
+                        '.image', '.img', '.photo', '.picture', '.gallery',
+                        '.slideshow', '.carousel', '.lightbox', '.media',
+                        '.caption', '.image-caption', '.photo-caption', '.media-caption',
+                        '.image-credit', '.photo-credit', '.media-credit',
+                        '.image-container', '.photo-container', '.media-container',
+                        
+                        // Bottom-of-article content (NYTimes and others)
+                        '.bottom-of-article', '.article-bottom', '.story-bottom',
+                        '.article-footer', '.story-footer', '.post-footer',
+                        '.article-end', '.story-end', '.content-end',
+                        '.author-info', '.author-bio', '.author-details', '.author-section',
+                        '.byline', '.byline-info', '.contributors', '.contributor-info',
+                        '.see-more-on', '.more-on', '.topics-covered', '.story-topics',
+                        '.share-article', '.share-story', '.share-full-article',
+                        '.article-sharing', '.story-sharing', '.share-this-article',
+                        '.article-tools', '.story-tools', '.content-tools',
+                        '.about-author', '.author-profile', '.writer-bio',
+                        
                         // Semantic elements often used for non-content
                         'nav', 'header', 'footer', 'aside',
                         
-                        // Common class patterns
+                        // Common class patterns for navigation and structure
                         '.nav', '.navigation', '.header', '.footer', '.sidebar',
+                        '.menu', '.breadcrumb', '.breadcrumbs',
+                        
+                        // WordPress-specific unwanted selectors
+                        '.wp-admin', '.wp-login', '.wp-json', '.wp-includes',
+                        '.wp-sidebar', '.wp-widget-area', '.widget-area',
+                        '.wp-calendar', '.wp-tag-cloud', '.wp-recent-posts',
+                        '.wp-recent-comments', '.wp-archives', '.wp-categories',
+                        '.wp-meta', '.wp-search', '.wp-links', '.wp-rss',
+                        '.sidebar-', '.widget-', '.wp-block-latest-posts',
+                        '.wp-block-latest-comments', '.wp-block-archives',
+                        '.wp-block-categories', '.wp-block-tag-cloud',
+                        '.entry-meta', '.post-meta', '.wp-post-meta',
+                        '.entry-footer', '.post-footer', '.wp-post-footer',
+                        '.post-navigation', '.nav-links', '.wp-prev-next',
+                        '.post-tags', '.entry-tags', '.wp-block-tag-cloud',
+                        '.related-posts', '.wp-block-latest-posts',
+                        '.comment-navigation', '.comment-meta', '.comment-form',
+                        '.trackback', '.pingback', '.wp-block-comments',
+                        
+                        // Ad patterns
                         '.ad', '.ads', '.advertisement', '.promo', '.promotion',
+                        '.google-ad', '.amazon-ad', '.taboola', '.outbrain',
+                        '.doubleclick', '.adsystem', '.adnxs', '.revcontent',
+                        '.content-ad', '.native-ad', '.sponsored-content',
+                        
+                        // Social and sharing
                         '.social', '.share', '.sharing', '.comments', '.comment',
-                        '.related', '.recommendations', '.newsletter', '.subscription',
-                        '.popup', '.modal', '.overlay', '.banner', '.cookie',
+                        '.social-share', '.share-buttons', '.sharing-buttons',
+                        '.follow', '.follow-buttons', '.social-links',
+                        
+                        // Newsletters and subscriptions
+                        '.newsletter', '.subscription', '.signup', '.newsletter-signup',
+                        '.email-signup', '.subscription-form', '.newsletter-promo',
+                        '.subscription-nag',
+                        
+                        // Related content (specific patterns)
+                        '.related', '.related-articles', '.recommended-articles', '.more-stories',
+                        '.trending-now', '.popular-stories', '.you-might-like',
+                        '.also-read', '.read-more', '.up-next', '.more-from',
+                        
+                        // Widgets and extras
                         '.widget', '.rail', '.secondary', '.supplementary',
-                        '.trending', '.popular', '.suggested', '.similar',
-                        '.more-from', '.also-read', '.read-more', '.up-next',
+                        '.popup', '.modal', '.overlay', '.banner',
+                        
+                        // Author and meta info that's not part of article
                         '.author-bio', '.byline-extra', '.article-meta', '.post-meta',
-                        '.byline', '.author-info', '.article-byline', '.post-byline',
                         '.tags', '.categories', '.filed-under', '.topics',
-                        '.paywall', '.subscription-prompt', '.premium-content',
+                        
+                        // Cookie and privacy
+                        '.cookie', '.privacy', '.gdpr', '.consent',
+                        '.cookie-banner', '.privacy-notice', '.gdpr-notice',
+                        
+                        // Donation and support (but keep general, less specific)
                         '.donate', '.donation', '.support', '.funding', '.membership',
-                        '.contribution', '.sponsor', '.patron', '.sustain', '.pledge',
+                        '.contribution', '.patron', '.sustain', '.pledge',
                         
                         // ID patterns
                         '#nav', '#navigation', '#header', '#footer', '#sidebar',
                         '#comments', '#related', '#recommendations', '#newsletter',
                         '#social', '#share', '#ads', '#advertisement', '#promo',
                         '#trending', '#popular', '#suggested', '#widget',
-                        '#author-bio', '#tags', '#categories', '#paywall',
+                        '#author-bio', '#tags', '#categories',
                         
                         // Role attributes
                         '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
@@ -162,62 +327,50 @@ async function getPageContent() {
                         // Data attributes commonly used for ads
                         '[data-ad]', '[data-advertisement]', '[data-sponsored]',
                         '[data-promo]', '[data-widget]', '[data-module="ads"]',
+                        '[data-ad-type]',
                         
-                        // Specific ad networks and services
-                        '.google-ad', '.doubleclick', '.adsystem', '.adnxs',
-                        '.amazon-ad', '.taboola', '.outbrain', '.revcontent',
-                        '.content-ad', '.native-ad', '.sponsored-content'
+                        // NYTimes-specific recirculation and bottom content
+                        '#bottom-sheet-sensor',
+                        '[data-testid="recirculation"]',
+                        '[data-testid="recirc-package"]',
+                        '[data-testid="recirc-rightrail"]',
+                        '[data-testid="recirc-item"]',
+                        '.duet--ledes--standard-lede',
+                        
+                        // Schema.org and JSON-LD (only if obviously not content)
+                        'script[type="application/ld+json"]'
+                        
+                        // Note: Removed overly specific paywall selectors that might catch
+                        // legitimate premium content sections
                     ];
                     
                     for (const selector of unwantedSelectors) {
-                        if (node.matches && node.matches(selector)) {
-                            return true;
+                        try {
+                            if (node.matches && node.matches(selector)) {
+                                return true;
+                            }
+                        } catch (e) {
+                            // Ignore selector errors
                         }
                     }
                     
-                    // Remove elements with JSON-LD or schema.org content
-                    if (node.getAttribute && (
-                        node.getAttribute('type') === 'application/ld+json' ||
-                        node.getAttribute('itemtype') ||
-                        node.getAttribute('itemscope') !== null
-                    )) {
+                    // Remove elements with JSON-LD that are not article content
+                    if (node.getAttribute && 
+                        node.getAttribute('type') === 'application/ld+json') {
                         return true;
                     }
                     
-                    // Text content analysis for promotional language
-                    if (textContent && textContent.length < 1000) { // Analyze text blocks up to 1000 chars
-                        const promotionalPhrases = [
-                            'subscribe', 'newsletter', 'sign up', 'join us', 'follow us',
-                            'more from', 'you might also', 'don\'t miss', 'trending now',
-                            'related articles', 'related stories', 'recommended for you',
-                            'advertisement', 'sponsored', 'promoted', 'affiliate',
-                            'continue reading', 'read more', 'full story',
-                            'share this', 'follow on', 'like us on', 'connect with us',
-                            'make your contribution', 'donate today', 'support to make',
-                            'funded by sponsors', 'member donations', 'help us thrive',
-                            'donate now', 'support our work', 'become a member',
-                            'published at', 'updated at', 'getty images', 'corbis',
-                            'image credit', 'photo credit', 'source:'
+                    // Less aggressive text content analysis - only for very short elements
+                    const textContent = (node.textContent ? String(node.textContent) : '').toLowerCase().trim();
+                    if (textContent && textContent.length < 100 && textContent.length > 10) {
+                        const obviousPromotional = [
+                            'click here to subscribe', 'sign up now', 'join our newsletter',
+                            'follow us on', 'download our app', 'get breaking news',
+                            'advertisement', 'sponsored by', 'affiliate link'
                         ];
                         
-                        for (const phrase of promotionalPhrases) {
+                        for (const phrase of obviousPromotional) {
                             if (textContent.includes(phrase)) {
-                                return true;
-                            }
-                        }
-                    }
-                    
-                    // Remove elements that are likely ads based on size and positioning
-                    if (node.getBoundingClientRect) {
-                        const rect = node.getBoundingClientRect();
-                        // Common ad sizes (in pixels)
-                        const commonAdSizes = [
-                            [728, 90], [300, 250], [336, 280], [320, 50], [300, 600],
-                            [970, 250], [300, 50], [320, 100], [468, 60], [234, 60]
-                        ];
-                        
-                        for (const [width, height] of commonAdSizes) {
-                            if (Math.abs(rect.width - width) < 10 && Math.abs(rect.height - height) < 10) {
                                 return true;
                             }
                         }
@@ -225,6 +378,14 @@ async function getPageContent() {
                     
                     return false;
                 },
+                replacement: function () {
+                    return '';
+                }
+            });
+            
+            // Add rule to completely remove images and media
+            turndownService.addRule('removeImages', {
+                filter: ['img', 'picture', 'figure', 'figcaption', 'video', 'audio', 'source'],
                 replacement: function () {
                     return '';
                 }
@@ -256,99 +417,166 @@ async function getPageContent() {
             }
             selectionSource = "selection";
         } else {
-            // Smart content extraction for full page
+            // Enhanced smart content extraction for full page
             let mainContent = null;
             
-            // Try multiple strategies to find the main content
+            // Expanded and more aggressive content selectors
             const contentSelectors = [
-                // Semantic HTML5 (highest priority) 
+                // High-priority semantic HTML5 and Schema.org
+                'article[role="main"]',
+                '[itemtype*="Article"]',
+                '[itemtype*="BlogPosting"]', 
+                '[itemtype*="NewsArticle"]',
                 'article',
                 'main',
-                'section',
                 '[role="main"]',
                 '[role="article"]',
                 
-                // High-confidence content patterns
-                '.article-content',
+                // WordPress-specific patterns (high priority)
+                '.single-post .entry-content',
+                '.post .entry-content',
+                '.single .entry-content',
+                '.type-post .entry-content',
+                '.blog-post .entry-content',
+                '.wp-block-post-content',
+                '.entry-content',
                 '.post-content',
-                '.entry-content', 
+                '.post-body',
+                '.post-text',
+                '.entry-text',
+                '.entry-body',
+                '.content-area article',
+                '.hentry .entry-content',
+                '.single-post-content',
+                '.blog-content',
+                '.post-wrapper .entry-content',
+                '.entry-wrapper .entry-content',
+                
+                // News-specific patterns (more comprehensive)
+                '.article-content',
+                '.story-content', 
                 '.story-body',
                 '.article-body',
-                '.post-body',
                 '.content-body',
-                
-                // News-specific patterns
-                '.story-content',
                 '.article-text',
                 '.story-text',
                 '.content-text',
-                '.post-text',
+                '.article-inner',
+                '.story-inner',
+                '.content-inner',
                 
-                // Blog patterns
+                // Content wrappers and containers
+                '.content-main',
+                '.main-content',
+                '.primary-content',
+                '.page-content',
+                '.site-content',
+                '.article-container',
+                '.story-container',
+                '.content-container',
+                '.post-container',
+                
+                // Blog and CMS patterns
                 '.post',
                 '.entry',
                 '.blog-post',
                 '.single-post',
                 '.hentry',
+                '.post-body',
+                '.entry-body',
                 
-                // Schema.org patterns
-                '[itemtype*="Article"]',
-                '[itemtype*="BlogPosting"]', 
-                '[itemtype*="NewsArticle"]',
-                
-                // Generic content patterns (lower priority)
+                // Generic content patterns
                 '.content',
-                '.main-content',
-                '.primary-content',
-                '.page-content',
-                '.site-content',
+                '.text',
+                '.copy',
+                '.article-wrap',
+                '.entry-wrap',
+                '.content-wrap',
                 
-                // Container patterns
+                // Container combinations (child selectors)
                 '.container article',
                 '.wrapper article', 
                 '.main article',
+                '.content article',
                 'article .text',
                 'main .content',
+                '.article .body',
+                '.story .body',
                 
-                // Additional authoritative patterns
-                '.text',
-                '.article-wrap',
-                '.entry-wrap'
+                // ID-based selectors (common patterns)
+                '#article',
+                '#content',
+                '#main-content',
+                '#story',
+                '#post-content',
+                '#article-body',
+                
+                // More generic but targeted selectors
+                'section[class*="content"]',
+                'div[class*="article"]',
+                'div[class*="story"]',
+                'div[class*="post"]',
+                
+                // Last resort: look for large text blocks
+                'section',
+                '.section'
             ];
             
-            // Collect all valid content candidates from all selectors
+            // Collect all valid content candidates from all selectors with improved scoring
             let candidates = [];
             
             for (const selector of contentSelectors) {
-                const elements = document.querySelectorAll(selector);
-                if (elements.length > 0) {
-                    // Find the best element for this selector
-                    const bestForSelector = Array.from(elements).reduce((prev, current) => {
-                        const prevText = (prev.textContent || '').trim().length;
-                        const currentText = (current.textContent || '').trim().length;
-                        return currentText > prevText ? current : prev;
-                    });
-                    
-                    // Validate this candidate
-                    const textLength = (bestForSelector.textContent || '').trim().length;
-                    if (textLength >= 100) {
-                        // Check text-to-link ratio to avoid navigation menus
-                        const linkLength = Array.from(bestForSelector.querySelectorAll('a'))
-                            .reduce((total, link) => total + (link.textContent || '').length, 0);
-                        const linkRatio = linkLength / textLength;
-                        
-                        // Only include if less than 50% of content is links
-                        if (linkRatio < 0.5) {
-                            candidates.push({
-                                element: bestForSelector,
-                                selector: selector,
-                                textLength: textLength,
-                                linkRatio: linkRatio,
-                                // Score based on selector priority (earlier = higher score) and content length
-                                score: (contentSelectors.length - contentSelectors.indexOf(selector)) * 1000 + textLength
-                            });
+                try {
+                    const elements = document.querySelectorAll(selector);
+                    if (elements.length > 0) {
+                        // Evaluate each element found by this selector
+                        for (const element of elements) {
+                            const textLength = (element.textContent || '').trim().length;
+                            
+                            // More lenient minimum text length
+                            if (textLength >= 50) {
+                                // Calculate link ratio - less strict
+                                const linkLength = Array.from(element.querySelectorAll('a'))
+                                    .reduce((total, link) => total + (link.textContent || '').length, 0);
+                                const linkRatio = textLength > 0 ? linkLength / textLength : 1;
+                                
+                                // Allow up to 60% links (was 50%) and prioritize article content
+                                if (linkRatio < 0.6) {
+                                    // Enhanced scoring system
+                                    let score = (contentSelectors.length - contentSelectors.indexOf(selector)) * 1000;
+                                    
+                                    // Bonus points for semantic elements
+                                    if (element.tagName === 'ARTICLE') score += 500;
+                                    if (element.getAttribute('role') === 'main') score += 400;
+                                    if (element.getAttribute('itemtype')) score += 300;
+                                    
+                                    // Bonus for content-indicating classes/IDs
+                                    const classAndId = ((element.className || '') + ' ' + (element.id || '')).toLowerCase();
+                                    if (classAndId.includes('article')) score += 200;
+                                    if (classAndId.includes('story')) score += 200;
+                                    if (classAndId.includes('content')) score += 150;
+                                    if (classAndId.includes('main')) score += 150;
+                                    
+                                    // Text length bonus (but not overwhelming)
+                                    score += Math.min(textLength / 10, 1000);
+                                    
+                                    // Penalty for excessive links
+                                    score -= linkRatio * 500;
+                                    
+                                    candidates.push({
+                                        element: element,
+                                        selector: selector,
+                                        textLength: textLength,
+                                        linkRatio: linkRatio,
+                                        score: score
+                                    });
+                                }
+                            }
                         }
                     }
+                } catch (e) {
+                    // Skip selectors that cause errors
+                    console.warn(`Selector "${selector}" caused error:`, e);
                 }
             }
             
@@ -358,7 +586,7 @@ async function getPageContent() {
                     current.score > prev.score ? current : prev
                 );
                 mainContent = bestCandidate.element;
-                console.log(`Found content using selector: ${bestCandidate.selector} (score: ${bestCandidate.score})`);
+                console.log(`Found content using selector: ${bestCandidate.selector} (score: ${bestCandidate.score}, length: ${bestCandidate.textLength})`);
             }
             
             if (mainContent) {
@@ -369,47 +597,133 @@ async function getPageContent() {
                     content = mainContent.textContent || mainContent.innerText || '';
                 }
             } else {
-                console.log("No main content found, using body fallback");
-                if (useMarkdownConversion) {
-                    // Create a clone of the body to modify
-                    const bodyClone = document.body.cloneNode(true);
+                console.log("No main content found, trying WordPress fallback");
+                
+                // Try WordPress-specific fallback selectors
+                const wpFallbackSelectors = [
+                    '.post .entry-content',
+                    '.single .entry-content',
+                    '.hentry .entry-content',
+                    '.type-post .entry-content',
+                    '.entry-content',
+                    '.post-content',
+                    '.post-body',
+                    '.content-area',
+                    '.site-content',
+                    '.primary-content',
+                    '.main-content',
+                    '.content',
+                    '.post',
+                    '.single-post',
+                    '.hentry',
+                    'article'
+                ];
+                
+                for (const selector of wpFallbackSelectors) {
+                    try {
+                        const wpElement = document.querySelector(selector);
+                        if (wpElement) {
+                            const wpTextLength = (wpElement.textContent || '').trim().length;
+                            if (wpTextLength >= 100) {
+                                console.log(`Found WordPress content using fallback selector: ${selector} (length: ${wpTextLength})`);
+                                mainContent = wpElement;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn(`WordPress fallback selector "${selector}" caused error:`, e);
+                    }
+                }
+                
+                if (mainContent) {
+                    if (useMarkdownConversion) {
+                        content = turndownService.turndown(mainContent.innerHTML);
+                    } else {
+                        content = mainContent.textContent || mainContent.innerText || '';
+                    }
+                } else {
+                    console.log("WordPress fallback failed, using enhanced body fallback");
+                    if (useMarkdownConversion) {
+                        // Create a clone of the body to modify
+                        const bodyClone = document.body.cloneNode(true);
                     
-                    // Remove obvious non-content elements
+                    // Remove obvious non-content elements for fallback
                     const elementsToRemove = bodyClone.querySelectorAll([
+                        // Images and media
+                        'img', 'picture', 'figure', 'figcaption',
+                        '.image', '.img', '.photo', '.picture', '.gallery',
+                        '.slideshow', '.carousel', '.lightbox', '.media',
+                        '.caption', '.image-caption', '.photo-caption', '.media-caption',
+                        '.image-credit', '.photo-credit', '.media-credit',
+                        '.image-container', '.photo-container', '.media-container',
+                        // Bottom-of-article content
+                        '.bottom-of-article', '.article-bottom', '.story-bottom',
+                        '.article-footer', '.story-footer', '.post-footer',
+                        '.author-info', '.author-bio', '.author-details', '.author-section',
+                        '.byline', '.byline-info', '.contributors', '.contributor-info',
+                        '.see-more-on', '.more-on', '.topics-covered', '.story-topics',
+                        '.share-article', '.share-story', '.share-full-article',
+                        '.article-sharing', '.story-sharing', '.share-this-article',
+                        '.article-tools', '.story-tools', '.content-tools',
+                        '.about-author', '.author-profile', '.writer-bio',
+                        // Structure elements
                         'nav', 'header', 'footer', 'aside',
                         '.nav', '.navigation', '.header', '.footer', '.sidebar',
-                        '.ad', '.ads', '.advertisement', '.social', '.share',
-                        '.comments', '.comment', '.related', '.newsletter',
+                        '.menu', '.breadcrumb', '.breadcrumbs',
+                        '.ad', '.ads', '.advertisement', '.promo', '.promotion',
+                        '.social', '.share', '.sharing', '.social-share', '.share-buttons',
+                        '.comments', '.comment', '.comments-section',
+                        '.newsletter', '.subscription', '.newsletter-signup',
+                        '.related-articles', '.recommended-articles', '.more-stories',
+                        '.trending-now', '.popular-stories', '.widget', '.rail',
+                        '.secondary', '.supplementary', '.popup', '.modal',
+                        '.overlay', '.banner', '.cookie', '.privacy', '.gdpr',
                         '#nav', '#navigation', '#header', '#footer', '#sidebar',
-                        '#comments', '#social', '#ads'
+                        '#comments', '#social-sharing', '#ads', '#newsletter',
+                        'script', 'style', 'noscript'
                     ].join(', '));
                     
                     elementsToRemove.forEach(el => el.remove());
                     
-                    content = turndownService.turndown(bodyClone.innerHTML);
-                } else {
-                    content = document.body.textContent || document.body.innerText || '';
-                    // Limit content to avoid excessive text when using fallback
-                    content = content.substring(0, 5000);
+                        content = turndownService.turndown(bodyClone.innerHTML);
+                    } else {
+                        content = document.body.textContent || document.body.innerText || '';
+                        // More generous fallback length
+                        content = content.substring(0, 10000);
+                    }
                 }
             }
         }
 
-        // Universal content cleanup (handles both markdown and text)
+        // More gentle content cleanup (handles both markdown and text)
         content = content
             // Basic whitespace cleanup
             .replace(/\n\s*\n\s*\n/g, '\n\n')
             .replace(/ +/g, ' ')
             .trim()
-            // Remove common promotional content
-            .replace(/.*support.*donate.*today.*/gi, '')
-            .replace(/.*funded by.*donations.*/gi, '')
-            // Remove image credits 
-            .replace(/^\s*.*(Getty Images|Corbis|Photo credit|Image credit).*$/gm, '')
-            // Remove HTML artifacts (for fallback mode)
+            // Remove obvious promotional content - targeted approach
+            .replace(/.*click here to subscribe.*$/gim, '')
+            .replace(/.*sign up for our newsletter.*$/gim, '')
+            .replace(/.*download our app.*$/gim, '')
+            .replace(/.*get breaking news alerts.*$/gim, '')
+            .replace(/.*follow us on (twitter|facebook|instagram).*$/gim, '')
+            // Remove image credits that are clearly separate
+            .replace(/^\s*.*\(Getty Images\).*$/gm, '')
+            .replace(/^\s*.*\(AP Photo.*\).*$/gm, '')
+            .replace(/^\s*.*Photo credit:.*$/gm, '')
+            .replace(/^\s*.*Image credit:.*$/gm, '')
+            .replace(/^\s*.*\(Corbis\).*$/gm, '')
+            // Remove standalone promotional phrases (but not if part of larger content)
+            .replace(/^\s*subscribe today\s*$/gim, '')
+            .replace(/^\s*join our newsletter\s*$/gim, '')
+            .replace(/^\s*advertisement\s*$/gim, '')
+            .replace(/^\s*sponsored content\s*$/gim, '')
+            // Remove HTML artifacts (for fallback mode only)
             .replace(/<!--.*?-->/g, '')
-            .replace(/<[^>]*>/g, '')
-            .replace(/&[^;]+;/g, ' ')
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+            .replace(/&nbsp;/g, ' ')
+            .replace(/&[a-zA-Z]+;/g, ' ')
             // Final cleanup
             .replace(/\n\s*\n\s*\n/g, '\n\n')
             .trim();

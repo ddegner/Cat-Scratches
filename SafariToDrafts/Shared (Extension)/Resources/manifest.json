@@ -4,7 +4,9 @@
 
     "name": "__MSG_extension_name__",
     "description": "__MSG_extension_description__",
-    "version": "1.0",
+    "version": "0.5",
+    "author": "David Degner",
+    "homepage_url": "https://www.daviddegner.com",
 
     "icons": {
         "48": "images/icon-48.png",
@@ -45,7 +47,8 @@
     "permissions": [ 
         "activeTab",
         "scripting",
-        "tabs"
+        "tabs",
+        "storage"
     ],
 
     "host_permissions": [

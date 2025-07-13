@@ -2,6 +2,10 @@
 
 The fastest and most elegant way to capture content from the web and send it directly to the Drafts app, perfectly formatted and ready for action.
 
+**Author:** David Degner  
+**Website:** https://www.daviddegner.com  
+**Source Code, bugs, and feature requests:** https://github.com/ddegner/SafariToDrafts
+
 ## 🚀 Features
 
 ### Intelligent, Context-Aware Capture
@@ -71,4 +75,11 @@ Your captured content here, perfectly formatted in Markdown...
 
 ---
 
-*Built for speed, designed for elegance, optimized for your workflow.* 
+*Built for speed, designed for elegance, optimized for your workflow.*
+
+## 📞 Support
+
+For bug reports, feature requests, or contributions, please visit our [GitHub repository](https://github.com/ddegner/SafariToDrafts).
+
+**Author:** David Degner  
+**Website:** https://www.daviddegner.com 

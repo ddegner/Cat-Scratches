@@ -84,6 +84,20 @@
             margin-top: 8px;
             padding: 0 16px;
         }
+        
+        .info-section {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f0f8ff;
+            border-radius: 6px;
+            border-left: 3px solid #007AFF;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -102,6 +116,18 @@
             
             <div class="shortcut">
                 Press ⌘⇧D to capture without opening popup
+            </div>
+            
+            <div class="info-section" id="permissionInfo" style="display: none;">
+                <div class="info-text">
+                    💡 <strong>Tip:</strong> Enable on all websites in Safari → Settings → Extensions → SafariToDrafts → "Allow on Every Website"
+                </div>
+            </div>
+            
+            <div class="info-section" id="draftsPermissionInfo" style="display: block;">
+                <div class="info-text">
+                    📝 <strong>First time?</strong> macOS may ask permission to open Drafts. Click "Allow" and check "Remember my choice" to avoid future prompts.
+                </div>
             </div>
         </div>
     </div>

@@ -45,6 +45,9 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         }
         
         DispatchQueue.main.async {
+            // Log helpful message for users about the dialog
+            os_log("Opening Drafts app - you may see a dialog asking permission to open Drafts", type: .info)
+            
             if NSWorkspace.shared.open(draftsURL) {
                 os_log("Successfully opened Drafts URL", type: .debug)
             } else {

@@ -59,3 +59,9 @@ body.state-off :is(.state-on, .state-unknown) {
 button {
     font-size: 1em;
 }
+
+.big-button {
+    font-size: 1.2em;
+    padding: 12px 24px;
+    font-weight: 600;
+}
