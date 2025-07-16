@@ -1,17 +1,43 @@
 // Background script for SafariToDrafts extension
 // Handles keyboard shortcuts and toolbar button clicks
 
+// Global settings object
+let extensionSettings = null;
+
 // Listen for extension startup
 browser.runtime.onStartup.addListener(() => {
-    console.log('SafariToDrafts extension started');
+    loadExtensionSettings();
 });
 
 browser.runtime.onInstalled.addListener(() => {
-    console.log('SafariToDrafts extension installed');
-    
     // Check if we have permission to run on all websites
     checkPermissions();
+
+    // Load settings
+    loadExtensionSettings();
 });
+
+// Listen for settings changes
+browser.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.safariToDraftsSettings) {
+        extensionSettings = changes.safariToDraftsSettings.newValue;
+    }
+});
+
+// Function to load extension settings from storage
+async function loadExtensionSettings() {
+    try {
+        const result = await browser.storage.local.get(['safariToDraftsSettings']);
+        if (result.safariToDraftsSettings) {
+            extensionSettings = result.safariToDraftsSettings;
+        } else {
+            extensionSettings = null;
+        }
+    } catch (error) {
+        console.error('Failed to load extension settings:', error);
+        extensionSettings = null;
+    }
+}
 
 // Function to check and request permissions
 async function checkPermissions() {
@@ -21,18 +47,22 @@ async function checkPermissions() {
         const hasPermission = await browser.permissions.contains({
             origins: ["<all_urls>"]
         });
-        
+
         if (!hasPermission) {
-            console.log('Extension does not have permission to run on all websites');
             // Note: Safari doesn't support requesting permissions programmatically
             // Users must manually enable in Safari settings
         }
     } catch (error) {
-        console.log('Permission check not supported in Safari');
+        // Permission check not supported in Safari
     }
 }
 
-// Listen for popup messages
+// Listen for toolbar button clicks
+browser.action.onClicked.addListener(async (tab) => {
+    await createDraftFromCurrentTab();
+});
+
+// Listen for messages (keeping for settings page communication)
 browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.action === 'captureContent') {
         await createDraftFromCurrentTab();
@@ -43,17 +73,7 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
 });
 
-// Increment usage count for tip management
-async function incrementUsageCount() {
-    try {
-        const result = await browser.storage.local.get(['usageCount']);
-        const usageCount = (result.usageCount || 0) + 1;
-        await browser.storage.local.set({ usageCount });
-    } catch (error) {
-        // If storage isn't available, that's okay
-        console.log('Storage not available for usage tracking');
-    }
-}
+
 
 // Listen for command (keyboard shortcut)
 browser.commands.onCommand.addListener(async (command) => {
@@ -68,7 +88,7 @@ async function createDraftFromCurrentTab() {
     try {
         // Get the active tab
         const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
-        
+
         if (!activeTab) {
             console.error("No active tab found");
             return;
@@ -84,17 +104,14 @@ async function createDraftFromCurrentTab() {
             const pageData = results[0].result;
             const isSelection = pageData.source === 'selection';
             await createDraft(pageData.title, pageData.url, pageData.body, isSelection);
-            
-            // Track usage for tip management
-            await incrementUsageCount();
         }
     } catch (error) {
         console.error("Error creating draft:", error);
-        
+
         // Check if this is a permission error
         if (error.message && error.message.includes('permission')) {
-            console.log("Permission denied - user needs to enable extension for this website");
-            console.log("To enable on all websites: Safari → Settings → Extensions → SafariToDrafts → Allow on Every Website");
+            // Permission denied - user needs to enable extension for this website
+            // To enable on all websites: Safari → Settings → Extensions → SafariToDrafts → Allow on Every Website
         }
     }
 }
@@ -104,7 +121,7 @@ async function getPageContent() {
     // Try to initialize Turndown for markdown conversion with fallback
     let turndownService = null;
     let useMarkdownConversion = false;
-    
+
     try {
         if (typeof TurndownService !== 'undefined') {
             turndownService = new TurndownService({
@@ -114,25 +131,26 @@ async function getPageContent() {
                 codeBlockStyle: 'fenced',
                 linkStyle: 'inline'
             });
-            
+
             // Add custom rules to filter out unwanted elements - now less aggressive
             turndownService.addRule('removeUnwanted', {
-                filter: function (node) {
+                filter: function(node) {
                     // Remove only obvious non-content elements
                     if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE' || node.nodeName === 'NOSCRIPT') {
                         return true;
                     }
-                    
-                    // Remove images and image-related elements
-                    if (node.nodeName === 'IMG' || node.nodeName === 'PICTURE' || node.nodeName === 'FIGURE') {
+
+                    // Check settings to see if we should remove images
+                    const shouldRemoveImages = !extensionSettings?.contentExtraction?.removeImages === false;
+                    if (shouldRemoveImages && (node.nodeName === 'IMG' || node.nodeName === 'PICTURE' || node.nodeName === 'FIGURE')) {
                         return true;
                     }
-                    
+
                     // Remove figcaptions (image captions)
                     if (node.nodeName === 'FIGCAPTION') {
                         return true;
                     }
-                    
+
                     // Remove links to images
                     if (node.nodeName === 'A' && node.getAttribute('href')) {
                         const href = node.getAttribute('href').toLowerCase();
@@ -140,210 +158,75 @@ async function getPageContent() {
                             return true;
                         }
                     }
-                    
+
                     // Get node attributes for analysis (safely handle different types)
                     const className = (node.className ? String(node.className) : '').toLowerCase();
                     const id = (node.id ? String(node.id) : '').toLowerCase();
                     const tagName = node.tagName?.toLowerCase() || '';
-                    
-                    // Comprehensive but targeted filtering patterns
+
+                    // More conservative filtering patterns - only obvious non-content
                     const unwantedPatterns = [
-                        // Navigation and page structure
-                        'nav', 'header', 'footer', 'aside', 'menu', 'breadcrumb',
-                        'navigation', 'main-nav', 'primary-nav', 'site-nav',
-                        'main-header', 'site-header', 'page-header',
-                        'main-footer', 'site-footer', 'page-footer',
-                        
-                        // WordPress-specific unwanted patterns
-                        'wp-admin', 'wp-login', 'wp-json', 'wp-includes',
-                        'wp-content-plugins', 'wp-sidebar', 'wp-widget',
-                        'wp-calendar', 'wp-tag-cloud', 'wp-recent-posts',
-                        'wp-recent-comments', 'wp-archives', 'wp-categories',
-                        'wp-meta', 'wp-search', 'wp-links', 'wp-rss',
-                        'widget-area', 'sidebar-', 'wp-block-latest-posts',
-                        'wp-block-latest-comments', 'wp-block-archives',
-                        'wp-block-categories', 'wp-block-tag-cloud',
-                        'entry-meta', 'post-meta', 'wp-post-meta',
-                        'entry-footer', 'post-footer', 'wp-post-footer',
-                        'post-navigation', 'nav-links', 'wp-prev-next',
-                        
-                        // Images and media
-                        'image', 'img', 'photo', 'picture', 'gallery', 'slideshow',
-                        'carousel', 'lightbox', 'media', 'video', 'audio',
-                        'caption', 'image-caption', 'photo-caption', 'media-caption',
-                        'image-credit', 'photo-credit', 'media-credit',
-                        
-                        // Bottom-of-article content (NYTimes and others)
-                        'bottom-of-article', 'article-bottom', 'story-bottom',
-                        'article-footer', 'story-footer', 'post-footer',
-                        'article-end', 'story-end', 'content-end',
-                        'author-info', 'author-bio', 'author-details', 'author-section',
-                        'byline', 'byline-info', 'contributors', 'contributor-info',
-                        'see-more-on', 'more-on', 'topics-covered', 'story-topics',
-                        'share-article', 'share-story', 'share-full-article',
-                        'article-sharing', 'story-sharing', 'share-this-article',
-                        'article-tools', 'story-tools', 'content-tools',
-                        'about-author', 'author-profile', 'writer-bio',
-                        
-                        // Ads and promotions  
-                        'ad', 'ads', 'advertisement', 'advertising', 'sponsor', 'sponsored',
-                        'promo', 'promotion', 'promotional', 'banner', 'popup', 'modal',
-                        'overlay', 'interstitial', 'affiliate', 'marketing',
-                        'google-ad', 'doubleclick', 'adsystem', 'ad-container', 
-                        'ad-wrapper', 'ad-placement', 'sponsored-content', 'native-ad',
-                        
-                        // Social sharing and engagement
-                        'social', 'share', 'sharing', 'follow', 'subscribe', 'newsletter',
-                        'signup', 'join', 'login', 'register', 'social-share', 
-                        'share-buttons', 'sharing-buttons', 'social-links', 'follow-buttons',
-                        
-                        // Comments and user content
-                        'comment', 'comments', 'discussion', 'reply', 'replies',
+                        // Navigation and structure (only obvious ones)
+                        'nav-', 'navigation-', 'header-', 'footer-', 'sidebar-',
+                        'menu-', 'breadcrumb-',
+
+                        // WordPress specific (only obvious ones)
+                        'wp-admin', 'wp-sidebar', 'wp-widget', 'wp-meta',
+
+                        // Ads and promotions (only obvious ones)
+                        'advertisement', 'google-ad', 'doubleclick', 'adsystem', 
+                        'ad-container', 'ad-wrapper', 'sponsored-content',
+
+                        // Social sharing (only obvious ones)
+                        'share-buttons', 'sharing-buttons', 'social-share',
+                        'follow-buttons',
+
+                        // Comments (only obvious ones)
                         'comments-section', 'comment-form', 'disqus',
-                        
-                        // Related content (be selective - only obvious non-article patterns)
-                        'related-articles', 'recommended-articles', 'more-stories',
-                        'trending-now', 'popular-stories', 'you-might-like',
-                        'also-read', 'next-read', 'read-more', 'read-next', 'up-next',
-                        'more-from',
-                        
-                        // Widgets and sidebars
-                        'widget', 'sidebar', 'rail', 'secondary',
-                        'supplementary', 'extras',
-                        
-                        // Newsletter and subscription specific
+
+                        // Newsletter and subscription (only obvious ones)
                         'newsletter-signup', 'email-signup', 'subscription-form',
                         'newsletter-promo', 'subscription-nag',
-                        
-                        // Cookie and privacy notices
-                        'cookie', 'privacy', 'gdpr', 'consent',
+
+                        // Cookie and privacy notices (only obvious ones)
                         'cookie-banner', 'privacy-notice', 'gdpr-notice', 'consent-banner'
-                        
-                        // Note: Removed overly broad paywall patterns like 'premium', 'member-only'
-                        // as these might appear in legitimate article content
                     ];
-                    
+
                     // Check class names and IDs against patterns
                     for (const pattern of unwantedPatterns) {
                         if (className.includes(pattern) || id.includes(pattern)) {
                             return true;
                         }
                     }
-                    
-                    // Remove specific problematic selectors - comprehensive but targeted
+
+                    // Very conservative unwanted selectors - only obvious non-content
                     const unwantedSelectors = [
-                        // Images and media elements
-                        'img', 'picture', 'figure', 'figcaption',
-                        '.image', '.img', '.photo', '.picture', '.gallery',
-                        '.slideshow', '.carousel', '.lightbox', '.media',
-                        '.caption', '.image-caption', '.photo-caption', '.media-caption',
-                        '.image-credit', '.photo-credit', '.media-credit',
-                        '.image-container', '.photo-container', '.media-container',
+                        // Only the most obvious structural elements
+                        'nav', 'header', 'footer',
                         
-                        // Bottom-of-article content (NYTimes and others)
-                        '.bottom-of-article', '.article-bottom', '.story-bottom',
-                        '.article-footer', '.story-footer', '.post-footer',
-                        '.article-end', '.story-end', '.content-end',
-                        '.author-info', '.author-bio', '.author-details', '.author-section',
-                        '.byline', '.byline-info', '.contributors', '.contributor-info',
-                        '.see-more-on', '.more-on', '.topics-covered', '.story-topics',
-                        '.share-article', '.share-story', '.share-full-article',
-                        '.article-sharing', '.story-sharing', '.share-this-article',
-                        '.article-tools', '.story-tools', '.content-tools',
-                        '.about-author', '.author-profile', '.writer-bio',
-                        
-                        // Semantic elements often used for non-content
-                        'nav', 'header', 'footer', 'aside',
-                        
-                        // Common class patterns for navigation and structure
-                        '.nav', '.navigation', '.header', '.footer', '.sidebar',
-                        '.menu', '.breadcrumb', '.breadcrumbs',
-                        
-                        // WordPress-specific unwanted selectors
-                        '.wp-admin', '.wp-login', '.wp-json', '.wp-includes',
-                        '.wp-sidebar', '.wp-widget-area', '.widget-area',
-                        '.wp-calendar', '.wp-tag-cloud', '.wp-recent-posts',
-                        '.wp-recent-comments', '.wp-archives', '.wp-categories',
-                        '.wp-meta', '.wp-search', '.wp-links', '.wp-rss',
-                        '.sidebar-', '.widget-', '.wp-block-latest-posts',
-                        '.wp-block-latest-comments', '.wp-block-archives',
-                        '.wp-block-categories', '.wp-block-tag-cloud',
-                        '.entry-meta', '.post-meta', '.wp-post-meta',
-                        '.entry-footer', '.post-footer', '.wp-post-footer',
-                        '.post-navigation', '.nav-links', '.wp-prev-next',
-                        '.post-tags', '.entry-tags', '.wp-block-tag-cloud',
-                        '.related-posts', '.wp-block-latest-posts',
-                        '.comment-navigation', '.comment-meta', '.comment-form',
-                        '.trackback', '.pingback', '.wp-block-comments',
-                        
-                        // Ad patterns
-                        '.ad', '.ads', '.advertisement', '.promo', '.promotion',
-                        '.google-ad', '.amazon-ad', '.taboola', '.outbrain',
-                        '.doubleclick', '.adsystem', '.adnxs', '.revcontent',
-                        '.content-ad', '.native-ad', '.sponsored-content',
-                        
-                        // Social and sharing
-                        '.social', '.share', '.sharing', '.comments', '.comment',
-                        '.social-share', '.share-buttons', '.sharing-buttons',
-                        '.follow', '.follow-buttons', '.social-links',
-                        
-                        // Newsletters and subscriptions
-                        '.newsletter', '.subscription', '.signup', '.newsletter-signup',
-                        '.email-signup', '.subscription-form', '.newsletter-promo',
-                        '.subscription-nag',
-                        
-                        // Related content (specific patterns)
-                        '.related', '.related-articles', '.recommended-articles', '.more-stories',
-                        '.trending-now', '.popular-stories', '.you-might-like',
-                        '.also-read', '.read-more', '.up-next', '.more-from',
-                        
-                        // Widgets and extras
-                        '.widget', '.rail', '.secondary', '.supplementary',
-                        '.popup', '.modal', '.overlay', '.banner',
-                        
-                        // Author and meta info that's not part of article
-                        '.author-bio', '.byline-extra', '.article-meta', '.post-meta',
-                        '.tags', '.categories', '.filed-under', '.topics',
-                        
-                        // Cookie and privacy
-                        '.cookie', '.privacy', '.gdpr', '.consent',
-                        '.cookie-banner', '.privacy-notice', '.gdpr-notice',
-                        
-                        // Donation and support (but keep general, less specific)
-                        '.donate', '.donation', '.support', '.funding', '.membership',
-                        '.contribution', '.patron', '.sustain', '.pledge',
-                        
-                        // ID patterns
-                        '#nav', '#navigation', '#header', '#footer', '#sidebar',
-                        '#comments', '#related', '#recommendations', '#newsletter',
-                        '#social', '#share', '#ads', '#advertisement', '#promo',
-                        '#trending', '#popular', '#suggested', '#widget',
-                        '#author-bio', '#tags', '#categories',
-                        
-                        // Role attributes
-                        '[role="navigation"]', '[role="banner"]', '[role="contentinfo"]',
-                        '[role="complementary"]', '[role="advertisement"]',
-                        
-                        // Data attributes commonly used for ads
-                        '[data-ad]', '[data-advertisement]', '[data-sponsored]',
-                        '[data-promo]', '[data-widget]', '[data-module="ads"]',
-                        '[data-ad-type]',
-                        
-                        // NYTimes-specific recirculation and bottom content
-                        '#bottom-sheet-sensor',
-                        '[data-testid="recirculation"]',
-                        '[data-testid="recirc-package"]',
-                        '[data-testid="recirc-rightrail"]',
-                        '[data-testid="recirc-item"]',
-                        '.duet--ledes--standard-lede',
-                        
-                        // Schema.org and JSON-LD (only if obviously not content)
-                        'script[type="application/ld+json"]'
-                        
-                        // Note: Removed overly specific paywall selectors that might catch
-                        // legitimate premium content sections
+                        // Only obvious ads
+                        '.google-ad', '.taboola', '.outbrain',
+                        '.advertisement', '.sponsored-content',
+
+                        // Only obvious social/sharing widgets
+                        '.share-buttons', '.social-share',
+
+                        // Only obvious comment forms
+                        '.comment-form', '.disqus',
+
+                        // Only obvious popups/modals
+                        '.popup', '.modal', '.overlay',
+
+                        // Only obvious cookie banners
+                        '.cookie-banner', '.privacy-notice',
+
+                        // Role attributes for ads only
+                        '[role="advertisement"]',
+
+                        // Data attributes for ads only
+                        '[data-ad]', '[data-advertisement]'
                     ];
-                    
+
                     for (const selector of unwantedSelectors) {
                         try {
                             if (node.matches && node.matches(selector)) {
@@ -353,13 +236,13 @@ async function getPageContent() {
                             // Ignore selector errors
                         }
                     }
-                    
+
                     // Remove elements with JSON-LD that are not article content
-                    if (node.getAttribute && 
+                    if (node.getAttribute &&
                         node.getAttribute('type') === 'application/ld+json') {
                         return true;
                     }
-                    
+
                     // Less aggressive text content analysis - only for very short elements
                     const textContent = (node.textContent ? String(node.textContent) : '').toLowerCase().trim();
                     if (textContent && textContent.length < 100 && textContent.length > 10) {
@@ -368,33 +251,34 @@ async function getPageContent() {
                             'follow us on', 'download our app', 'get breaking news',
                             'advertisement', 'sponsored by', 'affiliate link'
                         ];
-                        
+
                         for (const phrase of obviousPromotional) {
                             if (textContent.includes(phrase)) {
                                 return true;
                             }
                         }
                     }
-                    
+
                     return false;
                 },
-                replacement: function () {
+                replacement: function() {
                     return '';
                 }
             });
-            
-            // Add rule to completely remove images and media
-            turndownService.addRule('removeImages', {
-                filter: ['img', 'picture', 'figure', 'figcaption', 'video', 'audio', 'source'],
-                replacement: function () {
-                    return '';
-                }
-            });
-            
+
+            // Add rule to completely remove images and media (if enabled in settings)
+            if (extensionSettings?.contentExtraction?.removeImages !== false) {
+                turndownService.addRule('removeImages', {
+                    filter: ['img', 'picture', 'figure', 'figcaption', 'video', 'audio', 'source'],
+                    replacement: function() {
+                        return '';
+                    }
+                });
+            }
+
             useMarkdownConversion = true;
-            console.log("TurndownService initialized successfully");
         } else {
-            console.warn("TurndownService not available, using fallback text extraction");
+            // TurndownService not available, using fallback text extraction
         }
     } catch (error) {
         console.error("Failed to initialize TurndownService:", error);
@@ -419,112 +303,70 @@ async function getPageContent() {
         } else {
             // Enhanced smart content extraction for full page
             let mainContent = null;
-            
-            // Expanded and more aggressive content selectors
-            const contentSelectors = [
-                // High-priority semantic HTML5 and Schema.org
-                'article[role="main"]',
+
+            // Get content selectors from settings or use defaults
+            const contentSelectors = extensionSettings?.contentExtraction?.customSelectors || [
+                // Schema.org structured data (highest priority)
                 '[itemtype*="Article"]',
-                '[itemtype*="BlogPosting"]', 
+                '[itemtype*="BlogPosting"]',
                 '[itemtype*="NewsArticle"]',
+                
+                // Semantic HTML5
+                'article[role="main"]',
+                'main[role="main"]',
                 'article',
                 'main',
                 '[role="main"]',
-                '[role="article"]',
-                
-                // WordPress-specific patterns (high priority)
+
+                // WordPress (most common CMS)
                 '.single-post .entry-content',
                 '.post .entry-content',
-                '.single .entry-content',
-                '.type-post .entry-content',
-                '.blog-post .entry-content',
+                '.hentry .entry-content',
                 '.wp-block-post-content',
                 '.entry-content',
                 '.post-content',
-                '.post-body',
-                '.post-text',
-                '.entry-text',
-                '.entry-body',
-                '.content-area article',
-                '.hentry .entry-content',
-                '.single-post-content',
-                '.blog-content',
-                '.post-wrapper .entry-content',
-                '.entry-wrapper .entry-content',
-                
-                // News-specific patterns (more comprehensive)
-                '.article-content',
-                '.story-content', 
+
+                // Major news sites and policy sites
                 '.story-body',
                 '.article-body',
+                '.article-content',
                 '.content-body',
-                '.article-text',
-                '.story-text',
-                '.content-text',
-                '.article-inner',
-                '.story-inner',
-                '.content-inner',
-                
-                // Content wrappers and containers
-                '.content-main',
                 '.main-content',
+                '.commentary-content',
+                '.policy-content',
+
+                // Generic content selectors (broader matching)
+                '.blog-post',
+                '.content-main',
                 '.primary-content',
-                '.page-content',
-                '.site-content',
                 '.article-container',
-                '.story-container',
-                '.content-container',
-                '.post-container',
-                
-                // Blog and CMS patterns
+                '.content',
                 '.post',
                 '.entry',
-                '.blog-post',
-                '.single-post',
-                '.hentry',
-                '.post-body',
-                '.entry-body',
-                
-                // Generic content patterns
-                '.content',
-                '.text',
-                '.copy',
-                '.article-wrap',
-                '.entry-wrap',
-                '.content-wrap',
-                
-                // Container combinations (child selectors)
-                '.container article',
-                '.wrapper article', 
-                '.main article',
-                '.content article',
-                'article .text',
-                'main .content',
-                '.article .body',
-                '.story .body',
-                
-                // ID-based selectors (common patterns)
+                '.text-content',
+                '.body-content',
+
+                // ID-based selectors
                 '#article',
                 '#content',
                 '#main-content',
-                '#story',
                 '#post-content',
-                '#article-body',
-                
-                // More generic but targeted selectors
+
+                // Fallback selectors - more comprehensive
                 'section[class*="content"]',
                 'div[class*="article"]',
-                'div[class*="story"]',
+                'div[class*="content"]',
                 'div[class*="post"]',
-                
-                // Last resort: look for large text blocks
+                'div[class*="text"]',
                 'section',
-                '.section'
+                
+                // Very broad fallback - look for divs with substantial text content
+                'div'
             ];
-            
+
             // Collect all valid content candidates from all selectors with improved scoring
             let candidates = [];
-            
+
             for (const selector of contentSelectors) {
                 try {
                     const elements = document.querySelectorAll(selector);
@@ -532,37 +374,52 @@ async function getPageContent() {
                         // Evaluate each element found by this selector
                         for (const element of elements) {
                             const textLength = (element.textContent || '').trim().length;
-                            
-                            // More lenient minimum text length
-                            if (textLength >= 50) {
-                                // Calculate link ratio - less strict
+
+                            // Use minimum content length from settings - more lenient
+                            const minContentLength = extensionSettings?.advancedFiltering?.minContentLength || 100;
+                            if (textLength >= minContentLength) {
+                                // Calculate link ratio - more lenient
                                 const linkLength = Array.from(element.querySelectorAll('a'))
                                     .reduce((total, link) => total + (link.textContent || '').length, 0);
                                 const linkRatio = textLength > 0 ? linkLength / textLength : 1;
-                                
-                                // Allow up to 60% links (was 50%) and prioritize article content
-                                if (linkRatio < 0.6) {
+
+                                // Use max link ratio from settings - more lenient
+                                const maxLinkRatio = extensionSettings?.advancedFiltering?.maxLinkRatio || 0.8;
+                                if (linkRatio < maxLinkRatio) {
                                     // Enhanced scoring system
                                     let score = (contentSelectors.length - contentSelectors.indexOf(selector)) * 1000;
-                                    
+
                                     // Bonus points for semantic elements
                                     if (element.tagName === 'ARTICLE') score += 500;
                                     if (element.getAttribute('role') === 'main') score += 400;
                                     if (element.getAttribute('itemtype')) score += 300;
-                                    
+
                                     // Bonus for content-indicating classes/IDs
                                     const classAndId = ((element.className || '') + ' ' + (element.id || '')).toLowerCase();
                                     if (classAndId.includes('article')) score += 200;
                                     if (classAndId.includes('story')) score += 200;
                                     if (classAndId.includes('content')) score += 150;
                                     if (classAndId.includes('main')) score += 150;
-                                    
+                                    if (classAndId.includes('post')) score += 100;
+                                    if (classAndId.includes('text')) score += 100;
+
+                                    // Strong bonus for substantial text content
+                                    if (textLength > 1000) score += 500;
+                                    if (textLength > 2000) score += 1000;
+                                    if (textLength > 5000) score += 1500;
+
                                     // Text length bonus (but not overwhelming)
                                     score += Math.min(textLength / 10, 1000);
-                                    
-                                    // Penalty for excessive links
-                                    score -= linkRatio * 500;
-                                    
+
+                                    // Less harsh penalty for links
+                                    score -= linkRatio * 300;
+
+                                    // Penalty for elements that are likely navigation or metadata
+                                    if (classAndId.includes('nav') || classAndId.includes('menu') || 
+                                        classAndId.includes('header') || classAndId.includes('footer')) {
+                                        score -= 1000;
+                                    }
+
                                     candidates.push({
                                         element: element,
                                         selector: selector,
@@ -576,19 +433,17 @@ async function getPageContent() {
                     }
                 } catch (e) {
                     // Skip selectors that cause errors
-                    console.warn(`Selector "${selector}" caused error:`, e);
                 }
             }
-            
+
             // Pick the best candidate based on score
             if (candidates.length > 0) {
-                const bestCandidate = candidates.reduce((prev, current) => 
+                const bestCandidate = candidates.reduce((prev, current) =>
                     current.score > prev.score ? current : prev
                 );
                 mainContent = bestCandidate.element;
-                console.log(`Found content using selector: ${bestCandidate.selector} (score: ${bestCandidate.score}, length: ${bestCandidate.textLength})`);
             }
-            
+
             if (mainContent) {
                 if (useMarkdownConversion) {
                     content = turndownService.turndown(mainContent.innerHTML);
@@ -597,8 +452,8 @@ async function getPageContent() {
                     content = mainContent.textContent || mainContent.innerText || '';
                 }
             } else {
-                console.log("No main content found, trying WordPress fallback");
-                
+                // No main content found, trying WordPress fallback
+
                 // Try WordPress-specific fallback selectors
                 const wpFallbackSelectors = [
                     '.post .entry-content',
@@ -618,14 +473,13 @@ async function getPageContent() {
                     '.hentry',
                     'article'
                 ];
-                
+
                 for (const selector of wpFallbackSelectors) {
                     try {
                         const wpElement = document.querySelector(selector);
                         if (wpElement) {
                             const wpTextLength = (wpElement.textContent || '').trim().length;
                             if (wpTextLength >= 100) {
-                                console.log(`Found WordPress content using fallback selector: ${selector} (length: ${wpTextLength})`);
                                 mainContent = wpElement;
                                 break;
                             }
@@ -634,7 +488,7 @@ async function getPageContent() {
                         console.warn(`WordPress fallback selector "${selector}" caused error:`, e);
                     }
                 }
-                
+
                 if (mainContent) {
                     if (useMarkdownConversion) {
                         content = turndownService.turndown(mainContent.innerHTML);
@@ -642,49 +496,49 @@ async function getPageContent() {
                         content = mainContent.textContent || mainContent.innerText || '';
                     }
                 } else {
-                    console.log("WordPress fallback failed, using enhanced body fallback");
+                    // WordPress fallback failed, using enhanced body fallback
                     if (useMarkdownConversion) {
                         // Create a clone of the body to modify
                         const bodyClone = document.body.cloneNode(true);
-                    
-                    // Remove obvious non-content elements for fallback
-                    const elementsToRemove = bodyClone.querySelectorAll([
-                        // Images and media
-                        'img', 'picture', 'figure', 'figcaption',
-                        '.image', '.img', '.photo', '.picture', '.gallery',
-                        '.slideshow', '.carousel', '.lightbox', '.media',
-                        '.caption', '.image-caption', '.photo-caption', '.media-caption',
-                        '.image-credit', '.photo-credit', '.media-credit',
-                        '.image-container', '.photo-container', '.media-container',
-                        // Bottom-of-article content
-                        '.bottom-of-article', '.article-bottom', '.story-bottom',
-                        '.article-footer', '.story-footer', '.post-footer',
-                        '.author-info', '.author-bio', '.author-details', '.author-section',
-                        '.byline', '.byline-info', '.contributors', '.contributor-info',
-                        '.see-more-on', '.more-on', '.topics-covered', '.story-topics',
-                        '.share-article', '.share-story', '.share-full-article',
-                        '.article-sharing', '.story-sharing', '.share-this-article',
-                        '.article-tools', '.story-tools', '.content-tools',
-                        '.about-author', '.author-profile', '.writer-bio',
-                        // Structure elements
-                        'nav', 'header', 'footer', 'aside',
-                        '.nav', '.navigation', '.header', '.footer', '.sidebar',
-                        '.menu', '.breadcrumb', '.breadcrumbs',
-                        '.ad', '.ads', '.advertisement', '.promo', '.promotion',
-                        '.social', '.share', '.sharing', '.social-share', '.share-buttons',
-                        '.comments', '.comment', '.comments-section',
-                        '.newsletter', '.subscription', '.newsletter-signup',
-                        '.related-articles', '.recommended-articles', '.more-stories',
-                        '.trending-now', '.popular-stories', '.widget', '.rail',
-                        '.secondary', '.supplementary', '.popup', '.modal',
-                        '.overlay', '.banner', '.cookie', '.privacy', '.gdpr',
-                        '#nav', '#navigation', '#header', '#footer', '#sidebar',
-                        '#comments', '#social-sharing', '#ads', '#newsletter',
-                        'script', 'style', 'noscript'
-                    ].join(', '));
-                    
-                    elementsToRemove.forEach(el => el.remove());
-                    
+
+                        // Remove obvious non-content elements for fallback
+                        const elementsToRemove = bodyClone.querySelectorAll([
+                            // Images and media
+                            'img', 'picture', 'figure', 'figcaption',
+                            '.image', '.img', '.photo', '.picture', '.gallery',
+                            '.slideshow', '.carousel', '.lightbox', '.media',
+                            '.caption', '.image-caption', '.photo-caption', '.media-caption',
+                            '.image-credit', '.photo-credit', '.media-credit',
+                            '.image-container', '.photo-container', '.media-container',
+                            // Bottom-of-article content
+                            '.bottom-of-article', '.article-bottom', '.story-bottom',
+                            '.article-footer', '.story-footer', '.post-footer',
+                            '.author-info', '.author-bio', '.author-details', '.author-section',
+                            '.byline', '.byline-info', '.contributors', '.contributor-info',
+                            '.see-more-on', '.more-on', '.topics-covered', '.story-topics',
+                            '.share-article', '.share-story', '.share-full-article',
+                            '.article-sharing', '.story-sharing', '.share-this-article',
+                            '.article-tools', '.story-tools', '.content-tools',
+                            '.about-author', '.author-profile', '.writer-bio',
+                            // Structure elements
+                            'nav', 'header', 'footer', 'aside',
+                            '.nav', '.navigation', '.header', '.footer', '.sidebar',
+                            '.menu', '.breadcrumb', '.breadcrumbs',
+                            '.ad', '.ads', '.advertisement', '.promo', '.promotion',
+                            '.social', '.share', '.sharing', '.social-share', '.share-buttons',
+                            '.comments', '.comment', '.comments-section',
+                            '.newsletter', '.subscription', '.newsletter-signup',
+                            '.related-articles', '.recommended-articles', '.more-stories',
+                            '.trending-now', '.popular-stories', '.widget', '.rail',
+                            '.secondary', '.supplementary', '.popup', '.modal',
+                            '.overlay', '.banner', '.cookie', '.privacy', '.gdpr',
+                            '#nav', '#navigation', '#header', '#footer', '#sidebar',
+                            '#comments', '#social-sharing', '#ads', '#newsletter',
+                            'script', 'style', 'noscript'
+                        ].join(', '));
+
+                        elementsToRemove.forEach(el => el.remove());
+
                         content = turndownService.turndown(bodyClone.innerHTML);
                     } else {
                         content = document.body.textContent || document.body.innerText || '';
@@ -734,11 +588,11 @@ async function getPageContent() {
             body: content || 'No content extracted',
             source: selectionSource
         };
-        
+
     } catch (error) {
         console.error("Error in content extraction:", error);
         return {
-            title: document.title || 'Untitled', 
+            title: document.title || 'Untitled',
             url: window.location.href,
             body: 'Content extraction failed: ' + error.message,
             source: 'error'
@@ -747,19 +601,14 @@ async function getPageContent() {
 }
 
 async function createDraft(title, url, markdownBody, isSelection = false) {
-    // Debug logging
-    console.log("Creating draft for:", title);
-    console.log("URL:", url);
-    console.log("Content length:", markdownBody.length);
-    console.log("Is selection:", isSelection);
 
-    // Draft format: Title as header, URL as markdown link, then content
-    const draftContent = `# ${title}\n\n[${url}](${url})\n\n${markdownBody}`;
+    // Format draft content using settings
+    const draftContent = formatDraftContent(title, url, markdownBody, isSelection);
 
     // URL encode the content for the Drafts URL scheme
     const encodedContent = encodeURIComponent(draftContent);
     const draftsURL = `drafts://x-callback-url/create?text=${encodedContent}`;
-    
+
     // Debug logging
     console.log("Draft content length:", draftContent.length);
     console.log("Drafts URL length:", draftsURL.length);
@@ -767,57 +616,117 @@ async function createDraft(title, url, markdownBody, isSelection = false) {
     try {
         // Get the active tab
         const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
-        
+
         if (activeTab) {
             // Store the current URL so we can navigate back
             const currentURL = activeTab.url;
-            
+
             // Execute the URL scheme by navigating to it
             await browser.scripting.executeScript({
                 target: { tabId: activeTab.id },
                 func: function(draftsUrl, originalUrl) {
-                    console.log("Attempting to navigate to Drafts URL...");
-                    
                     // Navigate to the Drafts URL
                     window.location.href = draftsUrl;
-                    
+
                     // Set up a timer to navigate back to the original page
                     setTimeout(() => {
-                        console.log("Navigating back to original page...");
                         window.location.href = originalUrl;
                     }, 2000);
                 },
                 args: [draftsURL, currentURL]
             });
-            
-            console.log("Successfully executed navigation script");
+
+
         }
     } catch (error) {
         console.error("Failed to execute navigation script:", error);
-        
+
         // Fallback: try creating a new tab with the URL scheme
         try {
-            console.log("Trying fallback: creating new tab...");
-            const newTab = await browser.tabs.create({ 
-                url: draftsURL, 
-                active: false 
+            const newTab = await browser.tabs.create({
+                url: draftsURL,
+                active: false
             });
-            
+
             // Close the tab after a delay
             setTimeout(async () => {
                 try {
                     await browser.tabs.remove(newTab.id);
-                    console.log("Closed fallback tab");
                 } catch (e) {
-                    console.log("Could not close fallback tab:", e);
+                    // Could not close fallback tab
                 }
             }, 1500);
-            
+
         } catch (fallbackError) {
             console.error("Fallback method also failed:", fallbackError);
-            
+
             // Show user a message if all methods fail
             alert("Could not open Drafts. Please ensure Drafts is installed and try again.");
         }
     }
 }
+
+// Format draft content according to user settings
+function formatDraftContent(title, url, content, isSelection = false) {
+        // Load settings with defaults
+        const outputFormat = extensionSettings?.outputFormat || {};
+
+        // Simple settings (fallback to defaults if not specified)
+        const titleFormat = 'h1'; // Always use h1 for simple settings
+        const includeSource = outputFormat.includeSource !== false;
+        const includeSeparator = true; // Always include separator for simple settings
+        const includeTimestamp = outputFormat.includeTimestamp || false;
+        const customTemplate = ''; // Don't use custom template for simple settings
+
+        // If custom template is provided, use it
+        if (customTemplate.trim()) {
+            const timestamp = new Date().toISOString();
+            return customTemplate
+                .replace('{title}', title)
+                .replace('{url}', url)
+                .replace('{content}', content)
+                .replace('{timestamp}', timestamp);
+        }
+
+        // Build content using standard format
+        let result = '';
+
+        // Add title if enabled
+        if (titleFormat !== 'none') {
+            switch (titleFormat) {
+                case 'h1':
+                    result += `# ${title}\n\n`;
+                    break;
+                case 'h2':
+                    result += `## ${title}\n\n`;
+                    break;
+                case 'h3':
+                    result += `### ${title}\n\n`;
+                    break;
+                case 'bold':
+                    result += `**${title}**\n\n`;
+                    break;
+            }
+        }
+
+        // Add source URL if enabled
+        if (includeSource) {
+            result += `**Source:** [${url}](${url})\n\n`;
+        }
+
+        // Add timestamp if enabled
+        if (includeTimestamp) {
+            const timestamp = new Date().toLocaleString();
+            result += `**Captured:** ${timestamp}\n\n`;
+        }
+
+        // Add separator if enabled
+        if (includeSeparator) {
+            result += '---\n\n';
+        }
+
+        // Add the main content
+        result += content;
+
+        return result;
+    }

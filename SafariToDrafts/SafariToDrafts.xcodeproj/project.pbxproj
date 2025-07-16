@@ -67,8 +67,9 @@
 				Resources/content.js,
 				Resources/images,
 				Resources/manifest.json,
-				Resources/popup.html,
-				Resources/popup.js,
+				Resources/settings.html,
+				Resources/settings.js,
+				Resources/turndown.js,
 				SafariWebExtensionHandler.swift,
 			);
 			target = 7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */;
@@ -113,20 +114,6 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		7F57149C2E0322670079AEB5 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F57149C2E0322670079AEB5 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F5714A82E0322670079AEB5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -310,7 +297,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.5;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -342,7 +329,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.5;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -377,7 +364,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.5;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -414,7 +401,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 0.5;
 				OTHER_LDFLAGS = (
 					"-framework",

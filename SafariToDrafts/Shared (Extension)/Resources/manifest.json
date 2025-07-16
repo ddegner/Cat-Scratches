@@ -1,13 +1,11 @@
 {
     "manifest_version": 3,
     "default_locale": "en",
-
     "name": "__MSG_extension_name__",
     "description": "__MSG_extension_description__",
     "version": "0.5",
     "author": "David Degner",
     "homepage_url": "https://www.daviddegner.com",
-
     "icons": {
         "48": "images/icon-48.png",
         "96": "images/icon-96.png",
@@ -15,25 +13,29 @@
         "256": "images/icon-256.png",
         "512": "images/icon-512.png"
     },
-
     "background": {
-        "scripts": [ "background.js" ],
+        "scripts": [
+            "background.js"
+        ],
         "persistent": false
     },
-
-    "content_scripts": [{
-        "js": [ "turndown.js", "content.js" ],
-        "matches": [ "<all_urls>" ],
-        "run_at": "document_end",
-        "all_frames": false
-    }],
-
+    "content_scripts": [
+        {
+            "js": [
+                "turndown.js",
+                "content.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ],
+            "run_at": "document_end",
+            "all_frames": false
+        }
+    ],
     "action": {
         "default_icon": "images/toolbar-icon.png",
-        "default_popup": "popup.html",
         "default_title": "SafariToDrafts - Capture content to Drafts"
     },
-
     "commands": {
         "create_draft_command": {
             "suggested_key": {
@@ -43,24 +45,31 @@
             "description": "Create Draft from Selection/Page"
         }
     },
-
-    "permissions": [ 
+    "permissions": [
         "activeTab",
         "scripting",
         "tabs",
         "storage"
     ],
-
     "host_permissions": [
         "<all_urls>"
     ],
-
-    "web_accessible_resources": [{
-        "resources": ["*"],
-        "matches": ["<all_urls>"]
-    }],
-
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "settings.html"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self'"
-    }
+    },
+    "options_ui": {
+        "page": "settings.html",
+        "open_in_tab": true
+    },
+    "options_page": "settings.html"
 }
