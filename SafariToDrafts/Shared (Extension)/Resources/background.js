@@ -97,7 +97,8 @@ async function createDraftFromCurrentTab() {
         // Execute content script to get page content
         const results = await browser.scripting.executeScript({
             target: { tabId: activeTab.id },
-            func: getPageContent
+            func: getPageContent,
+            args: [extensionSettings]
         });
 
         if (results && results[0] && results[0].result) {
@@ -117,7 +118,7 @@ async function createDraftFromCurrentTab() {
 }
 
 // Function that will be executed in the content script context
-async function getPageContent() {
+async function getPageContent(extensionSettings) {
     // Try to initialize Turndown for markdown conversion with fallback
     let turndownService = null;
     let useMarkdownConversion = false;

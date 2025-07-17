@@ -10,7 +10,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
             margin: 0;
             padding: 20px;
-            background: #f8f9fa;
+            background: #ffffff;
             color: #1d1d1f;
             line-height: 1.6;
         }
@@ -19,38 +19,22 @@
             max-width: 800px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #007AFF, #0056CC);
-            color: white;
-            padding: 24px;
-            text-align: center;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            padding: 20px 24px;
+            border-bottom: 1px solid #d1d1d6;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .header .icon {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 18px;
         }
 
         .content {
@@ -69,26 +53,10 @@
         }
 
         .section h2 {
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
             margin: 0 0 16px 0;
             color: #1d1d1f;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-icon {
-            width: 24px;
-            height: 24px;
-            background: #007AFF;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
         }
 
         .form-group {
@@ -118,8 +86,8 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #007AFF;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            border-color: #86868b;
+            box-shadow: 0 0 0 2px rgba(134, 134, 139, 0.2);
         }
 
         .form-group textarea {
@@ -189,31 +157,18 @@
             transition: all 0.2s ease;
         }
 
-        .button-primary {
-            background: #007AFF;
-            color: white;
-        }
-
-        .button-primary:hover {
-            background: #0056CC;
-        }
-
-        .button-secondary {
+        .button {
             background: #f1f1f1;
             color: #1d1d1f;
+            border: 1px solid #d1d1d6;
         }
 
-        .button-secondary:hover {
+        .button:hover {
             background: #e1e1e1;
         }
 
         .button-danger {
-            background: #ff3b30;
-            color: white;
-        }
-
-        .button-danger:hover {
-            background: #d70015;
+            color: #d70015;
         }
 
         .status-message {
@@ -242,43 +197,13 @@
             color: #004085;
             border: 1px solid #b8daff;
         }
-
-        .preset-selectors {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .preset-button {
-            padding: 8px 12px;
-            background: #f1f1f1;
-            border: 1px solid #d1d1d6;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .preset-button:hover {
-            background: #e1e1e1;
-        }
-
-        .preset-button.active {
-            background: #007AFF;
-            color: white;
-            border-color: #007AFF;
-        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <h1>
-                <div class="icon">⚙️</div>
-                SafariToDrafts Settings
-            </h1>
+            <h1>SafariToDrafts Settings</h1>
         </div>
 
         <div class="content">
@@ -286,10 +211,7 @@
 
             <!-- Keyboard Shortcut Section -->
             <div class="section">
-                <h2>
-                    <div class="section-icon">⌨️</div>
-                    Keyboard Shortcut
-                </h2>
+                <h2>Keyboard Shortcut</h2>
                 <div class="form-group">
                     <label for="shortcut">Capture Content Shortcut</label>
                     <div class="shortcut-input">
@@ -318,22 +240,156 @@
 
             <!-- Content Extraction Section -->
             <div class="section">
-                <h2>
-                    <div class="section-icon">📄</div>
-                    Content Extraction
-                </h2>
+                <h2>Content Extraction</h2>
 
                 <div class="form-group">
-                    <label>Content Selection Strategy</label>
-                    <div class="preset-selectors">
-                        <div class="preset-button" data-preset="default">
-                            <strong>Default</strong><br>
-                            <small>Optimized for major news sites & CMSs</small>
-                        </div>
-                        <div class="preset-button" data-preset="custom">
-                            <strong>Custom</strong><br>
-                            <small>Manual configuration</small>
-                        </div>
+                    <label for="contentSelectors">Content Selectors</label>
+                    <textarea id="contentSelectors"
+                        placeholder="Enter CSS selectors to find article content, one per line">[itemtype*="Article"]
+[itemtype*="NewsArticle"]
+article[role="main"]
+main[role="main"]
+[role="main"]
+.node-article
+.content
+.node-page
+.content
+.hentry
+.entry-content
+.hentry
+.entry-content
+.post
+.entry-content
+.post
+.entry-content
+.wp-block-post-content
+.single-post
+.entry-content
+.gh-content
+.kg-post
+.node
+.content
+article
+.post
+article
+.page
+.story-body
+.article-body
+.article-content
+.post-content
+.entry-content
+.content-body
+.main-content
+.postArticle-content
+.blog-post-content
+.content-area
+.primary-content
+.markup
+.content
+.post
+.entry
+.article
+article
+main</textarea>
+                    <div class="help-text">
+                        CSS selectors used to find article content. Higher priority selectors should be listed first.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="customFilters">Elements to Remove</label>
+                    <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line">nav
+header
+footer
+aside
+.nav
+.navigation
+.header
+#header
+.footer
+#footer
+.sidebar
+#sidebar
+.ad
+.ads
+.advert
+.advertisement
+.sponsored
+.banner
+[class*="ad-"]
+[id*="ad-"]
+div[data-ad-id]
+.social
+.share
+.sharing
+[class*="share-"]
+[class*="social-"]
+.comments
+#comments
+.comment
+.comment-list
+#disqus_thread
+[id*="comment"]
+.related
+.related-posts
+.recommended
+[class*="related"]
+.newsletter
+.subscription
+[class*="subscribe"]
+.popup
+.modal
+.overlay
+[role="dialog"]
+.cookie-notice
+.age-gate
+.age-verification
+form
+.pagination
+.pager
+[role="pagination"]
+.widget
+.widget-area
+#secondary
+#colophon
+[role="contentinfo"]
+.masthead
+#main-nav
+#topnav
+[role="navigation"]
+.byline
+.post-meta
+.entry-meta
+.author
+.dateline
+.submitted
+.combx
+.contact
+.foot
+.footnote
+.media
+.promo
+.scroll
+.shoutbox
+.shopping
+.tags
+.tool
+.ad-break
+.adbox
+.ad_wrapper
+.community
+.disqus
+.extra
+.entry-unrelated
+.menu
+.navbar
+.hidden
+.invisible
+.meta
+#outbrain</textarea>
+                    <div class="help-text">
+                        CSS selectors for unwanted elements like ads, navigation, and sidebars that should be removed
+                        from captured content.
                     </div>
                 </div>
 
@@ -344,71 +400,18 @@
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="removeAds" checked>
-                        <label for="removeAds">Remove advertisements and promotions</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="removeNavigation" checked>
-                        <label for="removeNavigation">Remove navigation and menus</label>
+                        <label for="removeAds">Remove ads and navigation</label>
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="removeComments" checked>
                         <label for="removeComments">Remove comments and social sharing</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="removeRelated" checked>
-                        <label for="removeRelated">Remove related articles and recommendations</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="contentSelectors">Content Selectors</label>
-                    <textarea id="contentSelectors"
-                        placeholder="Enter CSS selectors to find article content, one per line"></textarea>
-                    <div class="help-text">
-                        CSS selectors used to find article content. Higher priority selectors should be listed first.
-                        One selector per line (e.g., article, .article-content, main)
-                    </div>
-                </div>
-            </div>
-
-            <!-- Advanced Filtering Section -->
-            <div class="section">
-                <h2>
-                    <div class="section-icon">🔍</div>
-                    Advanced Filtering
-                </h2>
-
-                <div class="form-group">
-                    <label for="customFilters">Custom Filter Patterns</label>
-                    <textarea id="customFilters" placeholder="Enter CSS selectors to remove, one per line"></textarea>
-                    <div class="help-text">
-                        CSS selectors for elements to remove. One selector per line (e.g., .advertisement, #sidebar)
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="minContentLength">Minimum Content Length</label>
-                    <input type="number" id="minContentLength" min="0" value="100">
-                    <div class="help-text">
-                        Minimum number of characters required for content to be captured
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="maxLinkRatio">Maximum Link Ratio</label>
-                    <input type="range" id="maxLinkRatio" min="0" max="1" step="0.1" value="0.5">
-                    <div class="help-text">
-                        Maximum ratio of link text to total text (0.5 = 50% links allowed)
                     </div>
                 </div>
             </div>
 
             <!-- Output Format Section -->
             <div class="section">
-                <h2>
-                    <div class="section-icon">📝</div>
-                    Output Format
-                </h2>
+                <h2>Output Format</h2>
 
                 <div class="form-group">
                     <label for="titleFormat">Title Format</label>
@@ -450,14 +453,10 @@
             <!-- Actions -->
             <div class="button-group">
                 <button class="button button-danger" id="resetSettings">Reset to Defaults</button>
-                <button class="button button-secondary" id="exportSettings">Export Settings</button>
-                <button class="button button-secondary" id="importSettings">Import Settings</button>
-                <button class="button button-primary" id="saveSettings">Save Settings</button>
+                <button class="button" id="saveSettings">Save Settings</button>
             </div>
         </div>
     </div>
-
-    <input type="file" id="importFile" accept=".json" style="display: none;">
 
     <script src="settings.js"></script>
 </body>

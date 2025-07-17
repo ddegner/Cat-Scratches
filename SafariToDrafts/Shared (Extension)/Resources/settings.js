@@ -282,9 +282,7 @@ function setupEventListeners() {
     // Content extraction checkboxes
     document.getElementById('removeImages').addEventListener('change', updateContentExtractionFromUI);
     document.getElementById('removeAds').addEventListener('change', updateContentExtractionFromUI);
-    document.getElementById('removeNavigation').addEventListener('change', updateContentExtractionFromUI);
     document.getElementById('removeComments').addEventListener('change', updateContentExtractionFromUI);
-    document.getElementById('removeRelated').addEventListener('change', updateContentExtractionFromUI);
 
     // Content selectors textarea
     document.getElementById('contentSelectors').addEventListener('input', updateContentSelectorsFromUI);
@@ -296,19 +294,12 @@ function setupEventListeners() {
     document.getElementById('includeTimestamp').addEventListener('change', updateOutputFormatFromUI);
     document.getElementById('customTemplate').addEventListener('input', updateOutputFormatFromUI);
 
-    // Advanced filtering inputs
+    // Advanced filtering inputs (using customFilters from HTML)
     document.getElementById('customFilters').addEventListener('input', updateAdvancedFilteringFromUI);
-    document.getElementById('minContentLength').addEventListener('input', updateAdvancedFilteringFromUI);
-    document.getElementById('maxLinkRatio').addEventListener('input', updateAdvancedFilteringFromUI);
 
     // Action buttons
     document.getElementById('saveSettings').addEventListener('click', handleSaveSettings);
     document.getElementById('resetSettings').addEventListener('click', handleResetSettings);
-    document.getElementById('exportSettings').addEventListener('click', handleExportSettings);
-    document.getElementById('importSettings').addEventListener('click', handleImportSettings);
-
-    // Import file input
-    document.getElementById('importFile').addEventListener('change', handleFileImport);
 }
 
 // Update UI with current settings
@@ -321,9 +312,7 @@ function updateUI() {
     // Content extraction
     document.getElementById('removeImages').checked = currentSettings.contentExtraction.removeImages;
     document.getElementById('removeAds').checked = currentSettings.contentExtraction.removeAds;
-    document.getElementById('removeNavigation').checked = currentSettings.contentExtraction.removeNavigation;
     document.getElementById('removeComments').checked = currentSettings.contentExtraction.removeComments;
-    document.getElementById('removeRelated').checked = currentSettings.contentExtraction.removeRelated;
 
     // Update content selectors textarea
     updateContentSelectorsUI();
@@ -337,8 +326,6 @@ function updateUI() {
 
     // Advanced filtering
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
-    document.getElementById('minContentLength').value = currentSettings.advancedFiltering.minContentLength;
-    document.getElementById('maxLinkRatio').value = currentSettings.advancedFiltering.maxLinkRatio;
 }
 
 // Update preset selection UI
@@ -411,9 +398,7 @@ function updateShortcutFromUI() {
 function updateContentExtractionFromUI() {
     currentSettings.contentExtraction.removeImages = document.getElementById('removeImages').checked;
     currentSettings.contentExtraction.removeAds = document.getElementById('removeAds').checked;
-    currentSettings.contentExtraction.removeNavigation = document.getElementById('removeNavigation').checked;
     currentSettings.contentExtraction.removeComments = document.getElementById('removeComments').checked;
-    currentSettings.contentExtraction.removeRelated = document.getElementById('removeRelated').checked;
 
     // When user changes settings, switch to custom preset
     currentSettings.contentExtraction.strategy = 'custom';
@@ -452,8 +437,6 @@ function updateAdvancedFilteringFromUI() {
         .filter(line => line);
 
     currentSettings.advancedFiltering.customFilters = customFilters;
-    currentSettings.advancedFiltering.minContentLength = parseInt(document.getElementById('minContentLength').value);
-    currentSettings.advancedFiltering.maxLinkRatio = parseFloat(document.getElementById('maxLinkRatio').value);
 }
 
 // Handle save settings
@@ -587,7 +570,49 @@ function showStatus(message, type) {
     }, timeout);
 }
 
-// Safari Web Extension API polyfill
-if (typeof browser === 'undefined' && typeof chrome !== 'undefined') {
-    window.browser = chrome;
+// Safari Web Extension API polyfill and fallback
+if (typeof browser === 'undefined') {
+    if (typeof chrome !== 'undefined') {
+        window.browser = chrome;
+    } else {
+        // Create a minimal polyfill for Safari
+        window.browser = {
+            storage: {
+                local: {
+                    get: async function(keys) {
+                        try {
+                            const result = {};
+                            if (Array.isArray(keys)) {
+                                keys.forEach(key => {
+                                    const value = localStorage.getItem(key);
+                                    if (value) {
+                                        result[key] = JSON.parse(value);
+                                    }
+                                });
+                            } else if (typeof keys === 'object') {
+                                for (const key in keys) {
+                                    const value = localStorage.getItem(key);
+                                    result[key] = value ? JSON.parse(value) : keys[key];
+                                }
+                            }
+                            return result;
+                        } catch (error) {
+                            console.error('Storage get error:', error);
+                            return {};
+                        }
+                    },
+                    set: async function(items) {
+                        try {
+                            for (const key in items) {
+                                localStorage.setItem(key, JSON.stringify(items[key]));
+                            }
+                        } catch (error) {
+                            console.error('Storage set error:', error);
+                            throw error;
+                        }
+                    }
+                }
+            }
+        };
+    }
 }

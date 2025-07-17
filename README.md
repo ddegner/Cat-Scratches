@@ -44,16 +44,25 @@ Your captured content here, perfectly formatted in Markdown...
 
 1. **Install the Extension**: Build and install the Safari extension from Xcode
 2. **Enable in Safari**: Go to Safari → Settings → Extensions → Enable SafariToDrafts
-3. **Customize Shortcut** (Optional): Change the keyboard shortcut in Safari → Settings → Extensions → SafariToDrafts
-4. **Configure Settings** (Optional): Click the SafariToDrafts toolbar icon and select "⚙️ Settings" to customize content selection, filtering, and output format
-5. **Install Drafts**: Make sure you have [Drafts](https://getdrafts.com) installed on your Mac
+3. **Configure Permissions**: 
+   - Go to Safari → Settings → Extensions → SafariToDrafts
+   - Choose "Allow on Every Website" for seamless operation
+4. **Set Up Drafts Permission**: 
+   - **First time users** will see a macOS dialog: "Do you want to allow this website to open 'Drafts'?"
+   - Click "Allow" and **check "Remember my choice"** to prevent future prompts
+   - Alternative: Safari → Settings → Websites → Pop-ups and Redirects → Set to "Allow"
+5. **Customize Shortcut** (Optional): Change the keyboard shortcut in Safari → Settings → Extensions → SafariToDrafts
+6. **Configure Settings** (Optional): Click the SafariToDrafts toolbar icon and select "⚙️ Settings" to customize content selection, filtering, and output format
+7. **Install Drafts**: Make sure you have [Drafts](https://getdrafts.com) installed on your Mac
 
 ## ⚡ Usage
 
 ### The 2-Second Workflow
 
 1. **Find & Highlight**: Browse the web, highlight interesting text (or don't, to save the whole page)
-2. **Press Shortcut**: Hit `⌘⇧D` (or your custom shortcut)
+2. **Capture Content**: 
+   - **Keyboard shortcut**: Press `⌘⇧D` (or your custom shortcut)
+   - **Toolbar button**: Click the SafariToDrafts button in Safari's toolbar
 3. **Done**: Drafts opens with your content, perfectly formatted and ready to use
 
 ### Pro Tips
@@ -88,6 +97,21 @@ Your captured content here, perfectly formatted in Markdown...
 ---
 
 *Built for speed, designed for elegance, optimized for your workflow.*
+
+## 🔧 Troubleshooting
+
+**"Do you want to allow this website to open 'Drafts'?" dialog appears:**
+- This is normal for first-time use
+- Click "Allow" and check "Remember my choice"
+- Future uses won't show this dialog
+
+**Extension doesn't work on some sites:**
+- Check Safari → Settings → Extensions → SafariToDrafts
+- Ensure "Allow on Every Website" is selected
+
+**Drafts doesn't open:**
+- Make sure Drafts app is installed
+- Check that you clicked "Allow" in the permission dialog
 
 ## 📞 Support
 
