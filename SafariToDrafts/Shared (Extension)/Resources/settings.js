@@ -1,6 +1,6 @@
 // Settings script for SafariToDrafts extension
 
-// Default settings configuration
+// Default settings configuration (single source of truth for all settings)
 const DEFAULT_SETTINGS = {
     keyboardShortcut: {
         modifier1: 'Command',
@@ -19,14 +19,14 @@ const DEFAULT_SETTINGS = {
             '[itemtype*="Article"]',
             '[itemtype*="BlogPosting"]',
             '[itemtype*="NewsArticle"]',
-            
+
             // Semantic HTML5
             'article[role="main"]',
             'main[role="main"]',
             'article',
             'main',
             '[role="main"]',
-            
+
             // Major news sites
             '.story-body',
             '.article-body',
@@ -35,23 +35,37 @@ const DEFAULT_SETTINGS = {
             '.entry-content',
             '.content-body',
             '.main-content',
-            
+
+            // Specific major news sites
+            '.css-53u6y8', // New York Times
+            '.zn-body__paragraph', // CNN
+            '.story-body__inner', // BBC
+            '.content__article-body', // Guardian
+            '.ArticleBody-articleBody', // Wall Street Journal
+
             // WordPress (most common CMS)
             '.single-post .entry-content',
             '.post .entry-content',
             '.hentry .entry-content',
             '.wp-block-post-content',
-            
+            '.site-main .entry-content',
+            '.content-area .entry-content',
+
             // Other CMS platforms
             '.node .content', // Drupal
+            '.field-name-body', // Drupal
             '.kg-post', // Ghost
             '.postArticle-content', // Medium
             '.markup', // Substack
-            
-            // Generic selectors
+            '.sqs-block-content', // Squarespace
+            '.w-richtext', // Webflow
+
+            // Generic content selectors
             '.blog-post-content',
             '.content-area',
             '.primary-content',
+            '.article-wrapper',
+            '.content-wrapper',
             '.content',
             '.post',
             '.entry',
@@ -67,135 +81,67 @@ const DEFAULT_SETTINGS = {
     },
     advancedFiltering: {
         customFilters: [
-            'nav',
-            'header',
-            'footer',
-            'aside',
-            '.nav',
-            '.navigation',
-            '.header',
-            '.footer',
-            '.sidebar',
-            '.ad',
-            '.ads',
-            '.advertisement',
-            '.social',
-            '.share',
-            '.comments',
-            '.comment',
-            '.related',
-            '.recommended'
-        ],
-        minContentLength: 100,
-        maxLinkRatio: 0.5
-    }
-};
-
-// Preset configurations for content extraction
-const EXTRACTION_PRESETS = {
-    default: {
-        removeImages: true,
-        removeAds: true,
-        removeNavigation: true,
-        removeComments: true,
-        removeRelated: true,
-        customSelectors: [
-            // Schema.org structured data (highest priority)
-            '[itemtype*="Article"]',
-            '[itemtype*="BlogPosting"]',
-            '[itemtype*="NewsArticle"]',
-            
-            // Semantic HTML5
-            'article[role="main"]',
-            'main[role="main"]',
-            'article',
-            'main',
-            '[role="main"]',
-            
-            // Major news sites
-            '.story-body',
-            '.article-body',
-            '.article-content',
-            '.post-content',
-            '.entry-content',
-            '.content-body',
-            '.main-content',
-            
-            // Specific major news sites
-            '.css-53u6y8', // New York Times
-            '.zn-body__paragraph', // CNN
-            '.story-body__inner', // BBC
-            '.content__article-body', // Guardian
-            '.ArticleBody-articleBody', // Wall Street Journal
-            
-            // WordPress (most common CMS)
-            '.single-post .entry-content',
-            '.post .entry-content',
-            '.hentry .entry-content',
-            '.wp-block-post-content',
-            '.site-main .entry-content',
-            '.content-area .entry-content',
-            
-            // Other CMS platforms
-            '.node .content', // Drupal
-            '.field-name-body', // Drupal
-            '.kg-post', // Ghost
-            '.postArticle-content', // Medium
-            '.markup', // Substack
-            '.sqs-block-content', // Squarespace
-            '.w-richtext', // Webflow
-            
-            // Generic content selectors
-            '.blog-post-content',
-            '.content-area',
-            '.primary-content',
-            '.article-wrapper',
-            '.content-wrapper',
-            '.content',
-            '.post',
-            '.entry',
-            '.article'
-        ],
-        customFilters: [
             // Navigation & structure
             'nav', 'header', 'footer', 'aside',
             '.nav', '.navigation', '.header', '.footer', '.sidebar',
             '.breadcrumb', '.pagination',
-            
+
+            // Article titles and page titles (since they're already in the draft)
+            'h1.entry-title', 'h1.post-title', 'h1.article-title', 'h1.page-title',
+            '.entry-title', '.post-title', '.article-title', '.page-title',
+            '.headline', '.title', '.story-headline', '.article-headline',
+            'h1.headline', 'h1.title', 'h1.story-headline', 'h1.article-headline',
+            '.post-header h1', '.article-header h1', '.entry-header h1',
+            '.content-header h1', '.story-header h1', '.page-header h1',
+            'header h1', '.header h1', '.masthead h1',
+            '[class*="title"] h1', '[class*="headline"] h1',
+            'h1[class*="title"]', 'h1[class*="headline"]',
+            '.wp-block-post-title', '.single-title', '.post-title-wrapper h1',
+
             // Advertisements
             '.ad', '.ads', '.advertisement', '.sponsored',
             '.banner', '.google-ad', '.outbrain', '.taboola',
             '[class*="ad-"]', '[id*="ad-"]',
-            
+
             // Social & sharing
             '.social', '.share', '.sharing', '.social-buttons',
             '.facebook', '.twitter', '.linkedin',
-            
+
             // Comments & discussions
             '.comments', '.comment', '.disqus',
             '.comment-form', '.comment-section',
-            
+
             // Related content
             '.related', '.recommended', '.more-stories',
             '.trending', '.popular', '.suggestions',
-            
+
             // Newsletter & subscriptions
             '.newsletter', '.subscription', '.signup',
             '.email-signup', '.cta',
-            
+
             // Popups & overlays
             '.popup', '.modal', '.overlay',
             '.cookie-notice', '.cookie-banner',
-            
+
             // Metadata & widgets
             '.author-bio', '.tags', '.categories', '.meta',
             '.widget', '.secondary', '.sidebar-widget',
-            
+
             // WordPress specific
             '.wp-caption', '.wp-gallery', '.sharedaddy'
         ],
         minContentLength: 150,
         maxLinkRatio: 0.3
+    }
+};
+
+// Preset configurations for content extraction (references the default settings)
+const EXTRACTION_PRESETS = {
+    default: {
+        ...DEFAULT_SETTINGS.contentExtraction,
+        customFilters: [...DEFAULT_SETTINGS.advancedFiltering.customFilters],
+        minContentLength: DEFAULT_SETTINGS.advancedFiltering.minContentLength,
+        maxLinkRatio: DEFAULT_SETTINGS.advancedFiltering.maxLinkRatio
     },
     custom: {
         // Will be populated from current settings
@@ -414,7 +360,7 @@ function updateContentSelectorsFromUI() {
         .filter(line => line);
 
     currentSettings.contentExtraction.customSelectors = selectors;
-    
+
     // When user changes selectors, switch to custom preset
     currentSettings.contentExtraction.strategy = 'custom';
     updatePresetSelection();
@@ -579,7 +525,7 @@ if (typeof browser === 'undefined') {
         window.browser = {
             storage: {
                 local: {
-                    get: async function(keys) {
+                    get: async function (keys) {
                         try {
                             const result = {};
                             if (Array.isArray(keys)) {
@@ -601,7 +547,7 @@ if (typeof browser === 'undefined') {
                             return {};
                         }
                     },
-                    set: async function(items) {
+                    set: async function (items) {
                         try {
                             for (const key in items) {
                                 localStorage.setItem(key, JSON.stringify(items[key]));
