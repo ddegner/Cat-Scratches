@@ -9,11 +9,6 @@ const DEFAULT_SETTINGS = {
     },
     contentExtraction: {
         strategy: 'default',
-        removeImages: true,
-        removeAds: true,
-        removeNavigation: true,
-        removeComments: true,
-        removeRelated: true,
         customSelectors: [
             // Schema.org structured data (highest priority)
             '[itemtype*="Article"]',
@@ -77,10 +72,18 @@ const DEFAULT_SETTINGS = {
         includeSource: true,
         includeSeparator: true,
         includeTimestamp: false,
-        customTemplate: ''
+        customTemplate: '',
+        defaultTag: ''
     },
     advancedFiltering: {
         customFilters: [
+            // Images and media
+            'img', 'picture', 'figure', 'figcaption', 'video', 'audio', 'source',
+            '.image', '.img', '.photo', '.picture', '.gallery', '.slideshow', '.carousel',
+            '.lightbox', '.media', '.caption', '.image-caption', '.photo-caption',
+            '.media-caption', '.image-credit', '.photo-credit', '.media-credit',
+            '.image-container', '.photo-container', '.media-container',
+
             // Navigation & structure
             'nav', 'header', 'footer', 'aside',
             '.nav', '.navigation', '.header', '.footer', '.sidebar',
@@ -226,9 +229,7 @@ function setupEventListeners() {
     });
 
     // Content extraction checkboxes
-    document.getElementById('removeImages').addEventListener('change', updateContentExtractionFromUI);
-    document.getElementById('removeAds').addEventListener('change', updateContentExtractionFromUI);
-    document.getElementById('removeComments').addEventListener('change', updateContentExtractionFromUI);
+    // Individual removal checkboxes removed - now using customFilters only
 
     // Content selectors textarea
     document.getElementById('contentSelectors').addEventListener('input', updateContentSelectorsFromUI);
@@ -239,6 +240,7 @@ function setupEventListeners() {
     document.getElementById('includeSeparator').addEventListener('change', updateOutputFormatFromUI);
     document.getElementById('includeTimestamp').addEventListener('change', updateOutputFormatFromUI);
     document.getElementById('customTemplate').addEventListener('input', updateOutputFormatFromUI);
+    document.getElementById('defaultTag').addEventListener('input', updateOutputFormatFromUI);
 
     // Advanced filtering inputs (using customFilters from HTML)
     document.getElementById('customFilters').addEventListener('input', updateAdvancedFilteringFromUI);
@@ -255,10 +257,7 @@ function updateUI() {
     document.getElementById('shortcutModifier2').value = currentSettings.keyboardShortcut.modifier2;
     document.getElementById('shortcutKey').value = currentSettings.keyboardShortcut.key;
 
-    // Content extraction
-    document.getElementById('removeImages').checked = currentSettings.contentExtraction.removeImages;
-    document.getElementById('removeAds').checked = currentSettings.contentExtraction.removeAds;
-    document.getElementById('removeComments').checked = currentSettings.contentExtraction.removeComments;
+    // Content extraction - individual removal settings removed, now using customFilters only
 
     // Update content selectors textarea
     updateContentSelectorsUI();
@@ -269,6 +268,7 @@ function updateUI() {
     document.getElementById('includeSeparator').checked = currentSettings.outputFormat.includeSeparator;
     document.getElementById('includeTimestamp').checked = currentSettings.outputFormat.includeTimestamp;
     document.getElementById('customTemplate').value = currentSettings.outputFormat.customTemplate;
+    document.getElementById('defaultTag').value = currentSettings.outputFormat.defaultTag || '';
 
     // Advanced filtering
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
@@ -308,11 +308,6 @@ function applyPreset(presetName) {
     if (!preset) return;
 
     currentSettings.contentExtraction.strategy = presetName;
-    currentSettings.contentExtraction.removeImages = preset.removeImages;
-    currentSettings.contentExtraction.removeAds = preset.removeAds;
-    currentSettings.contentExtraction.removeNavigation = preset.removeNavigation;
-    currentSettings.contentExtraction.removeComments = preset.removeComments;
-    currentSettings.contentExtraction.removeRelated = preset.removeRelated;
     currentSettings.contentExtraction.customSelectors = [...preset.customSelectors];
 
     // Apply advanced filtering settings if they exist in the preset
@@ -342,10 +337,7 @@ function updateShortcutFromUI() {
 
 // Update content extraction settings from UI
 function updateContentExtractionFromUI() {
-    currentSettings.contentExtraction.removeImages = document.getElementById('removeImages').checked;
-    currentSettings.contentExtraction.removeAds = document.getElementById('removeAds').checked;
-    currentSettings.contentExtraction.removeComments = document.getElementById('removeComments').checked;
-
+    // Individual removal settings removed - now using customFilters only
     // When user changes settings, switch to custom preset
     currentSettings.contentExtraction.strategy = 'custom';
     updatePresetSelection();
@@ -373,6 +365,7 @@ function updateOutputFormatFromUI() {
     currentSettings.outputFormat.includeSeparator = document.getElementById('includeSeparator').checked;
     currentSettings.outputFormat.includeTimestamp = document.getElementById('includeTimestamp').checked;
     currentSettings.outputFormat.customTemplate = document.getElementById('customTemplate').value;
+    currentSettings.outputFormat.defaultTag = document.getElementById('defaultTag').value.trim();
 }
 
 // Update advanced filtering from UI

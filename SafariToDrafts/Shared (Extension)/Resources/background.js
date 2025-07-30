@@ -133,7 +133,7 @@ async function getPageContent(extensionSettings) {
                 linkStyle: 'inline'
             });
 
-            // Add custom rules to filter out unwanted elements - now less aggressive
+            // Add custom rules to filter out unwanted elements using customFilters
             turndownService.addRule('removeUnwanted', {
                 filter: function(node) {
                     // Remove only obvious non-content elements
@@ -141,15 +141,18 @@ async function getPageContent(extensionSettings) {
                         return true;
                     }
 
-                    // Check settings to see if we should remove images
-                    const shouldRemoveImages = !extensionSettings?.contentExtraction?.removeImages === false;
-                    if (shouldRemoveImages && (node.nodeName === 'IMG' || node.nodeName === 'PICTURE' || node.nodeName === 'FIGURE')) {
-                        return true;
-                    }
-
-                    // Remove figcaptions (image captions)
-                    if (node.nodeName === 'FIGCAPTION') {
-                        return true;
+                    // Use customFilters for all removal logic
+                    const customFilters = extensionSettings?.advancedFiltering?.customFilters || [];
+                    
+                    // Check for image/media elements
+                    if (customFilters.some(filter => 
+                        filter.includes('img') || filter.includes('picture') || filter.includes('figure') ||
+                        filter.includes('video') || filter.includes('audio') || filter.includes('media')
+                    )) {
+                        if (node.nodeName === 'IMG' || node.nodeName === 'PICTURE' || node.nodeName === 'FIGURE' ||
+                            node.nodeName === 'VIDEO' || node.nodeName === 'AUDIO' || node.nodeName === 'FIGCAPTION') {
+                            return true;
+                        }
                     }
 
                     // Remove links to images
@@ -160,77 +163,10 @@ async function getPageContent(extensionSettings) {
                         }
                     }
 
-                    // Get node attributes for analysis (safely handle different types)
-                    const className = (node.className ? String(node.className) : '').toLowerCase();
-                    const id = (node.id ? String(node.id) : '').toLowerCase();
-                    const tagName = node.tagName?.toLowerCase() || '';
-
-                    // More conservative filtering patterns - only obvious non-content
-                    const unwantedPatterns = [
-                        // Navigation and structure (only obvious ones)
-                        'nav-', 'navigation-', 'header-', 'footer-', 'sidebar-',
-                        'menu-', 'breadcrumb-',
-
-                        // WordPress specific (only obvious ones)
-                        'wp-admin', 'wp-sidebar', 'wp-widget', 'wp-meta',
-
-                        // Ads and promotions (only obvious ones)
-                        'advertisement', 'google-ad', 'doubleclick', 'adsystem', 
-                        'ad-container', 'ad-wrapper', 'sponsored-content',
-
-                        // Social sharing (only obvious ones)
-                        'share-buttons', 'sharing-buttons', 'social-share',
-                        'follow-buttons',
-
-                        // Comments (only obvious ones)
-                        'comments-section', 'comment-form', 'disqus',
-
-                        // Newsletter and subscription (only obvious ones)
-                        'newsletter-signup', 'email-signup', 'subscription-form',
-                        'newsletter-promo', 'subscription-nag',
-
-                        // Cookie and privacy notices (only obvious ones)
-                        'cookie-banner', 'privacy-notice', 'gdpr-notice', 'consent-banner'
-                    ];
-
-                    // Check class names and IDs against patterns
-                    for (const pattern of unwantedPatterns) {
-                        if (className.includes(pattern) || id.includes(pattern)) {
-                            return true;
-                        }
-                    }
-
-                    // Very conservative unwanted selectors - only obvious non-content
-                    const unwantedSelectors = [
-                        // Only the most obvious structural elements
-                        'nav', 'header', 'footer',
-                        
-                        // Only obvious ads
-                        '.google-ad', '.taboola', '.outbrain',
-                        '.advertisement', '.sponsored-content',
-
-                        // Only obvious social/sharing widgets
-                        '.share-buttons', '.social-share',
-
-                        // Only obvious comment forms
-                        '.comment-form', '.disqus',
-
-                        // Only obvious popups/modals
-                        '.popup', '.modal', '.overlay',
-
-                        // Only obvious cookie banners
-                        '.cookie-banner', '.privacy-notice',
-
-                        // Role attributes for ads only
-                        '[role="advertisement"]',
-
-                        // Data attributes for ads only
-                        '[data-ad]', '[data-advertisement]'
-                    ];
-
-                    for (const selector of unwantedSelectors) {
+                    // Check all customFilters for element matching
+                    for (const filter of customFilters) {
                         try {
-                            if (node.matches && node.matches(selector)) {
+                            if (node.matches && node.matches(filter)) {
                                 return true;
                             }
                         } catch (e) {
@@ -267,15 +203,7 @@ async function getPageContent(extensionSettings) {
                 }
             });
 
-            // Add rule to completely remove images and media (if enabled in settings)
-            if (extensionSettings?.contentExtraction?.removeImages !== false) {
-                turndownService.addRule('removeImages', {
-                    filter: ['img', 'picture', 'figure', 'figcaption', 'video', 'audio', 'source'],
-                    replacement: function() {
-                        return '';
-                    }
-                });
-            }
+            // Image and media removal is now handled by customFilters
 
             useMarkdownConversion = true;
         } else {
@@ -502,41 +430,9 @@ async function getPageContent(extensionSettings) {
                         // Create a clone of the body to modify
                         const bodyClone = document.body.cloneNode(true);
 
-                        // Remove obvious non-content elements for fallback
-                        const elementsToRemove = bodyClone.querySelectorAll([
-                            // Images and media
-                            'img', 'picture', 'figure', 'figcaption',
-                            '.image', '.img', '.photo', '.picture', '.gallery',
-                            '.slideshow', '.carousel', '.lightbox', '.media',
-                            '.caption', '.image-caption', '.photo-caption', '.media-caption',
-                            '.image-credit', '.photo-credit', '.media-credit',
-                            '.image-container', '.photo-container', '.media-container',
-                            // Bottom-of-article content
-                            '.bottom-of-article', '.article-bottom', '.story-bottom',
-                            '.article-footer', '.story-footer', '.post-footer',
-                            '.author-info', '.author-bio', '.author-details', '.author-section',
-                            '.byline', '.byline-info', '.contributors', '.contributor-info',
-                            '.see-more-on', '.more-on', '.topics-covered', '.story-topics',
-                            '.share-article', '.share-story', '.share-full-article',
-                            '.article-sharing', '.story-sharing', '.share-this-article',
-                            '.article-tools', '.story-tools', '.content-tools',
-                            '.about-author', '.author-profile', '.writer-bio',
-                            // Structure elements
-                            'nav', 'header', 'footer', 'aside',
-                            '.nav', '.navigation', '.header', '.footer', '.sidebar',
-                            '.menu', '.breadcrumb', '.breadcrumbs',
-                            '.ad', '.ads', '.advertisement', '.promo', '.promotion',
-                            '.social', '.share', '.sharing', '.social-share', '.share-buttons',
-                            '.comments', '.comment', '.comments-section',
-                            '.newsletter', '.subscription', '.newsletter-signup',
-                            '.related-articles', '.recommended-articles', '.more-stories',
-                            '.trending-now', '.popular-stories', '.widget', '.rail',
-                            '.secondary', '.supplementary', '.popup', '.modal',
-                            '.overlay', '.banner', '.cookie', '.privacy', '.gdpr',
-                            '#nav', '#navigation', '#header', '#footer', '#sidebar',
-                            '#comments', '#social-sharing', '#ads', '#newsletter',
-                            'script', 'style', 'noscript'
-                        ].join(', '));
+                        // Remove elements using customFilters for fallback
+                        const customFilters = extensionSettings?.advancedFiltering?.customFilters || [];
+                        const elementsToRemove = bodyClone.querySelectorAll(customFilters.join(', '));
 
                         elementsToRemove.forEach(el => el.remove());
 
@@ -608,7 +504,21 @@ async function createDraft(title, url, markdownBody, isSelection = false) {
 
     // URL encode the content for the Drafts URL scheme
     const encodedContent = encodeURIComponent(draftContent);
-    const draftsURL = `drafts://x-callback-url/create?text=${encodedContent}`;
+    
+    // Build the Drafts URL with optional tag
+    let draftsURL = `drafts://x-callback-url/create?text=${encodedContent}`;
+    
+    // Add tag if specified in settings
+    const defaultTag = extensionSettings?.outputFormat?.defaultTag;
+    if (defaultTag && defaultTag.trim()) {
+        // Handle multiple tags separated by commas
+        const tags = defaultTag.split(',').map(tag => tag.trim()).filter(tag => tag);
+        if (tags.length > 0) {
+            // For multiple tags, use comma-separated format in a single tag parameter
+            const encodedTags = encodeURIComponent(tags.join(','));
+            draftsURL += `&tag=${encodedTags}`;
+        }
+    }
 
     // Debug logging
     console.log("Draft content length:", draftContent.length);
@@ -682,11 +592,13 @@ function formatDraftContent(title, url, content, isSelection = false) {
         // If custom template is provided, use it
         if (customTemplate.trim()) {
             const timestamp = new Date().toISOString();
+            const defaultTag = extensionSettings?.outputFormat?.defaultTag || '';
             return customTemplate
                 .replace('{title}', title)
                 .replace('{url}', url)
                 .replace('{content}', content)
-                .replace('{timestamp}', timestamp);
+                .replace('{timestamp}', timestamp)
+                .replace('{tag}', defaultTag);
         }
 
         // Build content using standard format

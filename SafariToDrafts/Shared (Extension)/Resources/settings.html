@@ -19,8 +19,6 @@
             max-width: 800px;
             margin: 0 auto;
             background: white;
-            border: 1px solid #d1d1d6;
-            border-radius: 8px;
             overflow: hidden;
         }
 
@@ -142,9 +140,6 @@
             display: flex;
             gap: 12px;
             justify-content: flex-end;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #e5e5e7;
         }
 
         .button {
@@ -211,9 +206,7 @@
 
             <!-- Keyboard Shortcut Section -->
             <div class="section">
-                <h2>Keyboard Shortcut</h2>
                 <div class="form-group">
-                    <label for="shortcut">Capture Content Shortcut</label>
                     <div class="shortcut-input">
                         <select id="shortcutModifier1">
                             <option value="Command">⌘ Command</option>
@@ -240,7 +233,6 @@
 
             <!-- Content Extraction Section -->
             <div class="section">
-                <h2>Content Extraction</h2>
 
                 <div class="form-group">
                     <label for="contentSelectors">Content Selectors</label>
@@ -298,7 +290,33 @@ main</textarea>
 
                 <div class="form-group">
                     <label for="customFilters">Elements to Remove</label>
-                    <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line">nav
+                    <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line">img
+picture
+figure
+figcaption
+video
+audio
+source
+.image
+.img
+.photo
+.picture
+.gallery
+.slideshow
+.carousel
+.lightbox
+.media
+.caption
+.image-caption
+.photo-caption
+.media-caption
+.image-credit
+.photo-credit
+.media-credit
+.image-container
+.photo-container
+.media-container
+nav
 header
 footer
 aside
@@ -420,30 +438,20 @@ form
 .meta
 #outbrain</textarea>
                     <div class="help-text">
-                        CSS selectors for unwanted elements like ads, navigation, and sidebars that should be removed
-                        from captured content.
+                        CSS selectors for unwanted elements that should be removed from captured content.
+                        One selector per line.
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="removeImages" checked>
-                        <label for="removeImages">Remove images and media</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="removeAds" checked>
-                        <label for="removeAds">Remove ads and navigation</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="removeComments" checked>
-                        <label for="removeComments">Remove comments and social sharing</label>
+                    <div class="help-text">
+                        All removal settings are now consolidated in the "Elements to Remove" list above.
                     </div>
                 </div>
             </div>
 
             <!-- Output Format Section -->
             <div class="section">
-                <h2>Output Format</h2>
 
                 <div class="form-group">
                     <label for="titleFormat">Title Format</label>
@@ -454,6 +462,14 @@ form
                         <option value="bold">Bold (**Title**)</option>
                         <option value="none">No Title</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="defaultTag">Default Tag</label>
+                    <input type="text" id="defaultTag" placeholder="e.g., reading, web, article (comma-separated for multiple tags)">
+                    <div class="help-text">
+                        Optional tag to automatically add to new drafts. For multiple tags, separate with commas. Leave empty for no default tag.
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -474,10 +490,10 @@ form
                 <div class="form-group">
                     <label for="customTemplate">Custom Template</label>
                     <textarea id="customTemplate"
-                        placeholder="Enter custom template using placeholders: {title}, {url}, {content}, {timestamp}"></textarea>
+                        placeholder="Enter custom template using placeholders: {title}, {url}, {content}, {timestamp}, {tag}"></textarea>
                     <div class="help-text">
                         Leave empty to use default format. Available placeholders: {title}, {url}, {content},
-                        {timestamp}
+                        {timestamp}, {tag}
                     </div>
                 </div>
             </div>
