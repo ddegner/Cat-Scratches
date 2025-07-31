@@ -19,8 +19,6 @@
             max-width: 700px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
 
         .header {
@@ -28,6 +26,15 @@
             color: #1d1d1f;
             padding: 32px 32px 24px 32px;
             border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
         }
 
         .header h1 {
@@ -42,8 +49,8 @@
         }
 
         .section {
-            margin-bottom: 40px;
-            padding-bottom: 32px;
+            margin-bottom: 48px;
+            padding-bottom: 40px;
             border-bottom: 1px solid #f0f0f0;
         }
 
@@ -54,14 +61,14 @@
         }
 
         .section h2 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
-            margin: 0 0 20px 0;
+            margin: 0 0 24px 0;
             color: #1d1d1f;
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .form-group label {
@@ -157,14 +164,14 @@
         }
 
         .button-danger {
-            color: #dc3545;
-            background: #fff5f5;
-            border-color: #ffcdd2;
+            color: #6c757d;
+            background: #f8f9fa;
+            border-color: #dee2e6;
         }
 
         .button-danger:hover {
-            background: #ffe6e6;
-            border-color: #ffb3b3;
+            background: #e9ecef;
+            border-color: #ced4da;
         }
 
         .status-message {
@@ -200,6 +207,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <img src="images/icon-128.png" alt="SafariToDrafts Icon">
             <h1>SafariToDrafts Settings</h1>
         </div>
 
@@ -209,42 +217,20 @@
 
 
             <!-- Keyboard Shortcut Info Section -->
-            <div class="section">
+            <div class="section" style="border-bottom: none; padding-bottom: 0;">
                 <div class="form-group">
-                    <label>Keyboard Shortcut: ⌘⇧D (Command+Shift+D)</label>
+                    <label style="font-weight: 400;">Keyboard Shortcut: ⌘⇧D (Command+Shift+D)</label>
                 </div>
             </div>
 
             <!-- Content Extraction Section -->
             <div class="section">
+                <h2>Page Parsing</h2>
 
                 <div class="form-group">
                     <label for="contentSelectors">Content Selectors</label>
                     <textarea id="contentSelectors"
-                        placeholder="Enter CSS selectors to find article content, one per line">[itemtype*="Article"]
-[itemtype*="BlogPosting"]
-[itemtype*="NewsArticle"]
-article[role="main"]
-main[role="main"]
-article
-main
-[role="main"]
-.entry-content
-.post-content
-.wp-block-post-content
-.story-body
-.article-body
-.article-content
-.content-body
-.main-content
-.kg-post
-.postArticle-content
-.markup
-.node .content
-.content
-.post
-.entry
-.article</textarea>
+                        placeholder="Enter CSS selectors to find article content, one per line"></textarea>
                     <div class="help-text">
                         CSS selectors used to find article content. Higher priority selectors should be listed first.
                     </div>
@@ -252,153 +238,7 @@ main
 
                 <div class="form-group">
                     <label for="customFilters">Elements to Remove</label>
-                    <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line">img
-picture
-figure
-figcaption
-video
-audio
-source
-.image
-.img
-.photo
-.picture
-.gallery
-.slideshow
-.carousel
-.lightbox
-.media
-.caption
-.image-caption
-.photo-caption
-.media-caption
-.image-credit
-.photo-credit
-.media-credit
-.image-container
-.photo-container
-.media-container
-nav
-header
-footer
-aside
-.nav
-.navigation
-.header
-#header
-.footer
-#footer
-.sidebar
-#sidebar
-h1.entry-title
-h1.post-title
-h1.article-title
-h1.page-title
-.entry-title
-.post-title
-.article-title
-.page-title
-.headline
-.title
-.story-headline
-.article-headline
-h1.headline
-h1.title
-h1.story-headline
-h1.article-headline
-.post-header h1
-.article-header h1
-.entry-header h1
-.content-header h1
-.story-header h1
-.page-header h1
-header h1
-.header h1
-.masthead h1
-[class*="title"] h1
-[class*="headline"] h1
-h1[class*="title"]
-h1[class*="headline"]
-.wp-block-post-title
-.single-title
-.post-title-wrapper h1
-.ad
-.ads
-.advert
-.advertisement
-.sponsored
-.banner
-[class*="ad-"]
-[id*="ad-"]
-div[data-ad-id]
-.social
-.share
-.sharing
-[class*="share-"]
-[class*="social-"]
-.comments
-#comments
-.comment
-.comment-list
-#disqus_thread
-[id*="comment"]
-.related
-.related-posts
-.recommended
-[class*="related"]
-.newsletter
-.subscription
-[class*="subscribe"]
-.popup
-.modal
-.overlay
-[role="dialog"]
-.cookie-notice
-.age-gate
-.age-verification
-form
-.pagination
-.pager
-[role="pagination"]
-.widget
-.widget-area
-#secondary
-#colophon
-[role="contentinfo"]
-.masthead
-#main-nav
-#topnav
-[role="navigation"]
-.byline
-.post-meta
-.entry-meta
-.author
-.dateline
-.submitted
-.combx
-.contact
-.foot
-.footnote
-.media
-.promo
-.scroll
-.shoutbox
-.shopping
-.tags
-.tool
-.ad-break
-.adbox
-.ad_wrapper
-.community
-.disqus
-.extra
-.entry-unrelated
-.menu
-.navbar
-.hidden
-.invisible
-.meta
-#outbrain</textarea>
+                    <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line"></textarea>
                     <div class="help-text">
                         CSS selectors for unwanted elements that should be removed from captured content.
                         One selector per line.
@@ -410,6 +250,7 @@ form
 
             <!-- Output Format Section -->
             <div class="section">
+                <h2>Draft Format</h2>
 
                 <div class="form-group">
                     <label for="titleFormat">Title Format</label>

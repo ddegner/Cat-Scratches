@@ -13,6 +13,13 @@
         "256": "images/icon-256.png",
         "512": "images/icon-512.png"
     },
+    "icons_dark": {
+        "48": "images/icon-48-dark.png",
+        "96": "images/icon-96-dark.png",
+        "128": "images/icon-128-dark.png",
+        "256": "images/icon-256-dark.png",
+        "512": "images/icon-512-dark.png"
+    },
     "background": {
         "scripts": [
             "background.js"
@@ -34,6 +41,10 @@
     ],
     "action": {
         "default_icon": "images/toolbar-icon.png",
+        "default_title": "SafariToDrafts - Capture content to Drafts"
+    },
+    "action_dark": {
+        "default_icon": "images/toolbar-icon-dark.png",
         "default_title": "SafariToDrafts - Capture content to Drafts"
     },
     "commands": {

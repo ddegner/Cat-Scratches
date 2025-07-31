@@ -106,7 +106,108 @@ const DEFAULT_SETTINGS = {
             '.widget', '.secondary', '.sidebar-widget',
 
             // WordPress specific
-            '.wp-caption', '.wp-gallery', '.sharedaddy'
+            '.wp-caption', '.wp-gallery', '.sharedaddy',
+
+            // New York Times specific selectors
+            '[data-testid="related-topics"]',
+            '[data-testid="related-links"]',
+            '[data-testid="related-content"]',
+            '[data-testid="related-articles"]',
+            '[data-testid="related-stories"]',
+            '[data-testid="related-topics-list"]',
+            '[data-testid="related-topics-item"]',
+            '[data-testid="advertisement"]',
+            '[data-testid="ad"]',
+            '[data-testid="sponsored"]',
+            '[data-testid="skip-advertisement"]',
+            '[data-testid="ad-skip"]',
+            '[data-testid="supported-by"]',
+            '[data-testid="sponsored-content"]',
+            '[data-testid="partner-content"]',
+            '[data-testid="share-tools"]',
+            '[data-testid="social-share"]',
+            '[data-testid="article-tools"]',
+            '[data-testid="listen-button"]',
+            '[data-testid="audio-player"]',
+            '[data-testid="listen-to-article"]',
+            '[data-testid="byline"]',
+            '[data-testid="author-info"]',
+            '[data-testid="article-meta"]',
+            '[data-testid="article-info"]',
+            '[data-testid="dateline"]',
+            '[data-testid="image-caption"]',
+            '[data-testid="photo-caption"]',
+            '[data-testid="image-credit"]',
+            '[data-testid="photo-credit"]',
+            '[data-testid="caption"]',
+            '[data-testid="credit"]',
+            '[data-testid="newsletter"]',
+            '[data-testid="subscription"]',
+            '[data-testid="subscribe"]',
+            '[data-testid="sign-up"]',
+            '[data-testid="comments"]',
+            '[data-testid="recommended"]',
+            '[data-testid="more-stories"]',
+            '[data-testid="see-more"]',
+            '[data-testid="share-full-article"]',
+            '[data-testid="skip-ad"]',
+            '[data-testid*="listen"]',
+            '[data-testid*="audio"]',
+            '[data-testid*="share"]',
+            '[data-testid*="learn-more"]',
+            '[data-testid*="updated"]',
+            '.related-topics',
+            '.related-links',
+            '.related-content',
+            '.related-articles',
+            '.related-stories',
+            '.advertisement',
+            '.supported-by',
+            '.share-tools',
+            '.social-share',
+            '.article-tools',
+            '.listen-button',
+            '.audio-player',
+            '.byline',
+            '.author-info',
+            '.article-meta',
+            '.article-info',
+            '.dateline',
+            '.image-caption',
+            '.photo-caption',
+            '.image-credit',
+            '.photo-credit',
+            '.caption',
+            '.credit',
+            '.newsletter',
+            '.subscription',
+            '.subscribe',
+            '.sign-up',
+            '.comments',
+            '.recommended',
+            '.more-stories',
+            '.see-more',
+            '.share-full-article',
+            '.skip-ad',
+            'nav[role="navigation"]',
+            '.navigation',
+            '.nav-menu',
+            '.nav-list',
+            '.nav-items',
+            '.nav-links',
+            '.site-header',
+            '.site-footer',
+            '.global-header',
+            '.global-footer',
+            '[class*="listen"]',
+            '[class*="audio"]',
+            '[class*="share-full"]',
+            '[class*="learn-more"]',
+            '[class*="updated-time"]',
+            '[class*="see-more"]',
+            '[class*="related-content"]',
+            '[class*="skip-ad"]',
+            '[class*="advertisement"]'
         ],
         minContentLength: 150,
         maxLinkRatio: 0.3
@@ -133,8 +234,10 @@ async function loadSettings() {
     try {
         const stored = await browser.storage.local.get(['safariToDraftsSettings']);
         if (stored.safariToDraftsSettings) {
-            currentSettings = mergeSettings(DEFAULT_SETTINGS, stored.safariToDraftsSettings);
+            // User has saved settings - use them exactly as saved
+            currentSettings = stored.safariToDraftsSettings;
         } else {
+            // No saved settings - use defaults for initial setup
             currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
         }
     } catch (error) {
@@ -157,20 +260,8 @@ async function saveSettings() {
     }
 }
 
-// Merge settings objects, keeping structure intact
-function mergeSettings(defaults, stored) {
-    const result = JSON.parse(JSON.stringify(defaults));
-
-    for (const key in stored) {
-        if (stored[key] !== null && typeof stored[key] === 'object' && !Array.isArray(stored[key])) {
-            result[key] = mergeSettings(result[key] || {}, stored[key]);
-        } else {
-            result[key] = stored[key];
-        }
-    }
-
-    return result;
-}
+// Merge settings function removed - no longer needed
+// User settings now completely replace defaults when saved
 
 // Set up all event listeners
 function setupEventListeners() {

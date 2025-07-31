@@ -503,10 +503,7 @@ function formatDraftContent(title, url, content, isSelection = false) {
             }
         }
 
-        // Add source URL if enabled
-        if (includeSource) {
-            result += `**Source:** [${url}](${url})\n\n`;
-        }
+
 
         // Add timestamp if enabled
         if (includeTimestamp) {
