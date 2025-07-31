@@ -9,83 +9,89 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 32px 24px;
             background: #ffffff;
             color: #1d1d1f;
             line-height: 1.6;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 700px;
             margin: 0 auto;
             background: white;
-            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         }
 
         .header {
-            background: #f5f5f7;
+            background: #ffffff;
             color: #1d1d1f;
-            padding: 20px 24px;
-            border-bottom: 1px solid #d1d1d6;
+            padding: 32px 32px 24px 32px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 600;
+            color: #1d1d1f;
         }
 
         .content {
-            padding: 24px;
+            padding: 32px;
         }
 
         .section {
-            margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid #e5e5e7;
+            margin-bottom: 40px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .section:last-child {
             border-bottom: none;
             margin-bottom: 0;
+            padding-bottom: 0;
         }
 
         .section h2 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            margin: 0 0 16px 0;
+            margin: 0 0 20px 0;
             color: #1d1d1f;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group label {
             display: block;
             font-weight: 500;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: #1d1d1f;
+            font-size: 14px;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #d1d1d6;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
             box-sizing: border-box;
+            transition: all 0.2s ease;
+            background: #ffffff;
         }
 
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #86868b;
-            box-shadow: 0 0 0 2px rgba(134, 134, 139, 0.2);
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
 
         .form-group textarea {
@@ -93,104 +99,100 @@
             min-height: 120px;
             font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
             font-size: 13px;
+            line-height: 1.5;
         }
 
         .form-group .help-text {
-            font-size: 12px;
-            color: #86868b;
-            margin-top: 4px;
+            font-size: 13px;
+            color: #666666;
+            margin-top: 6px;
+            line-height: 1.4;
         }
 
-        .shortcut-input {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
 
-        .shortcut-input input {
-            width: auto;
-            min-width: 60px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .shortcut-input .plus {
-            color: #86868b;
-            font-weight: 500;
-        }
 
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .checkbox-group input[type="checkbox"] {
             width: auto;
             margin: 0;
+            transform: scale(1.1);
         }
 
         .checkbox-group label {
             margin: 0;
             font-weight: 400;
+            font-size: 14px;
+            color: #1d1d1f;
         }
 
         .button-group {
             display: flex;
-            gap: 12px;
+            gap: 16px;
             justify-content: flex-end;
+            margin-top: 32px;
         }
 
         .button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-        }
-
-        .button {
-            background: #f1f1f1;
+            background: #f8f9fa;
             color: #1d1d1f;
-            border: 1px solid #d1d1d6;
+            border: 1px solid #e0e0e0;
         }
 
         .button:hover {
-            background: #e1e1e1;
+            background: #e9ecef;
+            border-color: #d0d0d0;
         }
 
         .button-danger {
-            color: #d70015;
+            color: #dc3545;
+            background: #fff5f5;
+            border-color: #ffcdd2;
+        }
+
+        .button-danger:hover {
+            background: #ffe6e6;
+            border-color: #ffb3b3;
         }
 
         .status-message {
-            padding: 12px 16px;
+            padding: 16px 20px;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             display: none;
+            border-left: 4px solid;
         }
 
         .status-message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #f0f9f0;
+            color: #166534;
+            border-left-color: #22c55e;
         }
 
         .status-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #fef2f2;
+            color: #dc2626;
+            border-left-color: #ef4444;
         }
 
         .status-message.info {
-            background: #cce5ff;
-            color: #004085;
-            border: 1px solid #b8daff;
+            background: #f0f9ff;
+            color: #1e40af;
+            border-left-color: #3b82f6;
         }
     </style>
 </head>
@@ -204,30 +206,12 @@
         <div class="content">
             <div class="status-message" id="statusMessage"></div>
 
-            <!-- Keyboard Shortcut Section -->
+
+
+            <!-- Keyboard Shortcut Info Section -->
             <div class="section">
                 <div class="form-group">
-                    <div class="shortcut-input">
-                        <select id="shortcutModifier1">
-                            <option value="Command">⌘ Command</option>
-                            <option value="Ctrl">Ctrl</option>
-                            <option value="Alt">⌥ Alt</option>
-                        </select>
-                        <span class="plus">+</span>
-                        <select id="shortcutModifier2">
-                            <option value="">None</option>
-                            <option value="Shift">⇧ Shift</option>
-                            <option value="Alt">⌥ Alt</option>
-                            <option value="Ctrl">Ctrl</option>
-                        </select>
-                        <span class="plus">+</span>
-                        <input type="text" id="shortcutKey" placeholder="D" maxlength="1">
-                    </div>
-                    <div class="help-text">
-                        Default: ⌘⇧D. Note: Shortcut changes require restarting Safari to take effect due to Safari
-                        extension limitations. Safari may also override your shortcut if it conflicts with existing
-                        Safari shortcuts.
-                    </div>
+                    <label>Keyboard Shortcut: ⌘⇧D (Command+Shift+D)</label>
                 </div>
             </div>
 
@@ -238,51 +222,29 @@
                     <label for="contentSelectors">Content Selectors</label>
                     <textarea id="contentSelectors"
                         placeholder="Enter CSS selectors to find article content, one per line">[itemtype*="Article"]
+[itemtype*="BlogPosting"]
 [itemtype*="NewsArticle"]
 article[role="main"]
 main[role="main"]
+article
+main
 [role="main"]
-.node-article
-.content
-.node-page
-.content
-.hentry
 .entry-content
-.hentry
-.entry-content
-.post
-.entry-content
-.post
-.entry-content
+.post-content
 .wp-block-post-content
-.single-post
-.entry-content
-.gh-content
-.kg-post
-.node
-.content
-article
-.post
-article
-.page
 .story-body
 .article-body
 .article-content
-.post-content
-.entry-content
 .content-body
 .main-content
+.kg-post
 .postArticle-content
-.blog-post-content
-.content-area
-.primary-content
 .markup
+.node .content
 .content
 .post
 .entry
-.article
-article
-main</textarea>
+.article</textarea>
                     <div class="help-text">
                         CSS selectors used to find article content. Higher priority selectors should be listed first.
                     </div>
@@ -443,11 +405,7 @@ form
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <div class="help-text">
-                        All removal settings are now consolidated in the "Elements to Remove" list above.
-                    </div>
-                </div>
+
             </div>
 
             <!-- Output Format Section -->

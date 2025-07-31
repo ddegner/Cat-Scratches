@@ -2,11 +2,6 @@
 
 // Default settings configuration (single source of truth for all settings)
 const DEFAULT_SETTINGS = {
-    keyboardShortcut: {
-        modifier1: 'Command',
-        modifier2: 'Shift',
-        key: 'D'
-    },
     contentExtraction: {
         strategy: 'default',
         customSelectors: [
@@ -22,45 +17,25 @@ const DEFAULT_SETTINGS = {
             'main',
             '[role="main"]',
 
+            // WordPress (most common CMS)
+            '.entry-content',
+            '.post-content',
+            '.wp-block-post-content',
+
             // Major news sites
             '.story-body',
             '.article-body',
             '.article-content',
-            '.post-content',
-            '.entry-content',
             '.content-body',
             '.main-content',
 
-            // Specific major news sites
-            '.css-53u6y8', // New York Times
-            '.zn-body__paragraph', // CNN
-            '.story-body__inner', // BBC
-            '.content__article-body', // Guardian
-            '.ArticleBody-articleBody', // Wall Street Journal
-
-            // WordPress (most common CMS)
-            '.single-post .entry-content',
-            '.post .entry-content',
-            '.hentry .entry-content',
-            '.wp-block-post-content',
-            '.site-main .entry-content',
-            '.content-area .entry-content',
-
             // Other CMS platforms
-            '.node .content', // Drupal
-            '.field-name-body', // Drupal
             '.kg-post', // Ghost
             '.postArticle-content', // Medium
             '.markup', // Substack
-            '.sqs-block-content', // Squarespace
-            '.w-richtext', // Webflow
+            '.node .content', // Drupal
 
             // Generic content selectors
-            '.blog-post-content',
-            '.content-area',
-            '.primary-content',
-            '.article-wrapper',
-            '.content-wrapper',
             '.content',
             '.post',
             '.entry',
@@ -138,19 +113,6 @@ const DEFAULT_SETTINGS = {
     }
 };
 
-// Preset configurations for content extraction (references the default settings)
-const EXTRACTION_PRESETS = {
-    default: {
-        ...DEFAULT_SETTINGS.contentExtraction,
-        customFilters: [...DEFAULT_SETTINGS.advancedFiltering.customFilters],
-        minContentLength: DEFAULT_SETTINGS.advancedFiltering.minContentLength,
-        maxLinkRatio: DEFAULT_SETTINGS.advancedFiltering.maxLinkRatio
-    },
-    custom: {
-        // Will be populated from current settings
-    }
-};
-
 // Global settings object
 let currentSettings = {};
 
@@ -164,9 +126,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Update UI with current settings
     updateUI();
-
-    // Set initial preset selection
-    updatePresetSelection();
 });
 
 // Load settings from storage
@@ -215,18 +174,6 @@ function mergeSettings(defaults, stored) {
 
 // Set up all event listeners
 function setupEventListeners() {
-    // Keyboard shortcut inputs
-    document.getElementById('shortcutModifier1').addEventListener('change', updateShortcutFromUI);
-    document.getElementById('shortcutModifier2').addEventListener('change', updateShortcutFromUI);
-    document.getElementById('shortcutKey').addEventListener('input', updateShortcutFromUI);
-
-    // Content extraction preset buttons
-    document.querySelectorAll('.preset-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const preset = button.dataset.preset;
-            applyPreset(preset);
-        });
-    });
 
     // Content extraction checkboxes
     // Individual removal checkboxes removed - now using customFilters only
@@ -252,10 +199,6 @@ function setupEventListeners() {
 
 // Update UI with current settings
 function updateUI() {
-    // Keyboard shortcut
-    document.getElementById('shortcutModifier1').value = currentSettings.keyboardShortcut.modifier1;
-    document.getElementById('shortcutModifier2').value = currentSettings.keyboardShortcut.modifier2;
-    document.getElementById('shortcutKey').value = currentSettings.keyboardShortcut.key;
 
     // Content extraction - individual removal settings removed, now using customFilters only
 
@@ -274,19 +217,7 @@ function updateUI() {
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
 }
 
-// Update preset selection UI
-function updatePresetSelection() {
-    const strategy = currentSettings.contentExtraction.strategy;
 
-    document.querySelectorAll('.preset-button').forEach(button => {
-        button.classList.remove('active');
-    });
-
-    const activeButton = document.querySelector(`[data-preset="${strategy}"]`);
-    if (activeButton) {
-        activeButton.classList.add('active');
-    }
-}
 
 // Update content selectors textarea display
 function updateContentSelectorsUI() {
@@ -296,52 +227,11 @@ function updateContentSelectorsUI() {
     }
 }
 
-// Apply preset configuration
-function applyPreset(presetName) {
-    if (presetName === 'custom') {
-        currentSettings.contentExtraction.strategy = 'custom';
-        updatePresetSelection();
-        return;
-    }
 
-    const preset = EXTRACTION_PRESETS[presetName];
-    if (!preset) return;
 
-    currentSettings.contentExtraction.strategy = presetName;
-    currentSettings.contentExtraction.customSelectors = [...preset.customSelectors];
 
-    // Apply advanced filtering settings if they exist in the preset
-    if (preset.customFilters) {
-        currentSettings.advancedFiltering.customFilters = [...preset.customFilters];
-    }
-    if (preset.minContentLength !== undefined) {
-        currentSettings.advancedFiltering.minContentLength = preset.minContentLength;
-    }
-    if (preset.maxLinkRatio !== undefined) {
-        currentSettings.advancedFiltering.maxLinkRatio = preset.maxLinkRatio;
-    }
 
-    updateUI();
-    updatePresetSelection();
-}
 
-// Update keyboard shortcut from UI
-function updateShortcutFromUI() {
-    currentSettings.keyboardShortcut.modifier1 = document.getElementById('shortcutModifier1').value;
-    currentSettings.keyboardShortcut.modifier2 = document.getElementById('shortcutModifier2').value;
-    currentSettings.keyboardShortcut.key = document.getElementById('shortcutKey').value.toUpperCase();
-
-    // Show notification that shortcut changes require restart
-    showStatus('Keyboard shortcut changes require restarting Safari to take effect.', 'info');
-}
-
-// Update content extraction settings from UI
-function updateContentExtractionFromUI() {
-    // Individual removal settings removed - now using customFilters only
-    // When user changes settings, switch to custom preset
-    currentSettings.contentExtraction.strategy = 'custom';
-    updatePresetSelection();
-}
 
 // Update content selectors from UI textarea
 function updateContentSelectorsFromUI() {
@@ -353,9 +243,7 @@ function updateContentSelectorsFromUI() {
 
     currentSettings.contentExtraction.customSelectors = selectors;
 
-    // When user changes selectors, switch to custom preset
-    currentSettings.contentExtraction.strategy = 'custom';
-    updatePresetSelection();
+
 }
 
 // Update output format from UI
@@ -387,8 +275,7 @@ async function handleSaveSettings() {
 
     await saveSettings();
 
-    // Always show reminder about keyboard shortcut changes since they require Safari restart
-    showStatus('Settings saved! Note: Keyboard shortcut changes require restarting Safari to take effect.', 'info');
+    showStatus('Settings saved successfully!', 'success');
 }
 
 // Handle reset settings
@@ -396,67 +283,14 @@ async function handleResetSettings() {
     if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
         currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
         updateUI();
-        updatePresetSelection();
         await saveSettings();
     }
 }
 
-// Handle export settings
-function handleExportSettings() {
-    const dataStr = JSON.stringify(currentSettings, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'safari-to-drafts-settings.json';
-    link.click();
-
-    URL.revokeObjectURL(url);
-    showStatus('Settings exported successfully!', 'success');
-}
-
-// Handle import settings
-function handleImportSettings() {
-    document.getElementById('importFile').click();
-}
-
-// Handle file import
-async function handleFileImport(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    try {
-        const text = await file.text();
-        const importedSettings = JSON.parse(text);
-
-        // Validate imported settings
-        if (!validateImportedSettings(importedSettings)) {
-            showStatus('Invalid settings file format', 'error');
-            return;
-        }
-
-        currentSettings = mergeSettings(DEFAULT_SETTINGS, importedSettings);
-        updateUI();
-        updatePresetSelection();
-        showStatus('Settings imported successfully!', 'success');
-    } catch (error) {
-        console.error('Import error:', error);
-        showStatus('Failed to import settings. Please check the file format.', 'error');
-    }
-
-    // Clear the file input
-    event.target.value = '';
-}
 
 // Validate current settings
 function validateSettings() {
-    // Validate keyboard shortcut
-    const key = currentSettings.keyboardShortcut.key;
-    if (!key || key.length !== 1) {
-        showStatus('Invalid keyboard shortcut key', 'error');
-        return false;
-    }
 
     // Validate minimum content length
     const minLength = currentSettings.advancedFiltering.minContentLength;
@@ -475,24 +309,7 @@ function validateSettings() {
     return true;
 }
 
-// Validate imported settings structure
-function validateImportedSettings(settings) {
-    // Basic structure validation
-    if (!settings || typeof settings !== 'object') {
-        return false;
-    }
 
-    // Check for required sections
-    const requiredSections = ['keyboardShortcut', 'contentExtraction', 'outputFormat', 'advancedFiltering'];
-
-    for (const section of requiredSections) {
-        if (!settings[section] || typeof settings[section] !== 'object') {
-            return false;
-        }
-    }
-
-    return true;
-}
 
 // Show status message
 function showStatus(message, type) {
@@ -509,49 +326,4 @@ function showStatus(message, type) {
     }, timeout);
 }
 
-// Safari Web Extension API polyfill and fallback
-if (typeof browser === 'undefined') {
-    if (typeof chrome !== 'undefined') {
-        window.browser = chrome;
-    } else {
-        // Create a minimal polyfill for Safari
-        window.browser = {
-            storage: {
-                local: {
-                    get: async function (keys) {
-                        try {
-                            const result = {};
-                            if (Array.isArray(keys)) {
-                                keys.forEach(key => {
-                                    const value = localStorage.getItem(key);
-                                    if (value) {
-                                        result[key] = JSON.parse(value);
-                                    }
-                                });
-                            } else if (typeof keys === 'object') {
-                                for (const key in keys) {
-                                    const value = localStorage.getItem(key);
-                                    result[key] = value ? JSON.parse(value) : keys[key];
-                                }
-                            }
-                            return result;
-                        } catch (error) {
-                            console.error('Storage get error:', error);
-                            return {};
-                        }
-                    },
-                    set: async function (items) {
-                        try {
-                            for (const key in items) {
-                                localStorage.setItem(key, JSON.stringify(items[key]));
-                            }
-                        } catch (error) {
-                            console.error('Storage set error:', error);
-                            throw error;
-                        }
-                    }
-                }
-            }
-        };
-    }
-}
+

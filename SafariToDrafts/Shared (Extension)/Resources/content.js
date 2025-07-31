@@ -1,5 +1,5 @@
 // Content script for SafariToDrafts extension
-// This script ensures Turndown is available and provides minimal fallback functionality
+// This script ensures Turndown is available and provides settings access
 
 // Global settings object
 let extensionSettings = null;
@@ -46,45 +46,3 @@ if (typeof browser !== 'undefined') {
 window.getSafariToDraftsSettings = function() {
     return extensionSettings;
 };
-
-// Minimal legacy function for compatibility
-function getPageContentLegacy() {
-    // Get content selectors from settings if available
-    const contentSelectors = extensionSettings?.contentExtraction?.customSelectors || [
-        'article',
-        'main',
-        '[role="main"]',
-        '.entry-content',
-        '.post-content',
-        '.article-content',
-        '.content'
-    ];
-
-    // Try to find main content using selectors
-    let mainElement = null;
-    let content = '';
-
-    // Try each selector
-    for (const selector of contentSelectors) {
-        try {
-            mainElement = document.querySelector(selector);
-            if (mainElement) break;
-        } catch (e) {
-            // Skip selectors that cause errors
-        }
-    }
-
-    if (mainElement) {
-        content = mainElement.innerText || mainElement.textContent || '';
-    } else {
-        // Fallback to body
-        content = document.body.innerText || document.body.textContent || '';
-    }
-
-    return {
-        title: document.title,
-        url: window.location.href,
-        body: content,
-        source: 'page'
-    };
-}
