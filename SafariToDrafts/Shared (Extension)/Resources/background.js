@@ -94,6 +94,12 @@ async function createDraftFromCurrentTab() {
             return;
         }
 
+        // Inject Turndown library and content utilities
+        await browser.scripting.executeScript({
+            target: { tabId: activeTab.id },
+            files: ['turndown.js', 'content.js']
+        });
+
         // Execute content script to get page content
         const results = await browser.scripting.executeScript({
             target: { tabId: activeTab.id },
@@ -108,11 +114,20 @@ async function createDraftFromCurrentTab() {
         }
     } catch (error) {
         console.error("Error creating draft:", error);
-
-        // Check if this is a permission error
-        if (error.message && error.message.includes('permission')) {
-            // Permission denied - user needs to enable extension for this website
-            // To enable on all websites: Safari → Settings → Extensions → SafariToDrafts → Allow on Every Website
+        
+        // Show user-friendly error message
+        try {
+            const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+            if (activeTab) {
+                await browser.scripting.executeScript({
+                    target: { tabId: activeTab.id },
+                    func: () => {
+                        alert('SafariToDrafts: Unable to capture content from this page. This may be due to page restrictions.');
+                    }
+                });
+            }
+        } catch (alertError) {
+            console.error("Could not show error message:", alertError);
         }
     }
 }

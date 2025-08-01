@@ -26,19 +26,7 @@
         ],
         "persistent": false
     },
-    "content_scripts": [
-        {
-            "js": [
-                "turndown.js",
-                "content.js"
-            ],
-            "matches": [
-                "<all_urls>"
-            ],
-            "run_at": "document_end",
-            "all_frames": false
-        }
-    ],
+
     "action": {
         "default_icon": "images/toolbar-icon.png",
         "default_title": "SafariToDrafts - Capture content to Drafts"
@@ -59,11 +47,7 @@
     "permissions": [
         "activeTab",
         "scripting",
-        "tabs",
         "storage"
-    ],
-    "host_permissions": [
-        "<all_urls>"
     ],
     "web_accessible_resources": [
         {
