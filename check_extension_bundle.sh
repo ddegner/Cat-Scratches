@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Script to verify SafariToDrafts extension bundle contains required files
+# Script to verify Cat Scratches extension bundle contains required files
 # Run this after building the project in Xcode
 
-echo "🔍 Checking SafariToDrafts extension bundle..."
+echo "🔍 Checking Cat Scratches extension bundle..."
 
 # Find the most recent built extension (sort by modification time)
-EXTENSION_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "SafariToDrafts Extension.appex" -path "*SafariToDrafts*" -not -path "*/Index.noindex/*" 2>/dev/null | while read -r path; do
+EXTENSION_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "Cat Scratches Extension.appex" -path "*SafariToDrafts*" -not -path "*/Index.noindex/*" 2>/dev/null | while read -r path; do
     echo "$(stat -f %m "$path") $path"
 done | sort -nr | head -1 | cut -d' ' -f2-)
 

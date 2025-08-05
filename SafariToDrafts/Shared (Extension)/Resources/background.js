@@ -1,4 +1,4 @@
-// Background script for SafariToDrafts extension
+// Background script for Cat Scratches extension
 // Handles keyboard shortcuts and toolbar button clicks
 
 // Global settings object
@@ -122,7 +122,7 @@ async function createDraftFromCurrentTab() {
                 await browser.scripting.executeScript({
                     target: { tabId: activeTab.id },
                     func: () => {
-                        alert('SafariToDrafts: Unable to capture content from this page. This may be due to page restrictions.');
+                        alert('Cat Scratches: Unable to capture content from this page. This may be due to page restrictions.');
                     }
                 });
             }

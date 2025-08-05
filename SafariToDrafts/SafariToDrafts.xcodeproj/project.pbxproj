@@ -290,7 +290,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "SafariToDrafts Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -304,7 +304,7 @@
 					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts.Extension;
-				PRODUCT_NAME = "SafariToDrafts Extension";
+				PRODUCT_NAME = "Cat Scratches Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -322,7 +322,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "SafariToDrafts Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -336,7 +336,7 @@
 					SafariServices,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts.Extension;
-				PRODUCT_NAME = "SafariToDrafts Extension";
+				PRODUCT_NAME = "Cat Scratches Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -355,7 +355,7 @@
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SafariToDrafts;
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
@@ -373,7 +373,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts;
-				PRODUCT_NAME = SafariToDrafts;
+				PRODUCT_NAME = "Cat Scratches";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -392,7 +392,7 @@
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SafariToDrafts;
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
@@ -410,7 +410,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts;
-				PRODUCT_NAME = SafariToDrafts;
+				PRODUCT_NAME = "Cat Scratches";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;

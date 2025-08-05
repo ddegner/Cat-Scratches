@@ -1,15 +1,15 @@
-# Privacy Policy for SafariToDrafts
+# Privacy Policy for Cat Scratches
 
 **Effective Date:** August 1, 2025  
 **Last Updated:** August 1, 2025
 
 ## Overview
 
-SafariToDrafts ("we," "our," or "the app") is a Safari extension that allows users to capture web content and send it directly to the Drafts app. This privacy policy explains how we handle information when you use our Safari extension.
+Cat Scratches ("we," "our," or "the app") is a Safari extension that allows users to capture web content and send it directly to the Drafts app. This privacy policy explains how we handle information when you use our Safari extension.
 
 ## Information We Do Not Collect
 
-SafariToDrafts is designed with privacy as a core principle. We want to be completely transparent about what we do and do not collect:
+Cat Scratches is designed with privacy as a core principle. We want to be completely transparent about what we do and do not collect:
 
 ### No Personal Data Collection
 - We do not collect, store, or transmit any personal information
@@ -35,7 +35,7 @@ SafariToDrafts is designed with privacy as a core principle. We want to be compl
 
 ## How the Extension Works
 
-SafariToDrafts operates entirely on your local device:
+Cat Scratches operates entirely on your local device:
 
 1. **Content Processing**: When you use the extension, it processes the webpage content locally in Safari
 2. **Local Conversion**: The content is converted to Markdown format using local JavaScript libraries
@@ -62,7 +62,7 @@ Since we don't collect any data, there is no data to secure on our end. However:
 
 ## Third-Party Services
 
-SafariToDrafts integrates with:
+Cat Scratches integrates with:
 
 - **Drafts App**: Content captured by our extension is sent to the Drafts app. Please refer to [Drafts' privacy policy](https://getdrafts.com/privacy/) for information about how they handle your data.
 
@@ -70,7 +70,7 @@ We are not responsible for the privacy practices of third-party applications.
 
 ## Children's Privacy
 
-SafariToDrafts does not collect any personal information from anyone, including children under 13. The extension is safe for users of all ages.
+Cat Scratches does not collect any personal information from anyone, including children under 13. The extension is safe for users of all ages.
 
 ## Changes to This Privacy Policy
 
@@ -78,11 +78,11 @@ We may update this privacy policy from time to time. Any changes will be posted 
 
 ## Open Source
 
-SafariToDrafts is open source software. You can review our code at [https://github.com/ddegner/SafariToDrafts](https://github.com/ddegner/SafariToDrafts) to verify our privacy practices.
+Cat Scratches is open source software. You can review our code at [https://github.com/ddegner/SafariToDrafts](https://github.com/ddegner/SafariToDrafts) to verify our privacy practices.
 
 ## Contact Information
 
-If you have any questions about this privacy policy or SafariToDrafts, you can contact us:
+If you have any questions about this privacy policy or Cat Scratches, you can contact us:
 
 - **Developer**: David Degner
 - **Website**: [https://www.daviddegner.com](https://www.daviddegner.com)
@@ -90,8 +90,8 @@ If you have any questions about this privacy policy or SafariToDrafts, you can c
 
 ## Summary
 
-In simple terms: SafariToDrafts doesn't collect, store, or transmit any of your personal data or browsing information. Everything happens locally on your device, and we have no way to see or access your data. Your privacy is completely protected.
+In simple terms: Cat Scratches doesn't collect, store, or transmit any of your personal data or browsing information. Everything happens locally on your device, and we have no way to see or access your data. Your privacy is completely protected.
 
 ---
 
-*This privacy policy is designed to be transparent and comprehensive. SafariToDrafts is committed to protecting your privacy by simply not collecting any data in the first place.*
+*This privacy policy is designed to be transparent and comprehensive. Cat Scratches is committed to protecting your privacy by simply not collecting any data in the first place.*

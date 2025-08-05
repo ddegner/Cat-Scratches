@@ -2,9 +2,9 @@ function show(platform, enabled, useSettingsInsteadOfPreferences) {
     document.body.classList.add(`platform-${platform}`);
 
     if (useSettingsInsteadOfPreferences) {
-        document.getElementsByClassName('platform-mac state-on')[0].innerText = "SafariToDrafts’s extension is currently on. You can turn it off in the Extensions section of Safari Settings.";
-        document.getElementsByClassName('platform-mac state-off')[0].innerText = "SafariToDrafts’s extension is currently off. You can turn it on in the Extensions section of Safari Settings.";
-        document.getElementsByClassName('platform-mac state-unknown')[0].innerText = "You can turn on SafariToDrafts’s extension in the Extensions section of Safari Settings.";
+        document.getElementsByClassName('platform-mac state-on')[0].innerText = "Cat Scratches's extension is currently on. You can turn it off in the Extensions section of Safari Settings.";
+        document.getElementsByClassName('platform-mac state-off')[0].innerText = "Cat Scratches's extension is currently off. You can turn it on in the Extensions section of Safari Settings.";
+        document.getElementsByClassName('platform-mac state-unknown')[0].innerText = "You can turn on Cat Scratches's extension in the Extensions section of Safari Settings.";
         document.getElementsByClassName('platform-mac open-preferences')[0].innerText = "Quit and Open Safari Settings…";
     }
 

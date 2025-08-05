@@ -25,7 +25,7 @@ struct ContentView: View {
                 .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
             
             // Title
-            Text("SafariToDrafts")
+            Text("Cat Scratches")
                 .font(.largeTitle)
                 .fontWeight(.semibold)
             
@@ -115,11 +115,11 @@ struct ContentView: View {
         
         switch extensionManager.state {
         case .unknown:
-            return "You can enable SafariToDrafts in the \(settingsLocation)."
+            return "You can enable Cat Scratches in the \(settingsLocation)."
         case .enabled:
-            return "SafariToDrafts is active and ready to use. You can disable it in the \(settingsLocation)."
+            return "Cat Scratches is active and ready to use. You can disable it in the \(settingsLocation)."
         case .disabled:
-            return "SafariToDrafts is currently disabled. You can enable it in the \(settingsLocation)."
+            return "Cat Scratches is currently disabled. You can enable it in the \(settingsLocation)."
         }
     }
     
