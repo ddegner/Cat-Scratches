@@ -315,10 +315,9 @@
       customSelectors: unique(BASE_SELECTORS)
     },
     outputFormat: {
-      titleFormat: 'h1',
       // Unified template engine: always render via template with a sensible default
-      // {formattedTitle} respects the selected titleFormat; {title} is the raw title
-      template: '{formattedTitle}\n\n{url}\n\n---\n\n{content}',
+      // Title and URL markdown are now baked into the default template for simplicity
+      template: '# {title}\n\n<{url}>\n\n---\n\n{content}',
       defaultTag: ''
     },
     advancedFiltering: {
