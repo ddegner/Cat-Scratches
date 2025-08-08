@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7F5714B62E0322670079AEB5 /* SafariToDrafts Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F5714B52E0322670079AEB5 /* SafariToDrafts Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F5714B62E0322670079AEB5 /* Cat Scratches Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,7 +27,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				7F5714B62E0322670079AEB5 /* SafariToDrafts Extension.appex in Embed Foundation Extensions */,
+				7F5714B62E0322670079AEB5 /* Cat Scratches Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -35,12 +35,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7F57149F2E0322670079AEB5 /* SafariToDrafts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafariToDrafts.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7F5714B52E0322670079AEB5 /* SafariToDrafts Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "SafariToDrafts Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F57149F2E0322670079AEB5 /* Cat Scratches.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cat Scratches.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Cat Scratches Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "SafariToDrafts (macOS)" target */ = {
+		7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "Cat Scratches (macOS)" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"/Localized: Resources/Main.html",
@@ -50,20 +50,21 @@
 				Resources/Style.css,
 				ViewController.swift,
 			);
-			target = 7F57149E2E0322670079AEB5 /* SafariToDrafts (macOS) */;
+			target = 7F57149E2E0322670079AEB5 /* Cat Scratches (macOS) */;
 		};
-		7F5714E82E0322670079AEB5 /* Exceptions for "macOS (Extension)" folder in "SafariToDrafts Extension (macOS)" target */ = {
+		7F5714E82E0322670079AEB5 /* Exceptions for "macOS (Extension)" folder in "Cat Scratches Extension (macOS)" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */;
+			target = 7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */;
 		};
-		7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "SafariToDrafts Extension (macOS)" target */ = {
+		7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "Cat Scratches Extension (macOS)" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Resources/_locales,
 				Resources/background.js,
+				Resources/defaults.js,
 				Resources/content.js,
 				Resources/images,
 				Resources/manifest.json,
@@ -72,7 +73,7 @@
 				Resources/turndown.js,
 				SafariWebExtensionHandler.swift,
 			);
-			target = 7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */;
+			target = 7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -80,7 +81,7 @@
 		7F5714752E0322660079AEB5 /* Shared (App) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "SafariToDrafts (macOS)" target */,
+				7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "Cat Scratches (macOS)" target */,
 			);
 			path = "Shared (App)";
 			sourceTree = "<group>";
@@ -88,7 +89,7 @@
 		7F57147E2E0322670079AEB5 /* Shared (Extension) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "SafariToDrafts Extension (macOS)" target */,
+				7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "Cat Scratches Extension (macOS)" target */,
 			);
 			explicitFolders = (
 				Resources/_locales,
@@ -105,7 +106,7 @@
 		7F5714B92E0322670079AEB5 /* macOS (Extension) */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				7F5714E82E0322670079AEB5 /* Exceptions for "macOS (Extension)" folder in "SafariToDrafts Extension (macOS)" target */,
+				7F5714E82E0322670079AEB5 /* Exceptions for "macOS (Extension)" folder in "Cat Scratches Extension (macOS)" target */,
 			);
 			path = "macOS (Extension)";
 			sourceTree = "<group>";
@@ -144,8 +145,8 @@
 		7F57148E2E0322670079AEB5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7F57149F2E0322670079AEB5 /* SafariToDrafts.app */,
-				7F5714B52E0322670079AEB5 /* SafariToDrafts Extension.appex */,
+				7F57149F2E0322670079AEB5 /* Cat Scratches.app */,
+				7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,9 +154,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7F57149E2E0322670079AEB5 /* SafariToDrafts (macOS) */ = {
+		7F57149E2E0322670079AEB5 /* Cat Scratches (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7F5714EA2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts (macOS)" */;
+			buildConfigurationList = 7F5714EA2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches (macOS)" */;
 			buildPhases = (
 				7F57149B2E0322670079AEB5 /* Sources */,
 				7F57149C2E0322670079AEB5 /* Frameworks */,
@@ -170,16 +171,16 @@
 			fileSystemSynchronizedGroups = (
 				7F5714A02E0322670079AEB5 /* macOS (App) */,
 			);
-			name = "SafariToDrafts (macOS)";
+			name = "Cat Scratches (macOS)";
 			packageProductDependencies = (
 			);
 			productName = "SafariToDrafts (macOS)";
-			productReference = 7F57149F2E0322670079AEB5 /* SafariToDrafts.app */;
+			productReference = 7F57149F2E0322670079AEB5 /* Cat Scratches.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */ = {
+		7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7F5714E52E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts Extension (macOS)" */;
+			buildConfigurationList = 7F5714E52E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (macOS)" */;
 			buildPhases = (
 				7F5714B12E0322670079AEB5 /* Sources */,
 				7F5714B22E0322670079AEB5 /* Frameworks */,
@@ -192,11 +193,11 @@
 			fileSystemSynchronizedGroups = (
 				7F5714B92E0322670079AEB5 /* macOS (Extension) */,
 			);
-			name = "SafariToDrafts Extension (macOS)";
+			name = "Cat Scratches Extension (macOS)";
 			packageProductDependencies = (
 			);
 			productName = "SafariToDrafts Extension (macOS)";
-			productReference = 7F5714B52E0322670079AEB5 /* SafariToDrafts Extension.appex */;
+			productReference = 7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -217,7 +218,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7F5714742E0322650079AEB5 /* Build configuration list for PBXProject "SafariToDrafts" */;
+			buildConfigurationList = 7F5714742E0322650079AEB5 /* Build configuration list for PBXProject "Cat Scratches" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -231,8 +232,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7F57149E2E0322670079AEB5 /* SafariToDrafts (macOS) */,
-				7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */,
+				7F57149E2E0322670079AEB5 /* Cat Scratches (macOS) */,
+				7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -274,7 +275,7 @@
 /* Begin PBXTargetDependency section */
 		7F5714B82E0322670079AEB5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7F5714B42E0322670079AEB5 /* SafariToDrafts Extension (macOS) */;
+			target = 7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */;
 			targetProxy = 7F5714B72E0322670079AEB5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -283,7 +284,7 @@
 		7F5714E62E0322670079AEB5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/SafariToDrafts.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q26G342EEL;
@@ -303,7 +304,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts.Extension;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
 				PRODUCT_NAME = "Cat Scratches Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -315,7 +316,7 @@
 		7F5714E72E0322670079AEB5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/SafariToDrafts.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q26G342EEL;
@@ -335,7 +336,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts.Extension;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
 				PRODUCT_NAME = "Cat Scratches Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
@@ -349,7 +350,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/SafariToDrafts.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q26G342EEL;
@@ -372,7 +374,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
 				PRODUCT_NAME = "Cat Scratches";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
@@ -386,7 +388,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/SafariToDrafts.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Q26G342EEL;
@@ -409,7 +412,7 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddegner.SafariToDrafts;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
 				PRODUCT_NAME = "Cat Scratches";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
@@ -537,7 +540,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7F5714742E0322650079AEB5 /* Build configuration list for PBXProject "SafariToDrafts" */ = {
+		7F5714742E0322650079AEB5 /* Build configuration list for PBXProject "Cat Scratches" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7F5714EF2E0322670079AEB5 /* Debug */,
@@ -546,7 +549,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7F5714E52E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts Extension (macOS)" */ = {
+		7F5714E52E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7F5714E62E0322670079AEB5 /* Debug */,
@@ -555,7 +558,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7F5714EA2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "SafariToDrafts (macOS)" */ = {
+		7F5714EA2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7F5714EB2E0322670079AEB5 /* Debug */,

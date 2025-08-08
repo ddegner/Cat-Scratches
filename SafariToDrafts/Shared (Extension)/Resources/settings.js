@@ -1,288 +1,6 @@
 // Settings script for Cat Scratches extension
 
-// Default settings configuration (single source of truth for all settings)
-const DEFAULT_SETTINGS = {
-    contentExtraction: {
-        strategy: 'default',
-        customSelectors: [
-            '[itemtype*="Article"]',
-            '[itemtype*="BlogPosting"]',
-            '[itemtype*="NewsArticle"]',
-            'article[role="main"]',
-            'main[role="main"]',
-            'article',
-            'main',
-            '[role="main"]',
-            '.entry-content',
-            '.post-content',
-            '.wp-block-post-content',
-            '.story-body',
-            '.article-body',
-            '.article-content',
-            '.content-body',
-            '.main-content',
-            '.kg-post',
-            '.postArticle-content',
-            '.markup',
-            '.node .content',
-            '.content',
-            '.post',
-            '.entry',
-            '.article',
-            'section[name="articleBody"]',
-            '[itemprop="articleBody"]',
-            '.StoryBodyCompanionColumn',
-            '.content__article-body',
-            '.article__content',
-            '.article__body',
-            '.post-body',
-            '.entry-body',
-            '.itemFullText',
-            '#js-article-text'
-        ]
-    },
-    outputFormat: {
-        titleFormat: 'h1',
-        includeSource: true,
-        includeSeparator: true,
-        includeTimestamp: false,
-        customTemplate: '',
-        defaultTag: ''
-    },
-    advancedFiltering: {
-        customFilters: [
-            'img',
-            'picture',
-            'figure',
-            'figcaption',
-            'video',
-            'audio',
-            'source',
-            '.image',
-            '.img',
-            '.photo',
-            '.picture',
-            '.gallery',
-            '.slideshow',
-            '.carousel',
-            '.lightbox',
-            '.media',
-            '.caption',
-            '.image-caption',
-            '.photo-caption',
-            '.media-caption',
-            '.image-credit',
-            '.photo-credit',
-            '.media-credit',
-            '.image-container',
-            '.photo-container',
-            '.media-container',
-            'nav',
-            'header',
-            'footer',
-            'aside',
-            '.nav',
-            '.navigation',
-            '.header',
-            '.footer',
-            '.sidebar',
-            '.breadcrumb',
-            '.pagination',
-            'h1.entry-title',
-            'h1.post-title',
-            'h1.article-title',
-            'h1.page-title',
-            '.entry-title',
-            '.post-title',
-            '.article-title',
-            '.page-title',
-            '.headline',
-            '.title',
-            '.story-headline',
-            '.article-headline',
-            'h1.headline',
-            'h1.title',
-            'h1.story-headline',
-            'h1.article-headline',
-            '.post-header h1',
-            '.article-header h1',
-            '.entry-header h1',
-            '.content-header h1',
-            '.story-header h1',
-            '.page-header h1',
-            'header h1',
-            '.header h1',
-            '.masthead h1',
-            '[class*="title"] h1',
-            '[class*="headline"] h1',
-            'h1[class*="title"]',
-            'h1[class*="headline"]',
-            '.wp-block-post-title',
-            '.single-title',
-            '.post-title-wrapper h1',
-            '.ad',
-            '.ads',
-            '.advertisement',
-            '.sponsored',
-            '.banner',
-            '.google-ad',
-            '.outbrain',
-            '.taboola',
-            '[class*="ad-"]',
-            '[id*="ad-"]',
-            '.social',
-            '.share',
-            '.sharing',
-            '.social-buttons',
-            '.facebook',
-            '.twitter',
-            '.linkedin',
-            '.comments',
-            '.comment',
-            '.disqus',
-            '.comment-form',
-            '.comment-section',
-            '.related',
-            '.recommended',
-            '.more-stories',
-            '.trending',
-            '.popular',
-            '.suggestions',
-            '.newsletter',
-            '.subscription',
-            '.signup',
-            '.email-signup',
-            '.cta',
-            '.popup',
-            '.modal',
-            '.overlay',
-            '.cookie-notice',
-            '.cookie-banner',
-            '.author-bio',
-            '.tags',
-            '.categories',
-            '.meta',
-            '.widget',
-            '.secondary',
-            '.sidebar-widget',
-            '.wp-caption',
-            '.wp-gallery',
-            '.sharedaddy',
-            '[data-testid="related-topics"]',
-            '[data-testid="related-links"]',
-            '[data-testid="related-content"]',
-            '[data-testid="related-articles"]',
-            '[data-testid="related-stories"]',
-            '[data-testid="related-topics-list"]',
-            '[data-testid="related-topics-item"]',
-            '[data-testid="advertisement"]',
-            '[data-testid="ad"]',
-            '[data-testid="sponsored"]',
-            '[data-testid="skip-advertisement"]',
-            '[data-testid="ad-skip"]',
-            '[data-testid="supported-by"]',
-            '[data-testid="sponsored-content"]',
-            '[data-testid="partner-content"]',
-            '[data-testid="share-tools"]',
-            '[data-testid="social-share"]',
-            '[data-testid="article-tools"]',
-            '[data-testid="listen-button"]',
-            '[data-testid="audio-player"]',
-            '[data-testid="listen-to-article"]',
-            '[data-testid="byline"]',
-            '[data-testid="author-info"]',
-            '[data-testid="article-meta"]',
-            '[data-testid="article-info"]',
-            '[data-testid="dateline"]',
-            '[data-testid="image-caption"]',
-            '[data-testid="photo-caption"]',
-            '[data-testid="image-credit"]',
-            '[data-testid="photo-credit"]',
-            '[data-testid="caption"]',
-            '[data-testid="credit"]',
-            '[data-testid="newsletter"]',
-            '[data-testid="subscription"]',
-            '[data-testid="subscribe"]',
-            '[data-testid="sign-up"]',
-            '[data-testid="comments"]',
-            '[data-testid="recommended"]',
-            '[data-testid="more-stories"]',
-            '[data-testid="see-more"]',
-            '[data-testid="share-full-article"]',
-            '[data-testid="skip-ad"]',
-            '[data-testid*="listen"]',
-            '[data-testid*="audio"]',
-            '[data-testid*="share"]',
-            '[data-testid*="learn-more"]',
-            '[data-testid*="updated"]',
-            '.related-topics',
-            '.related-links',
-            '.related-content',
-            '.related-articles',
-            '.related-stories',
-            '.advertisement',
-            '.supported-by',
-            '.share-tools',
-            '.social-share',
-            '.article-tools',
-            '.listen-button',
-            '.audio-player',
-            '.byline',
-            '.author-info',
-            '.article-meta',
-            '.article-info',
-            '.dateline',
-            '.image-caption',
-            '.photo-caption',
-            '.image-credit',
-            '.photo-credit',
-            '.caption',
-            '.credit',
-            '.newsletter',
-            '.subscription',
-            '.subscribe',
-            '.sign-up',
-            '.comments',
-            '.recommended',
-            '.more-stories',
-            '.see-more',
-            '.share-full-article',
-            '.skip-ad',
-            'nav[role="navigation"]',
-            '.navigation',
-            '.nav-menu',
-            '.nav-list',
-            '.nav-items',
-            '.nav-links',
-            '.site-header',
-            '.site-footer',
-            '.global-header',
-            '.global-footer',
-            '[class*="listen"]',
-            '[class*="audio"]',
-            '[class*="share-full"]',
-            '[class*="learn-more"]',
-            '[class*="updated-time"]',
-            '[class*="see-more"]',
-            '[class*="related-content"]',
-            '[class*="skip-ad"]',
-            '[class*="advertisement"]',
-            'iframe',
-            'embed',
-            'object',
-            'canvas',
-            'form',
-            '.instagram',
-            '.instagram-media',
-            '.twitter-tweet',
-            '.fb-post',
-            'script',
-            'noscript'
-        ],
-        minContentLength: 150,
-        maxLinkRatio: 0.3
-    }
-};
+// Default settings are provided by defaults.js (window.DEFAULT_SETTINGS)
 
 // Global settings object
 let currentSettings = {};
@@ -302,10 +20,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load settings from storage
 async function loadSettings() {
     try {
-        const stored = await browser.storage.local.get(['safariToDraftsSettings']);
-        if (stored.safariToDraftsSettings) {
+        const stored = await browser.storage.local.get(['catScratchesSettings']);
+        if (stored.catScratchesSettings) {
             // User has saved settings - use them exactly as saved
-            currentSettings = stored.safariToDraftsSettings;
+            currentSettings = migrateSettings(stored.catScratchesSettings);
         } else {
             // No saved settings - use defaults for initial setup
             currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
@@ -321,7 +39,7 @@ async function loadSettings() {
 async function saveSettings() {
     try {
         await browser.storage.local.set({
-            safariToDraftsSettings: currentSettings
+            catScratchesSettings: currentSettings
         });
         showStatus('Settings saved successfully!', 'success');
     } catch (error) {
@@ -344,10 +62,7 @@ function setupEventListeners() {
 
     // Output format inputs
     document.getElementById('titleFormat').addEventListener('change', updateOutputFormatFromUI);
-    document.getElementById('includeSource').addEventListener('change', updateOutputFormatFromUI);
-    document.getElementById('includeSeparator').addEventListener('change', updateOutputFormatFromUI);
-    document.getElementById('includeTimestamp').addEventListener('change', updateOutputFormatFromUI);
-    document.getElementById('customTemplate').addEventListener('input', updateOutputFormatFromUI);
+    document.getElementById('template').addEventListener('input', updateOutputFormatFromUI);
     document.getElementById('defaultTag').addEventListener('input', updateOutputFormatFromUI);
 
     // Advanced filtering inputs (using customFilters from HTML)
@@ -368,10 +83,7 @@ function updateUI() {
 
     // Output format
     document.getElementById('titleFormat').value = currentSettings.outputFormat.titleFormat;
-    document.getElementById('includeSource').checked = currentSettings.outputFormat.includeSource;
-    document.getElementById('includeSeparator').checked = currentSettings.outputFormat.includeSeparator;
-    document.getElementById('includeTimestamp').checked = currentSettings.outputFormat.includeTimestamp;
-    document.getElementById('customTemplate').value = currentSettings.outputFormat.customTemplate;
+    document.getElementById('template').value = currentSettings.outputFormat.template || '';
     document.getElementById('defaultTag').value = currentSettings.outputFormat.defaultTag || '';
 
     // Advanced filtering
@@ -410,10 +122,7 @@ function updateContentSelectorsFromUI() {
 // Update output format from UI
 function updateOutputFormatFromUI() {
     currentSettings.outputFormat.titleFormat = document.getElementById('titleFormat').value;
-    currentSettings.outputFormat.includeSource = document.getElementById('includeSource').checked;
-    currentSettings.outputFormat.includeSeparator = document.getElementById('includeSeparator').checked;
-    currentSettings.outputFormat.includeTimestamp = document.getElementById('includeTimestamp').checked;
-    currentSettings.outputFormat.customTemplate = document.getElementById('customTemplate').value;
+    currentSettings.outputFormat.template = document.getElementById('template').value;
     currentSettings.outputFormat.defaultTag = document.getElementById('defaultTag').value.trim();
 }
 
@@ -441,10 +150,24 @@ async function handleSaveSettings() {
 
 // Handle reset settings
 async function handleResetSettings() {
-    if (confirm('Are you sure you want to reset all settings to defaults? This cannot be undone.')) {
-        currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    try {
+        // Remove any saved settings
+        await browser.storage.local.remove('catScratchesSettings');
+
+        // Recreate defaults as on first install
+        const defaults = (typeof getDefaultSettings === 'function')
+            ? getDefaultSettings()
+            : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+
+        await browser.storage.local.set({ catScratchesSettings: defaults });
+
+        // Update in-memory and UI state
+        currentSettings = JSON.parse(JSON.stringify(defaults));
         updateUI();
-        await saveSettings();
+        showStatus('Settings reset to defaults.', 'success');
+    } catch (error) {
+        console.error('Failed to reset settings:', error);
+        showStatus('Failed to reset settings. Please try again.', 'error');
     }
 }
 
@@ -486,5 +209,69 @@ function showStatus(message, type) {
         statusEl.style.display = 'none';
     }, timeout);
 }
+
+// Migrate older settings structure to the new unified template approach
+function migrateSettings(inputSettings) {
+    const settings = JSON.parse(JSON.stringify(inputSettings || {}));
+    settings.outputFormat = settings.outputFormat || {};
+    // If legacy customTemplate exists or include* flags exist, convert to template
+    const hasLegacyFlags = (
+        settings.outputFormat.hasOwnProperty('includeSource') ||
+        settings.outputFormat.hasOwnProperty('includeSeparator') ||
+        settings.outputFormat.hasOwnProperty('includeTimestamp') ||
+        settings.outputFormat.hasOwnProperty('customTemplate')
+    );
+
+    // Ensure a template exists; prefer legacy customTemplate if present
+    if (!settings.outputFormat.template) {
+        const legacyTemplate = (settings.outputFormat.customTemplate || '').trim();
+        if (legacyTemplate) {
+            settings.outputFormat.template = legacyTemplate;
+        } else {
+            // Use current defaults from DEFAULT_SETTINGS if available
+            const defaultTemplate = (DEFAULT_SETTINGS && DEFAULT_SETTINGS.outputFormat && DEFAULT_SETTINGS.outputFormat.template)
+                ? DEFAULT_SETTINGS.outputFormat.template
+                : '{formattedTitle}\n\n{url}\n\n---\n\n{content}';
+            settings.outputFormat.template = defaultTemplate;
+        }
+    }
+
+    // Remove legacy fields to keep storage clean
+    delete settings.outputFormat.includeSource;
+    delete settings.outputFormat.includeSeparator;
+    delete settings.outputFormat.includeTimestamp;
+    delete settings.outputFormat.customTemplate;
+
+    // Ensure titleFormat exists
+    if (!settings.outputFormat.titleFormat) {
+        settings.outputFormat.titleFormat = 'h1';
+    }
+
+    return settings;
+}
+
+// Enhance UX: clickable placeholder tags to insert into template
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('placeholderTags');
+    if (!container) return;
+    const placeholders = ['{title}', '{formattedTitle}', '{url}', '{content}', '{timestamp}', '{tag}'];
+    placeholders.forEach(ph => {
+        const el = document.createElement('span');
+        el.className = 'placeholder-tag';
+        el.textContent = ph;
+        el.addEventListener('click', () => {
+            const textarea = document.getElementById('template');
+            if (!textarea) return;
+            const start = textarea.selectionStart || 0;
+            const end = textarea.selectionEnd || 0;
+            const value = textarea.value || '';
+            textarea.value = value.substring(0, start) + ph + value.substring(end);
+            textarea.dispatchEvent(new Event('input'));
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + ph.length;
+        });
+        container.appendChild(el);
+    });
+});
 
 

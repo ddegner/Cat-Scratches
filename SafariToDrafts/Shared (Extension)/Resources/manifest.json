@@ -21,10 +21,7 @@
         "512": "images/icon-512-dark.png"
     },
     "background": {
-        "scripts": [
-            "background.js"
-        ],
-        "persistent": false
+        "service_worker": "background.js"
     },
 
     "action": {
@@ -49,22 +46,23 @@
         "scripting",
         "storage"
     ],
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "settings.html"
-            ],
-            "matches": [
-                "<all_urls>"
-            ]
-        }
-    ],
     "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self'"
+        "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"
     },
     "options_ui": {
         "page": "settings.html",
         "open_in_tab": true
     },
-    "options_page": "settings.html"
+    "options_page": "settings.html",
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "catlogo_dark.png",
+                "catlogo_light.png"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
 }

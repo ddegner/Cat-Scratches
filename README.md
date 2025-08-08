@@ -4,7 +4,7 @@ The fastest and most elegant way to capture content from the web and send it dir
 
 **Author:** David Degner
 **Website:** https://www.daviddegner.com
-**Source Code, bugs, and feature requests:** https://github.com/ddegner/SafariToDrafts
+**Source Code, bugs, and feature requests:** https://github.com/ddegner/Cat-Scratches
 
 ## 🚀 Features
 
@@ -115,7 +115,7 @@ Your captured content here, perfectly formatted in Markdown...
 
 ## 📞 Support
 
-For bug reports, feature requests, or contributions, please visit our [GitHub repository](https://github.com/ddegner/SafariToDrafts).
+For bug reports, feature requests, or contributions, please visit our [GitHub repository](https://github.com/ddegner/Cat-Scratches).
 
 **Author:** David Degner
 **Website:** https://www.daviddegner.com

@@ -1,61 +1,134 @@
 // Background script for Cat Scratches extension
 // Handles keyboard shortcuts and toolbar button clicks
+// Ensure defaults are loaded in MV3 service worker context
+try { /* ESM import for MV3 */
+    importScripts; // reference to avoid bundlers removing next line in non-module contexts
+} catch (_) { /* noop */ }
+try {
+    // For MV3 module service worker, prefer static import
+    // Note: This will be ignored by MV2/background page
+    // eslint-disable-next-line import/no-unresolved
+    // @ts-ignore
+    import('./defaults.js');
+} catch (_) {
+    // Fallback for non-module worker environments (not expected on MV3)
+    try { self.importScripts('defaults.js'); } catch (_) {}
+}
 
 // Global settings object
 let extensionSettings = null;
+
+// Provide robust defaults even if defaults.js fails to load in MV3 worker
+function getEffectiveDefaults() {
+    try {
+        if (typeof getDefaultSettings === 'function') {
+            return getDefaultSettings();
+        }
+        if (typeof DEFAULT_SETTINGS !== 'undefined') {
+            return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+        }
+    } catch (_) { /* ignore */ }
+    // Minimal built-in defaults to ensure first-run works
+    return {
+        contentExtraction: {
+            strategy: 'default',
+            customSelectors: [
+                '[itemtype*="Article"]',
+                '[itemtype*="BlogPosting"]',
+                '[itemtype*="NewsArticle"]',
+                'article[role="main"]',
+                'main[role="main"]',
+                'article',
+                'main',
+                '[role="main"]',
+                '.entry-content',
+                '.post-content',
+                '.article-content',
+                '.content',
+                '.post',
+                '.entry'
+            ]
+        },
+        outputFormat: {
+            titleFormat: 'h1',
+            template: '{formattedTitle}\n\n{url}\n\n---\n\n{content}',
+            defaultTag: ''
+        },
+        advancedFiltering: {
+            customFilters: ['img', 'picture', 'figure', 'video', 'audio', 'nav', 'header', 'footer', '.ad', '.ads', '.advertisement', '.social', '.share', '.comments'],
+            minContentLength: 150,
+            maxLinkRatio: 0.3
+        }
+    };
+}
 
 // Listen for extension startup
 browser.runtime.onStartup.addListener(() => {
     loadExtensionSettings();
 });
 
-browser.runtime.onInstalled.addListener(() => {
+browser.runtime.onInstalled.addListener(async () => {
     // Check if we have permission to run on all websites
     checkPermissions();
 
-    // Load settings
-    loadExtensionSettings();
+    // Initialize with default settings on first install
+    try {
+        const result = await browser.storage.local.get(['catScratchesSettings']);
+        if (!result.catScratchesSettings) {
+            // First install - save default settings
+            const defaultSettings = getEffectiveDefaults();
+            await browser.storage.local.set({
+                catScratchesSettings: defaultSettings
+            });
+            extensionSettings = defaultSettings;
+        } else {
+            // Extension already has settings
+            extensionSettings = migrateSettings(result.catScratchesSettings);
+            // Persist migrated structure if changes were applied
+            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
+        }
+    } catch (error) {
+        console.error('Failed to initialize extension settings:', error);
+        // Don't throw here - let the extension load and show error when used
+    }
 });
 
 // Listen for settings changes
 browser.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes.safariToDraftsSettings) {
-        extensionSettings = changes.safariToDraftsSettings.newValue;
+    if (area === 'local' && changes.catScratchesSettings) {
+        extensionSettings = migrateSettings(changes.catScratchesSettings.newValue);
     }
 });
 
 // Function to load extension settings from storage
 async function loadExtensionSettings() {
     try {
-        const result = await browser.storage.local.get(['safariToDraftsSettings']);
-        if (result.safariToDraftsSettings) {
-            extensionSettings = result.safariToDraftsSettings;
+        const result = await browser.storage.local.get(['catScratchesSettings']);
+        if (result.catScratchesSettings) {
+            extensionSettings = migrateSettings(result.catScratchesSettings);
+            // Persist migrated structure
+            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
         } else {
-            extensionSettings = null;
+            // No settings found - initialize from defaults to support true first-run actions
+            const defaults = getEffectiveDefaults();
+            extensionSettings = migrateSettings(defaults);
+            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
         }
     } catch (error) {
         console.error('Failed to load extension settings:', error);
-        extensionSettings = null;
-    }
-}
-
-// Function to check and request permissions
-async function checkPermissions() {
-    try {
-        // In Safari, we can't actually request permissions programmatically
-        // But we can detect when we don't have them and inform the user
-        const hasPermission = await browser.permissions.contains({
-            origins: ["<all_urls>"]
-        });
-
-        if (!hasPermission) {
-            // Note: Safari doesn't support requesting permissions programmatically
-            // Users must manually enable in Safari settings
+        // Last-resort fallback to in-memory defaults so user action can still proceed
+        if (!extensionSettings) {
+            try { extensionSettings = migrateSettings(getEffectiveDefaults()); }
+            catch (_) { /* keep null; caller will surface a friendly error */ }
         }
-    } catch (error) {
-        // Permission check not supported in Safari
+        throw new Error('Failed to load extension settings: ' + error.message);
     }
 }
+
+// Default settings are provided by defaults.js (getDefaultSettings)
+
+// Remove broad permission checks to avoid host-wide prompts; rely on activeTab
+async function checkPermissions() { /* no-op */ }
 
 // Listen for toolbar button clicks
 browser.action.onClicked.addListener(async (tab) => {
@@ -86,7 +159,12 @@ browser.commands.onCommand.addListener(async (command) => {
 
 async function createDraftFromCurrentTab() {
     try {
-        // Get the active tab
+        // Ensure settings are loaded
+        if (!extensionSettings) {
+            await loadExtensionSettings();
+        }
+
+        // Get the active tab. activeTab permission enables temporary scripting on user gesture.
         const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
 
         if (!activeTab) {
@@ -94,11 +172,9 @@ async function createDraftFromCurrentTab() {
             return;
         }
 
-        // Inject Turndown library and content utilities
-        await browser.scripting.executeScript({
-            target: { tabId: activeTab.id },
-            files: ['turndown.js', 'content.js']
-        });
+        // Inject Turndown library and content utilities under the current user gesture
+        await browser.scripting.executeScript({ target: { tabId: activeTab.id }, files: ['turndown.js'] });
+        await browser.scripting.executeScript({ target: { tabId: activeTab.id }, files: ['content.js'] });
 
         // Execute content script to get page content
         const results = await browser.scripting.executeScript({
@@ -121,9 +197,10 @@ async function createDraftFromCurrentTab() {
             if (activeTab) {
                 await browser.scripting.executeScript({
                     target: { tabId: activeTab.id },
-                    func: () => {
-                        alert('Cat Scratches: Unable to capture content from this page. This may be due to page restrictions.');
-                    }
+                    func: (errorMessage) => {
+                        alert('Cat Scratches Error: ' + errorMessage);
+                    },
+                    args: [error.message]
                 });
             }
         } catch (alertError) {
@@ -157,7 +234,10 @@ async function getPageContent(extensionSettings) {
                     }
 
                     // Use customFilters for all removal logic
-                    const customFilters = extensionSettings?.advancedFiltering?.customFilters || [];
+                    if (!extensionSettings?.advancedFiltering?.customFilters) {
+                        throw new Error('No custom filters configured. Please check extension settings.');
+                    }
+                    const customFilters = extensionSettings.advancedFiltering.customFilters;
                     
                     // Check for image/media elements
                     if (customFilters.some(filter => 
@@ -230,44 +310,11 @@ async function getPageContent(extensionSettings) {
             // Simplified content extraction for full page
             let mainContent = null;
 
-            // Get content selectors from settings or use defaults
-            const contentSelectors = extensionSettings?.contentExtraction?.customSelectors || [
-                // Schema.org structured data (highest priority)
-                '[itemtype*="Article"]',
-                '[itemtype*="BlogPosting"]',
-                '[itemtype*="NewsArticle"]',
-                
-                // Semantic HTML5
-                'article[role="main"]',
-                'main[role="main"]',
-                'article',
-                'main',
-                '[role="main"]',
-
-                // WordPress (most common CMS)
-                '.entry-content',
-                '.post-content',
-                '.wp-block-post-content',
-
-                // Major news sites
-                '.story-body',
-                '.article-body',
-                '.article-content',
-                '.content-body',
-                '.main-content',
-
-                // Other CMS platforms
-                '.kg-post', // Ghost
-                '.postArticle-content', // Medium
-                '.markup', // Substack
-                '.node .content', // Drupal
-
-                // Generic content selectors
-                '.content',
-                '.post',
-                '.entry',
-                '.article'
-            ];
+            // Get content selectors from settings - no fallbacks
+            if (!extensionSettings?.contentExtraction?.customSelectors) {
+                throw new Error('No content selectors configured. Please check extension settings.');
+            }
+            const contentSelectors = extensionSettings.contentExtraction.customSelectors;
 
             // Find the best content element using a simplified scoring system
             let bestElement = null;
@@ -278,14 +325,20 @@ async function getPageContent(extensionSettings) {
                     const elements = document.querySelectorAll(selector);
                     for (const element of elements) {
                         const textLength = (element.textContent || '').trim().length;
-                        const minContentLength = extensionSettings?.advancedFiltering?.minContentLength || 150;
+                        const minContentLength = extensionSettings?.advancedFiltering?.minContentLength;
+                        if (minContentLength === undefined || minContentLength === null) {
+                            throw new Error('Minimum content length not configured. Please check extension settings.');
+                        }
                         
                         if (textLength >= minContentLength) {
                             // Calculate link ratio
                             const linkLength = Array.from(element.querySelectorAll('a'))
                                 .reduce((total, link) => total + (link.textContent || '').length, 0);
                             const linkRatio = textLength > 0 ? linkLength / textLength : 1;
-                            const maxLinkRatio = extensionSettings?.advancedFiltering?.maxLinkRatio || 0.3;
+                            const maxLinkRatio = extensionSettings?.advancedFiltering?.maxLinkRatio;
+                            if (maxLinkRatio === undefined || maxLinkRatio === null) {
+                                throw new Error('Maximum link ratio not configured. Please check extension settings.');
+                            }
                             
                             if (linkRatio < maxLinkRatio) {
                                 // Simple scoring system
@@ -336,7 +389,10 @@ async function getPageContent(extensionSettings) {
                     const bodyClone = document.body.cloneNode(true);
 
                     // Remove elements using customFilters for fallback
-                    const customFilters = extensionSettings?.advancedFiltering?.customFilters || [];
+                    if (!extensionSettings?.advancedFiltering?.customFilters) {
+                        throw new Error('No custom filters configured. Please check extension settings.');
+                    }
+                    const customFilters = extensionSettings.advancedFiltering.customFilters;
                     const elementsToRemove = bodyClone.querySelectorAll(customFilters.join(', '));
                     elementsToRemove.forEach(el => el.remove());
 
@@ -348,11 +404,10 @@ async function getPageContent(extensionSettings) {
             }
         }
 
-        // Content cleanup
+        // Content cleanup (single normalization pass)
         content = content
             .replace(/\n\s*\n\s*\n/g, '\n\n')
             .replace(/ +/g, ' ')
-            .trim()
             .replace(/.*click here to subscribe.*$/gim, '')
             .replace(/.*sign up for our newsletter.*$/gim, '')
             .replace(/.*download our app.*$/gim, '')
@@ -428,111 +483,97 @@ async function createDraft(title, url, markdownBody, isSelection = false) {
             // Store the current URL so we can navigate back
             const currentURL = activeTab.url;
 
-            // Execute the URL scheme by navigating to it
+            // Execute the URL scheme by navigating to it (primary method)
             await browser.scripting.executeScript({
                 target: { tabId: activeTab.id },
                 func: function(draftsUrl, originalUrl) {
-                    // Navigate to the Drafts URL
                     window.location.href = draftsUrl;
-
-                    // Set up a timer to navigate back to the original page
                     setTimeout(() => {
                         window.location.href = originalUrl;
                     }, 2000);
                 },
                 args: [draftsURL, currentURL]
             });
-
-
         }
     } catch (error) {
-        console.error("Failed to execute navigation script:", error);
-
-        // Fallback: try creating a new tab with the URL scheme
-        try {
-            const newTab = await browser.tabs.create({
-                url: draftsURL,
-                active: false
-            });
-
-            // Close the tab after a delay
-            setTimeout(async () => {
-                try {
-                    await browser.tabs.remove(newTab.id);
-                } catch (e) {
-                    // Could not close fallback tab
-                }
-            }, 1500);
-
-        } catch (fallbackError) {
-            console.error("Fallback method also failed:", fallbackError);
-
-            // Show user a message if all methods fail
-            alert("Could not open Drafts. Please ensure Drafts is installed and try again.");
-        }
+        console.error("Error opening Drafts via URL scheme:", error);
     }
 }
 
-// Format draft content according to user settings
-function formatDraftContent(title, url, content, isSelection = false) {
-        // Load settings with defaults
-        const outputFormat = extensionSettings?.outputFormat || {};
+// Format draft content: unified template engine with default template
+function formatDraftContent(title, url, content, _isSelection = false) {
+    const defaults = (typeof DEFAULT_SETTINGS !== 'undefined') ? DEFAULT_SETTINGS.outputFormat : null;
+    const outputFormat = (extensionSettings && extensionSettings.outputFormat) || defaults || {};
 
-        // Simple settings (fallback to defaults if not specified)
-        const titleFormat = 'h1'; // Always use h1 for simple settings
-        const includeSource = outputFormat.includeSource !== false;
-        const includeSeparator = true; // Always include separator for simple settings
-        const includeTimestamp = outputFormat.includeTimestamp || false;
-        const customTemplate = ''; // Don't use custom template for simple settings
-
-        // If custom template is provided, use it
-        if (customTemplate.trim()) {
-            const timestamp = new Date().toISOString();
-            const defaultTag = extensionSettings?.outputFormat?.defaultTag || '';
-            return customTemplate
-                .replace('{title}', title)
-                .replace('{url}', url)
-                .replace('{content}', content)
-                .replace('{timestamp}', timestamp)
-                .replace('{tag}', defaultTag);
-        }
-
-        // Build content using standard format
-        let result = '';
-
-        // Add title if enabled
-        if (titleFormat !== 'none') {
-            switch (titleFormat) {
-                case 'h1':
-                    result += `# ${title}\n\n`;
-                    break;
-                case 'h2':
-                    result += `## ${title}\n\n`;
-                    break;
-                case 'h3':
-                    result += `### ${title}\n\n`;
-                    break;
-                case 'bold':
-                    result += `**${title}**\n\n`;
-                    break;
-            }
-        }
-
-
-
-        // Add timestamp if enabled
-        if (includeTimestamp) {
-            const timestamp = new Date().toLocaleString();
-            result += `**Captured:** ${timestamp}\n\n`;
-        }
-
-        // Add separator if enabled
-        if (includeSeparator) {
-            result += '---\n\n';
-        }
-
-        // Add the main content
-        result += content;
-
-        return result;
+    const titleFormat = outputFormat.titleFormat || 'h1';
+    let formattedTitle = '';
+    if (titleFormat !== 'none') {
+        if (titleFormat === 'h1') formattedTitle = `# ${title}`;
+        else if (titleFormat === 'h2') formattedTitle = `## ${title}`;
+        else if (titleFormat === 'h3') formattedTitle = `### ${title}`;
+        else if (titleFormat === 'bold') formattedTitle = `**${title}**`;
     }
+
+    const template = (outputFormat.template || '').trim() || '{formattedTitle}\n\n{url}\n\n---\n\n{content}';
+    const timestampISO = new Date().toISOString();
+    const defaultTag = outputFormat.defaultTag || '';
+
+    return template
+        .replace('{formattedTitle}', formattedTitle)
+        .replace('{title}', title)
+        .replace('{url}', url)
+        .replace('{content}', content)
+        .replace('{timestamp}', timestampISO)
+        .replace('{tag}', defaultTag);
+}
+
+// Migrate older settings to unified template model
+function migrateSettings(inputSettings) {
+    const settings = JSON.parse(JSON.stringify(inputSettings || {}));
+    settings.outputFormat = settings.outputFormat || {};
+
+    // Construct a template if missing, leveraging legacy flags if present
+    if (!settings.outputFormat.template) {
+        const legacy = settings.outputFormat;
+        const legacyCustom = (legacy.customTemplate || '').trim();
+        if (legacyCustom) {
+            settings.outputFormat.template = legacyCustom;
+        } else {
+            // Build from legacy include flags or fall back to default
+            const defaultTemplate = (typeof DEFAULT_SETTINGS !== 'undefined' && DEFAULT_SETTINGS.outputFormat && DEFAULT_SETTINGS.outputFormat.template)
+                ? DEFAULT_SETTINGS.outputFormat.template
+                : '{formattedTitle}\n\n{url}\n\n---\n\n{content}';
+            let tpl = defaultTemplate;
+            // If legacy includeSource was false, remove {url} line
+            if (legacy.hasOwnProperty('includeSource') && legacy.includeSource === false) {
+                tpl = tpl.replace(/\n?\n?\{url\}\n?/g, '\n');
+            }
+            // If legacy includeSeparator was false, remove separator line
+            if (legacy.hasOwnProperty('includeSeparator') && legacy.includeSeparator === false) {
+                tpl = tpl.replace(/\n?\n?---\n?/g, '\n');
+            }
+            // If legacy includeTimestamp true, append timestamp after URL line
+            if (legacy.hasOwnProperty('includeTimestamp') && legacy.includeTimestamp === true) {
+                // Insert a timestamp line after formattedTitle/url block if url present, else after title
+                if (tpl.includes('{url}')) {
+                    tpl = tpl.replace('{url}', '{url}\n\n{timestamp}');
+                } else {
+                    tpl = tpl.replace('{formattedTitle}', '{formattedTitle}\n\n{timestamp}');
+                }
+            }
+            settings.outputFormat.template = tpl;
+        }
+    }
+
+    // Cleanup legacy fields
+    delete settings.outputFormat.includeSource;
+    delete settings.outputFormat.includeSeparator;
+    delete settings.outputFormat.includeTimestamp;
+    delete settings.outputFormat.customTemplate;
+
+    if (!settings.outputFormat.titleFormat) {
+        settings.outputFormat.titleFormat = 'h1';
+    }
+
+    return settings;
+}

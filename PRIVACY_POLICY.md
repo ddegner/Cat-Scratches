@@ -78,7 +78,7 @@ We may update this privacy policy from time to time. Any changes will be posted 
 
 ## Open Source
 
-Cat Scratches is open source software. You can review our code at [https://github.com/ddegner/SafariToDrafts](https://github.com/ddegner/SafariToDrafts) to verify our privacy practices.
+Cat Scratches is open source software. You can review our code at [https://github.com/ddegner/Cat-Scratches](https://github.com/ddegner/Cat-Scratches) to verify our privacy practices.
 
 ## Contact Information
 
@@ -86,7 +86,7 @@ If you have any questions about this privacy policy or Cat Scratches, you can co
 
 - **Developer**: David Degner
 - **Website**: [https://www.daviddegner.com](https://www.daviddegner.com)
-- **GitHub**: [https://github.com/ddegner/SafariToDrafts](https://github.com/ddegner/SafariToDrafts)
+- **GitHub**: [https://github.com/ddegner/Cat-Scratches](https://github.com/ddegner/Cat-Scratches)
 
 ## Summary
 
