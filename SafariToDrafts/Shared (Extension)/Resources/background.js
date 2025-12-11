@@ -50,7 +50,8 @@ function getEffectiveDefaults() {
             ]
         },
         outputFormat: {
-            template: '# {title}\n\n<{url}>\n\n---\n\n{content}',
+            titleFormat: 'h1',
+            template: '{formattedTitle}\n\n{url}\n\n---\n\n{content}',
             defaultTag: ''
         },
         advancedFiltering: {
@@ -503,11 +504,22 @@ async function createDraft(title, url, markdownBody, isSelection = false) {
 function formatDraftContent(title, url, content, _isSelection = false) {
     const defaults = (typeof DEFAULT_SETTINGS !== 'undefined') ? DEFAULT_SETTINGS.outputFormat : null;
     const outputFormat = (extensionSettings && extensionSettings.outputFormat) || defaults || {};
-    const template = (outputFormat.template || '').trim() || '# {title}\n\n<{url}>\n\n---\n\n{content}';
+
+    const titleFormat = outputFormat.titleFormat || 'h1';
+    let formattedTitle = '';
+    if (titleFormat !== 'none') {
+        if (titleFormat === 'h1') formattedTitle = `# ${title}`;
+        else if (titleFormat === 'h2') formattedTitle = `## ${title}`;
+        else if (titleFormat === 'h3') formattedTitle = `### ${title}`;
+        else if (titleFormat === 'bold') formattedTitle = `**${title}**`;
+    }
+
+    const template = (outputFormat.template || '').trim() || '{formattedTitle}\n\n{url}\n\n---\n\n{content}';
     const timestampISO = new Date().toISOString();
     const defaultTag = outputFormat.defaultTag || '';
 
     return template
+        .replace('{formattedTitle}', formattedTitle)
         .replace('{title}', title)
         .replace('{url}', url)
         .replace('{content}', content)
@@ -530,7 +542,7 @@ function migrateSettings(inputSettings) {
             // Build from legacy include flags or fall back to default
             const defaultTemplate = (typeof DEFAULT_SETTINGS !== 'undefined' && DEFAULT_SETTINGS.outputFormat && DEFAULT_SETTINGS.outputFormat.template)
                 ? DEFAULT_SETTINGS.outputFormat.template
-                : '# {title}\n\n<{url}>\n\n---\n\n{content}';
+                : '{formattedTitle}\n\n{url}\n\n---\n\n{content}';
             let tpl = defaultTemplate;
             // If legacy includeSource was false, remove {url} line
             if (legacy.hasOwnProperty('includeSource') && legacy.includeSource === false) {
@@ -545,23 +557,12 @@ function migrateSettings(inputSettings) {
                 // Insert a timestamp line after formattedTitle/url block if url present, else after title
                 if (tpl.includes('{url}')) {
                     tpl = tpl.replace('{url}', '{url}\n\n{timestamp}');
-                } else if (tpl.includes('{title}')) {
-                    tpl = tpl.replace('{title}', '{title}\n\n{timestamp}');
+                } else {
+                    tpl = tpl.replace('{formattedTitle}', '{formattedTitle}\n\n{timestamp}');
                 }
             }
             settings.outputFormat.template = tpl;
         }
-    }
-
-    // Replace {formattedTitle} with a concrete heading based on legacy titleFormat
-    if (settings.outputFormat.template && settings.outputFormat.template.includes('{formattedTitle}')) {
-        const legacyFormat = settings.outputFormat.titleFormat || 'h1';
-        let headingSyntax = '# {title}';
-        if (legacyFormat === 'h2') headingSyntax = '## {title}';
-        else if (legacyFormat === 'h3') headingSyntax = '### {title}';
-        else if (legacyFormat === 'bold') headingSyntax = '**{title}**';
-        else if (legacyFormat === 'none') headingSyntax = '';
-        settings.outputFormat.template = settings.outputFormat.template.replace('{formattedTitle}', headingSyntax).replace(/\n\n\n+/g, '\n\n').trim();
     }
 
     // Cleanup legacy fields
@@ -569,7 +570,10 @@ function migrateSettings(inputSettings) {
     delete settings.outputFormat.includeSeparator;
     delete settings.outputFormat.includeTimestamp;
     delete settings.outputFormat.customTemplate;
-    delete settings.outputFormat.titleFormat;
+
+    if (!settings.outputFormat.titleFormat) {
+        settings.outputFormat.titleFormat = 'h1';
+    }
 
     return settings;
 }

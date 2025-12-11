@@ -61,6 +61,7 @@ function setupEventListeners() {
     document.getElementById('contentSelectors').addEventListener('input', updateContentSelectorsFromUI);
 
     // Output format inputs
+    document.getElementById('titleFormat').addEventListener('change', updateOutputFormatFromUI);
     document.getElementById('template').addEventListener('input', updateOutputFormatFromUI);
     document.getElementById('defaultTag').addEventListener('input', updateOutputFormatFromUI);
 
@@ -81,6 +82,7 @@ function updateUI() {
     updateContentSelectorsUI();
 
     // Output format
+    document.getElementById('titleFormat').value = currentSettings.outputFormat.titleFormat;
     document.getElementById('template').value = currentSettings.outputFormat.template || '';
     document.getElementById('defaultTag').value = currentSettings.outputFormat.defaultTag || '';
 
@@ -119,6 +121,7 @@ function updateContentSelectorsFromUI() {
 
 // Update output format from UI
 function updateOutputFormatFromUI() {
+    currentSettings.outputFormat.titleFormat = document.getElementById('titleFormat').value;
     currentSettings.outputFormat.template = document.getElementById('template').value;
     currentSettings.outputFormat.defaultTag = document.getElementById('defaultTag').value.trim();
 }
@@ -228,20 +231,9 @@ function migrateSettings(inputSettings) {
             // Use current defaults from DEFAULT_SETTINGS if available
             const defaultTemplate = (DEFAULT_SETTINGS && DEFAULT_SETTINGS.outputFormat && DEFAULT_SETTINGS.outputFormat.template)
                 ? DEFAULT_SETTINGS.outputFormat.template
-                : '# {title}\n\n<{url}>\n\n---\n\n{content}';
+                : '{formattedTitle}\n\n{url}\n\n---\n\n{content}';
             settings.outputFormat.template = defaultTemplate;
         }
-    }
-
-    // Replace {formattedTitle} placeholder with concrete heading if present
-    if (settings.outputFormat.template && settings.outputFormat.template.includes('{formattedTitle}')) {
-        const legacyFormat = settings.outputFormat.titleFormat || 'h1';
-        let headingSyntax = '# {title}';
-        if (legacyFormat === 'h2') headingSyntax = '## {title}';
-        else if (legacyFormat === 'h3') headingSyntax = '### {title}';
-        else if (legacyFormat === 'bold') headingSyntax = '**{title}**';
-        else if (legacyFormat === 'none') headingSyntax = '';
-        settings.outputFormat.template = settings.outputFormat.template.replace('{formattedTitle}', headingSyntax).replace(/\n\n\n+/g, '\n\n').trim();
     }
 
     // Remove legacy fields to keep storage clean
@@ -249,7 +241,11 @@ function migrateSettings(inputSettings) {
     delete settings.outputFormat.includeSeparator;
     delete settings.outputFormat.includeTimestamp;
     delete settings.outputFormat.customTemplate;
-    delete settings.outputFormat.titleFormat;
+
+    // Ensure titleFormat exists
+    if (!settings.outputFormat.titleFormat) {
+        settings.outputFormat.titleFormat = 'h1';
+    }
 
     return settings;
 }
@@ -258,7 +254,7 @@ function migrateSettings(inputSettings) {
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('placeholderTags');
     if (!container) return;
-    const placeholders = ['{title}', '{url}', '{content}', '{timestamp}', '{tag}'];
+    const placeholders = ['{title}', '{formattedTitle}', '{url}', '{content}', '{timestamp}', '{tag}'];
     placeholders.forEach(ph => {
         const el = document.createElement('span');
         el.className = 'placeholder-tag';
