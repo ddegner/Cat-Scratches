@@ -1,13 +1,15 @@
 // Shared default settings for Cat Scratches (Safari-only)
 // Provides a single source of truth for defaults used by background and settings pages
+'use strict';
 
-(function() {
+(function () {
   // Support both window (extension pages) and service worker (globalThis/self) contexts
   const root = (typeof globalThis !== 'undefined')
     ? globalThis
     : (typeof self !== 'undefined')
       ? self
       : (typeof window !== 'undefined' ? window : {});
+
   const BASE_SELECTORS = [
     '[itemtype*="Article"]',
     '[itemtype*="BlogPosting"]',
@@ -315,9 +317,8 @@
       customSelectors: unique(BASE_SELECTORS)
     },
     outputFormat: {
-      // Unified template engine: always render via template with a sensible default
-      // Title and URL markdown are now baked into the default template for simplicity
       template: '# {title}\n\n<{url}>\n\n---\n\n{content}',
+      titleFormat: 'h1',
       defaultTag: ''
     },
     advancedFiltering: {
@@ -331,8 +332,60 @@
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   }
 
+  /**
+   * Migrate older settings structure to the unified template approach.
+   * Shared by background.js and settings.js.
+   * @param {Object} inputSettings - Settings object to migrate
+   * @returns {Object} Migrated settings
+   */
+  function migrateSettings(inputSettings) {
+    const settings = JSON.parse(JSON.stringify(inputSettings || {}));
+    settings.outputFormat = settings.outputFormat || {};
+
+    // Construct a template if missing, leveraging legacy flags if present
+    if (!settings.outputFormat.template) {
+      const legacy = settings.outputFormat;
+      const legacyCustom = (legacy.customTemplate || '').trim();
+      if (legacyCustom) {
+        settings.outputFormat.template = legacyCustom;
+      } else {
+        // Build from legacy include flags or fall back to default
+        let tpl = DEFAULT_SETTINGS.outputFormat.template;
+        // If legacy includeSource was false, remove {url} line
+        if (legacy.hasOwnProperty('includeSource') && legacy.includeSource === false) {
+          tpl = tpl.replace(/\n?\n?\{url\}\n?/g, '\n');
+        }
+        // If legacy includeSeparator was false, remove separator line
+        if (legacy.hasOwnProperty('includeSeparator') && legacy.includeSeparator === false) {
+          tpl = tpl.replace(/\n?\n?---\n?/g, '\n');
+        }
+        // If legacy includeTimestamp true, append timestamp after URL line
+        if (legacy.hasOwnProperty('includeTimestamp') && legacy.includeTimestamp === true) {
+          if (tpl.includes('{url}')) {
+            tpl = tpl.replace('{url}', '{url}\n\n{timestamp}');
+          } else {
+            tpl = tpl.replace('{formattedTitle}', '{formattedTitle}\n\n{timestamp}');
+          }
+        }
+        settings.outputFormat.template = tpl;
+      }
+    }
+
+    // Cleanup legacy fields
+    delete settings.outputFormat.includeSource;
+    delete settings.outputFormat.includeSeparator;
+    delete settings.outputFormat.includeTimestamp;
+    delete settings.outputFormat.customTemplate;
+
+    if (!settings.outputFormat.titleFormat) {
+      settings.outputFormat.titleFormat = 'h1';
+    }
+
+    return settings;
+  }
+
   // Expose globally for background and settings pages
   root.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
   root.getDefaultSettings = getDefaultSettings;
+  root.migrateSettings = migrateSettings;
 })();
-

@@ -1,6 +1,7 @@
 // Settings script for Cat Scratches extension
+'use strict';
 
-// Default settings are provided by defaults.js (window.DEFAULT_SETTINGS)
+// Default settings and migrateSettings are provided by defaults.js
 
 // Global settings object
 let currentSettings = {};
@@ -15,6 +16,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Update UI with current settings
     updateUI();
+
+    // Set up clickable placeholder tags
+    setupPlaceholderTags();
 });
 
 // Load settings from storage
@@ -22,10 +26,8 @@ async function loadSettings() {
     try {
         const stored = await browser.storage.local.get(['catScratchesSettings']);
         if (stored.catScratchesSettings) {
-            // User has saved settings - use them exactly as saved
             currentSettings = migrateSettings(stored.catScratchesSettings);
         } else {
-            // No saved settings - use defaults for initial setup
             currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
         }
     } catch (error) {
@@ -48,15 +50,8 @@ async function saveSettings() {
     }
 }
 
-// Merge settings function removed - no longer needed
-// User settings now completely replace defaults when saved
-
 // Set up all event listeners
 function setupEventListeners() {
-
-    // Content extraction checkboxes
-    // Individual removal checkboxes removed - now using customFilters only
-
     // Content selectors textarea
     document.getElementById('contentSelectors').addEventListener('input', updateContentSelectorsFromUI);
 
@@ -65,7 +60,7 @@ function setupEventListeners() {
     document.getElementById('template').addEventListener('input', updateOutputFormatFromUI);
     document.getElementById('defaultTag').addEventListener('input', updateOutputFormatFromUI);
 
-    // Advanced filtering inputs (using customFilters from HTML)
+    // Advanced filtering inputs
     document.getElementById('customFilters').addEventListener('input', updateAdvancedFilteringFromUI);
 
     // Action buttons
@@ -75,22 +70,17 @@ function setupEventListeners() {
 
 // Update UI with current settings
 function updateUI() {
-
-    // Content extraction - individual removal settings removed, now using customFilters only
-
     // Update content selectors textarea
     updateContentSelectorsUI();
 
     // Output format
-    document.getElementById('titleFormat').value = currentSettings.outputFormat.titleFormat;
+    document.getElementById('titleFormat').value = currentSettings.outputFormat.titleFormat || 'h1';
     document.getElementById('template').value = currentSettings.outputFormat.template || '';
     document.getElementById('defaultTag').value = currentSettings.outputFormat.defaultTag || '';
 
     // Advanced filtering
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
 }
-
-
 
 // Update content selectors textarea display
 function updateContentSelectorsUI() {
@@ -99,12 +89,6 @@ function updateContentSelectorsUI() {
         contentSelectorsTextarea.value = currentSettings.contentExtraction.customSelectors.join('\n');
     }
 }
-
-
-
-
-
-
 
 // Update content selectors from UI textarea
 function updateContentSelectorsFromUI() {
@@ -115,8 +99,6 @@ function updateContentSelectorsFromUI() {
         .filter(line => line);
 
     currentSettings.contentExtraction.customSelectors = selectors;
-
-
 }
 
 // Update output format from UI
@@ -138,30 +120,20 @@ function updateAdvancedFilteringFromUI() {
 
 // Handle save settings
 async function handleSaveSettings() {
-    // Validate settings
     if (!validateSettings()) {
         return;
     }
-
     await saveSettings();
-
-    showStatus('Settings saved successfully!', 'success');
 }
 
 // Handle reset settings
 async function handleResetSettings() {
     try {
-        // Remove any saved settings
         await browser.storage.local.remove('catScratchesSettings');
 
-        // Recreate defaults as on first install
-        const defaults = (typeof getDefaultSettings === 'function')
-            ? getDefaultSettings()
-            : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-
+        const defaults = getDefaultSettings();
         await browser.storage.local.set({ catScratchesSettings: defaults });
 
-        // Update in-memory and UI state
         currentSettings = JSON.parse(JSON.stringify(defaults));
         updateUI();
         showStatus('Settings reset to defaults.', 'success');
@@ -171,19 +143,14 @@ async function handleResetSettings() {
     }
 }
 
-
-
 // Validate current settings
 function validateSettings() {
-
-    // Validate minimum content length
     const minLength = currentSettings.advancedFiltering.minContentLength;
     if (minLength < 0 || isNaN(minLength)) {
         showStatus('Minimum content length must be a positive number', 'error');
         return false;
     }
 
-    // Validate link ratio
     const linkRatio = currentSettings.advancedFiltering.maxLinkRatio;
     if (linkRatio < 0 || linkRatio > 1 || isNaN(linkRatio)) {
         showStatus('Link ratio must be between 0 and 1', 'error');
@@ -193,8 +160,6 @@ function validateSettings() {
     return true;
 }
 
-
-
 // Show status message
 function showStatus(message, type) {
     const statusEl = document.getElementById('statusMessage');
@@ -202,58 +167,17 @@ function showStatus(message, type) {
     statusEl.className = `status-message ${type || 'info'}`;
     statusEl.style.display = 'block';
 
-    // Different timeout durations based on message type
     const timeout = type === 'error' ? 7000 : 5000;
-
     setTimeout(() => {
         statusEl.style.display = 'none';
     }, timeout);
 }
 
-// Migrate older settings structure to the new unified template approach
-function migrateSettings(inputSettings) {
-    const settings = JSON.parse(JSON.stringify(inputSettings || {}));
-    settings.outputFormat = settings.outputFormat || {};
-    // If legacy customTemplate exists or include* flags exist, convert to template
-    const hasLegacyFlags = (
-        settings.outputFormat.hasOwnProperty('includeSource') ||
-        settings.outputFormat.hasOwnProperty('includeSeparator') ||
-        settings.outputFormat.hasOwnProperty('includeTimestamp') ||
-        settings.outputFormat.hasOwnProperty('customTemplate')
-    );
-
-    // Ensure a template exists; prefer legacy customTemplate if present
-    if (!settings.outputFormat.template) {
-        const legacyTemplate = (settings.outputFormat.customTemplate || '').trim();
-        if (legacyTemplate) {
-            settings.outputFormat.template = legacyTemplate;
-        } else {
-            // Use current defaults from DEFAULT_SETTINGS if available
-            const defaultTemplate = (DEFAULT_SETTINGS && DEFAULT_SETTINGS.outputFormat && DEFAULT_SETTINGS.outputFormat.template)
-                ? DEFAULT_SETTINGS.outputFormat.template
-                : '{formattedTitle}\n\n{url}\n\n---\n\n{content}';
-            settings.outputFormat.template = defaultTemplate;
-        }
-    }
-
-    // Remove legacy fields to keep storage clean
-    delete settings.outputFormat.includeSource;
-    delete settings.outputFormat.includeSeparator;
-    delete settings.outputFormat.includeTimestamp;
-    delete settings.outputFormat.customTemplate;
-
-    // Ensure titleFormat exists
-    if (!settings.outputFormat.titleFormat) {
-        settings.outputFormat.titleFormat = 'h1';
-    }
-
-    return settings;
-}
-
-// Enhance UX: clickable placeholder tags to insert into template
-document.addEventListener('DOMContentLoaded', () => {
+// Set up clickable placeholder tags to insert into template
+function setupPlaceholderTags() {
     const container = document.getElementById('placeholderTags');
     if (!container) return;
+
     const placeholders = ['{title}', '{formattedTitle}', '{url}', '{content}', '{timestamp}', '{tag}'];
     placeholders.forEach(ph => {
         const el = document.createElement('span');
@@ -272,6 +196,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         container.appendChild(el);
     });
-});
-
-
+}

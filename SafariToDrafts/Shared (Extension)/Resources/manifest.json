@@ -23,7 +23,6 @@
     "background": {
         "service_worker": "background.js"
     },
-
     "action": {
         "default_icon": "images/toolbar-icon.png",
         "default_title": "Cat Scratches - Capture content to Drafts"
@@ -53,16 +52,5 @@
         "page": "settings.html",
         "open_in_tab": true
     },
-    "options_page": "settings.html",
-    "web_accessible_resources": [
-        {
-            "resources": [
-                "catlogo_dark.png",
-                "catlogo_light.png"
-            ],
-            "matches": [
-                "<all_urls>"
-            ]
-        }
-    ]
+    "options_page": "settings.html"
 }

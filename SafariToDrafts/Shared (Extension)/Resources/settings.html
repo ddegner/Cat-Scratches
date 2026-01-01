@@ -398,6 +398,18 @@ form
                 <h2>Draft Format</h2>
 
                 <div class="form-group">
+                    <label for="titleFormat">Title Format</label>
+                    <select id="titleFormat">
+                        <option value="h1">Heading 1 (# Title)</option>
+                        <option value="h2">Heading 2 (## Title)</option>
+                        <option value="h3">Heading 3 (### Title)</option>
+                        <option value="bold">Bold (**Title**)</option>
+                        <option value="none">No Title</option>
+                    </select>
+                    <p class="help-text">Used when {formattedTitle} placeholder is in template</p>
+                </div>
+
+                <div class="form-group">
                     <label for="defaultTag">Default Tag</label>
                     <input type="text" id="defaultTag" placeholder="e.g., reading, web, article">
                 </div>

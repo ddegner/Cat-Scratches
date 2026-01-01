@@ -218,7 +218,6 @@ class ExtensionManager: ObservableObject {
         }
     }
 
-    // no-op
 }
 
 // MARK: - ViewController
