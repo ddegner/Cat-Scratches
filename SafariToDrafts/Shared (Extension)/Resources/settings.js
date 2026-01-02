@@ -1,7 +1,7 @@
 // Settings script for Cat Scratches extension
 'use strict';
 
-// Default settings and migrateSettings are provided by defaults.js
+// Default settings, migrateSettings, and NATIVE_APP_ID are provided by defaults.js
 
 // Global settings object
 let currentSettings = {};
@@ -21,32 +21,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupPlaceholderTags();
 });
 
-// Load settings from storage
+// Load settings from iCloud (with local cache fallback)
 async function loadSettings() {
     try {
-        const stored = await browser.storage.local.get(['catScratchesSettings']);
-        if (stored.catScratchesSettings) {
-            currentSettings = migrateSettings(stored.catScratchesSettings);
-        } else {
-            currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+        // Try to get settings from iCloud via native messaging
+        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+            action: 'getSettings'
+        });
+
+        if (response && response.settings && typeof response.settings === 'object') {
+            currentSettings = migrateSettings(response.settings);
+            // Cache locally for offline access
+            await browser.storage.local.set({ catScratchesSettings: currentSettings });
+            console.log('Settings loaded from iCloud');
+            return;
         }
     } catch (error) {
-        console.error('Failed to load settings:', error);
-        currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-        showStatus('Failed to load settings. Using defaults.', 'error');
+        console.log('Could not load from iCloud, trying local cache:', error.message);
     }
+
+    // Fallback to local cache
+    try {
+        const localResult = await browser.storage.local.get(['catScratchesSettings']);
+        if (localResult.catScratchesSettings) {
+            currentSettings = migrateSettings(localResult.catScratchesSettings);
+            console.log('Settings loaded from local cache');
+            return;
+        }
+    } catch (error) {
+        console.log('Local cache also failed:', error.message);
+    }
+
+    // Last resort: use defaults
+    currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    showStatus('Using default settings.', 'info');
 }
 
-// Save settings to storage
+// Save settings to iCloud (and local cache)
 async function saveSettings() {
     try {
-        await browser.storage.local.set({
-            catScratchesSettings: currentSettings
+        // Always cache locally first
+        await browser.storage.local.set({ catScratchesSettings: currentSettings });
+
+        console.log('Attempting to save settings via native messaging...');
+        console.log('Settings object:', JSON.stringify(currentSettings).substring(0, 200) + '...');
+
+        // Then save to iCloud
+        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+            action: 'saveSettings',
+            settings: currentSettings
         });
-        showStatus('Settings saved successfully!', 'success');
+
+        console.log('Native messaging response:', JSON.stringify(response));
+
+        if (response && response.success) {
+            showStatus('Settings saved to iCloud!', 'success');
+        } else {
+            console.log('Response did not indicate success:', response);
+            showStatus('Settings saved locally.', 'success');
+        }
     } catch (error) {
-        console.error('Failed to save settings:', error);
-        showStatus('Failed to save settings. Please try again.', 'error');
+        console.error('Native messaging error:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        showStatus('Settings saved locally (iCloud unavailable).', 'success');
     }
 }
 
@@ -56,7 +94,6 @@ function setupEventListeners() {
     document.getElementById('contentSelectors').addEventListener('input', updateContentSelectorsFromUI);
 
     // Output format inputs
-    document.getElementById('titleFormat').addEventListener('change', updateOutputFormatFromUI);
     document.getElementById('template').addEventListener('input', updateOutputFormatFromUI);
     document.getElementById('defaultTag').addEventListener('input', updateOutputFormatFromUI);
 
@@ -74,7 +111,6 @@ function updateUI() {
     updateContentSelectorsUI();
 
     // Output format
-    document.getElementById('titleFormat').value = currentSettings.outputFormat.titleFormat || 'h1';
     document.getElementById('template').value = currentSettings.outputFormat.template || '';
     document.getElementById('defaultTag').value = currentSettings.outputFormat.defaultTag || '';
 
@@ -103,7 +139,6 @@ function updateContentSelectorsFromUI() {
 
 // Update output format from UI
 function updateOutputFormatFromUI() {
-    currentSettings.outputFormat.titleFormat = document.getElementById('titleFormat').value;
     currentSettings.outputFormat.template = document.getElementById('template').value;
     currentSettings.outputFormat.defaultTag = document.getElementById('defaultTag').value.trim();
 }
@@ -129,13 +164,10 @@ async function handleSaveSettings() {
 // Handle reset settings
 async function handleResetSettings() {
     try {
-        await browser.storage.local.remove('catScratchesSettings');
-
         const defaults = getDefaultSettings();
-        await browser.storage.local.set({ catScratchesSettings: defaults });
-
         currentSettings = JSON.parse(JSON.stringify(defaults));
         updateUI();
+        await saveSettings();  // Uses native messaging to save to iCloud
         showStatus('Settings reset to defaults.', 'success');
     } catch (error) {
         console.error('Failed to reset settings:', error);
@@ -178,7 +210,7 @@ function setupPlaceholderTags() {
     const container = document.getElementById('placeholderTags');
     if (!container) return;
 
-    const placeholders = ['{title}', '{formattedTitle}', '{url}', '{content}', '{timestamp}', '{tag}'];
+    const placeholders = ['{title}', '{url}', '{content}', '{timestamp}', '{tag}'];
     placeholders.forEach(ph => {
         const el = document.createElement('span');
         el.className = 'placeholder-tag';

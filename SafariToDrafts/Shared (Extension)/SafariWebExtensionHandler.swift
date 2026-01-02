@@ -9,31 +9,62 @@ import SafariServices
 import os.log
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
+    
+    // iCloud Key-Value Store for cross-device sync
+    // Uses single-key pattern: store entire settings dict under "settings" key
+    private let store = NSUbiquitousKeyValueStore.default
+    private let settingsKey = "settings"
 
-	func beginRequest(with context: NSExtensionContext) {
+    func beginRequest(with context: NSExtensionContext) {
         let item = context.inputItems.first as? NSExtensionItem
         let message = item?.userInfo?[SFExtensionMessageKey]
         
-        // Check if this is a message from our extension
-        if let messageDict = message as? [String: Any],
-           let action = messageDict["action"] as? String {
-            if action == "openOptions" {
-                openOptionsPage()
-            } else {
-                os_log("Ignoring action '%@' (Drafts opening handled in JS)", type: .info, action)
-            }
+        guard let messageDict = message as? [String: Any],
+              let action = messageDict["action"] as? String else {
+            context.completeRequest(returningItems: nil, completionHandler: nil)
+            return
         }
         
-        context.completeRequest(returningItems: nil, completionHandler: nil)
-	}
-    
-    // No native Drafts opening path; handled fully in background.js
-    
-    private func openOptionsPage() {
-        // For Safari Web Extensions, the options page should be handled automatically
-        // by Safari when the user right-clicks the extension button and selects "Settings"
-        os_log("Options page request received", type: .info)
+        var response: [String: Any] = ["success": true]
+        
+        switch action {
+        case "getSettings":
+            // Sync from iCloud first (only call synchronize on READ, not write)
+            store.synchronize()
+            
+            // Load settings dictionary from iCloud Key-Value Store
+            if let settingsDict = store.dictionary(forKey: settingsKey) {
+                response["settings"] = settingsDict
+                os_log(.info, "Loaded settings from iCloud KVS")
+            } else {
+                response["settings"] = NSNull()
+                os_log(.info, "No settings found in iCloud KVS")
+            }
+            
+        case "saveSettings":
+            // Save settings to iCloud Key-Value Store (single dictionary key pattern)
+            // NOTE: Do NOT call synchronize() on every write - let iCloud handle it
+            if let settings = messageDict["settings"] as? [String: Any] {
+                // Store as dictionary - must be property-list safe types
+                store.set(settings, forKey: settingsKey)
+                response["saved"] = true
+                os_log(.info, "Settings saved to iCloud KVS (will sync automatically)")
+            } else {
+                response["success"] = false
+                response["error"] = "Settings must be a dictionary"
+                os_log(.error, "Failed to save settings: not a dictionary")
+            }
+            
+        case "openOptions":
+            os_log(.info, "Options page request received")
+            
+        default:
+            os_log(.info, "Ignoring action: %{public}@", action)
+        }
+        
+        // Send response back to JavaScript
+        let responseItem = NSExtensionItem()
+        responseItem.userInfo = [SFExtensionMessageKey: response]
+        context.completeRequest(returningItems: [responseItem], completionHandler: nil)
     }
 }
-
-let SFExtensionMessageKey = "message"

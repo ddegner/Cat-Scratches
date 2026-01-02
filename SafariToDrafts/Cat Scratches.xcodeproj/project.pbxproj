@@ -7,27 +7,90 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7F5714B62E0322670079AEB5 /* Cat Scratches Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F9F05582F07291D0070E1B2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9F05572F07291D0070E1B2 /* AppDelegate.swift */; };
+		7F9F055A2F07291D0070E1B2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9F05592F07291D0070E1B2 /* SceneDelegate.swift */; };
+		7F9F055D2F07291D0070E1B2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F055B2F07291D0070E1B2 /* LaunchScreen.storyboard */; };
+		7F9F05602F07291D0070E1B2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F055E2F07291D0070E1B2 /* Main.storyboard */; };
+		7F9F05692F07291D0070E1B2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9F05682F07291D0070E1B2 /* AppDelegate.swift */; };
+		7F9F056C2F07291D0070E1B2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F056A2F07291D0070E1B2 /* Main.storyboard */; };
+		7F9F05732F07291D0070E1B2 /* Cat Scratches Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F9F05722F07291D0070E1B2 /* Cat Scratches Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F9F057D2F07291D0070E1B2 /* Cat Scratches Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F9F057C2F07291D0070E1B2 /* Cat Scratches Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7F9F05822F07291D0070E1B2 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05472F07291B0070E1B2 /* Main.html */; };
+		7F9F05832F07291D0070E1B2 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05472F07291B0070E1B2 /* Main.html */; };
+		7F9F05842F07291D0070E1B2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05492F07291B0070E1B2 /* Icon.png */; };
+		7F9F05852F07291D0070E1B2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05492F07291B0070E1B2 /* Icon.png */; };
+		7F9F05862F07291D0070E1B2 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054A2F07291B0070E1B2 /* Style.css */; };
+		7F9F05872F07291D0070E1B2 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054A2F07291B0070E1B2 /* Style.css */; };
+		7F9F05882F07291D0070E1B2 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054B2F07291B0070E1B2 /* Script.js */; };
+		7F9F05892F07291D0070E1B2 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054B2F07291B0070E1B2 /* Script.js */; };
+		7F9F058B2F07291D0070E1B2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9F054C2F07291B0070E1B2 /* ViewController.swift */; };
+		7F9F058C2F07291D0070E1B2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054D2F07291C0070E1B2 /* Assets.xcassets */; };
+		7F9F058D2F07291D0070E1B2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054D2F07291C0070E1B2 /* Assets.xcassets */; };
+		7F9F058E2F07291D0070E1B2 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9F054F2F07291C0070E1B2 /* SafariWebExtensionHandler.swift */; };
+		7F9F058F2F07291D0070E1B2 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9F054F2F07291C0070E1B2 /* SafariWebExtensionHandler.swift */; };
+		7F9F05AC2F07291D0070E1B2 /* catlogo_light.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A12F07291D0070E1B2 /* catlogo_light.png */; };
+		7F9F05AD2F07291D0070E1B2 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A22F07291D0070E1B2 /* background.js */; };
+		7F9F05AE2F07291D0070E1B2 /* images in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A32F07291D0070E1B2 /* images */; };
+		7F9F05AF2F07291D0070E1B2 /* catlogo_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A42F07291D0070E1B2 /* catlogo_dark.png */; };
+		7F9F05B02F07291D0070E1B2 /* turndown.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A52F07291D0070E1B2 /* turndown.js */; };
+		7F9F05B12F07291D0070E1B2 /* catlogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A62F07291D0070E1B2 /* catlogo.png */; };
+		7F9F05B22F07291D0070E1B2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A72F07291D0070E1B2 /* manifest.json */; };
+		7F9F05B32F07291D0070E1B2 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A82F07291D0070E1B2 /* _locales */; };
+		7F9F05B42F07291D0070E1B2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A92F07291D0070E1B2 /* settings.html */; };
+		7F9F05B52F07291D0070E1B2 /* defaults.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AA2F07291D0070E1B2 /* defaults.js */; };
+		7F9F05B62F07291D0070E1B2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AB2F07291D0070E1B2 /* settings.js */; };
+		7F9F05B72F07291D0070E1B2 /* catlogo_light.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A12F07291D0070E1B2 /* catlogo_light.png */; };
+		7F9F05B82F07291D0070E1B2 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A22F07291D0070E1B2 /* background.js */; };
+		7F9F05B92F07291D0070E1B2 /* images in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A32F07291D0070E1B2 /* images */; };
+		7F9F05BA2F07291D0070E1B2 /* catlogo_dark.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A42F07291D0070E1B2 /* catlogo_dark.png */; };
+		7F9F05BB2F07291D0070E1B2 /* turndown.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A52F07291D0070E1B2 /* turndown.js */; };
+		7F9F05BC2F07291D0070E1B2 /* catlogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A62F07291D0070E1B2 /* catlogo.png */; };
+		7F9F05BD2F07291D0070E1B2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A72F07291D0070E1B2 /* manifest.json */; };
+		7F9F05BE2F07291D0070E1B2 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A82F07291D0070E1B2 /* _locales */; };
+		7F9F05BF2F07291D0070E1B2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A92F07291D0070E1B2 /* settings.html */; };
+		7F9F05C02F07291D0070E1B2 /* defaults.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AA2F07291D0070E1B2 /* defaults.js */; };
+		7F9F05C12F07291D0070E1B2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AB2F07291D0070E1B2 /* settings.js */; };
+		7FABC0012F07400000000001 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0002F07400000000001 /* ViewController.swift */; };
+
+		7FABC0052F07600000000001 /* NativeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0042F07600000000001 /* NativeSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		7F5714B72E0322670079AEB5 /* PBXContainerItemProxy */ = {
+		7F9F05742F07291D0070E1B2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 7F5714712E0322650079AEB5 /* Project object */;
+			containerPortal = 7F9F05412F07291B0070E1B2 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 7F5714B42E0322670079AEB5;
-			remoteInfo = "SafariToDrafts Extension (macOS)";
+			remoteGlobalIDString = 7F9F05712F07291D0070E1B2;
+			remoteInfo = "Cat Scratches Extension (iOS)";
+		};
+		7F9F057E2F07291D0070E1B2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7F9F05412F07291B0070E1B2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7F9F057B2F07291D0070E1B2;
+			remoteInfo = "Cat Scratches Extension (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		7F5714E92E0322670079AEB5 /* Embed Foundation Extensions */ = {
+		7F9F05952F07291D0070E1B2 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				7F5714B62E0322670079AEB5 /* Cat Scratches Extension.appex in Embed Foundation Extensions */,
+				7F9F05732F07291D0070E1B2 /* Cat Scratches Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F9F059C2F07291D0070E1B2 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7F9F057D2F07291D0070E1B2 /* Cat Scratches Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -35,92 +98,66 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7F57149F2E0322670079AEB5 /* Cat Scratches.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cat Scratches.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Cat Scratches Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F9F05482F07291B0070E1B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		7F9F05492F07291B0070E1B2 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		7F9F054A2F07291B0070E1B2 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		7F9F054B2F07291B0070E1B2 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		7F9F054C2F07291B0070E1B2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7F9F054D2F07291C0070E1B2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7F9F054F2F07291C0070E1B2 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		7F9F05542F07291D0070E1B2 /* Cat Scratches.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cat Scratches.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F9F05572F07291D0070E1B2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7F9F05592F07291D0070E1B2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		7F9F055C2F07291D0070E1B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		7F9F055F2F07291D0070E1B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7F9F05612F07291D0070E1B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7F9F05662F07291D0070E1B2 /* Cat Scratches.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cat Scratches.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F9F05682F07291D0070E1B2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7F9F056B2F07291D0070E1B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7F9F056D2F07291D0070E1B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7F9F05722F07291D0070E1B2 /* Cat Scratches Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Cat Scratches Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F9F05772F07291D0070E1B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7F9F057C2F07291D0070E1B2 /* Cat Scratches Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Cat Scratches Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F9F05812F07291D0070E1B2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7F9F05A12F07291D0070E1B2 /* catlogo_light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = catlogo_light.png; path = Resources/catlogo_light.png; sourceTree = "<group>"; };
+		7F9F05A22F07291D0070E1B2 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		7F9F05A32F07291D0070E1B2 /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = Resources/images; sourceTree = "<group>"; };
+		7F9F05A42F07291D0070E1B2 /* catlogo_dark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = catlogo_dark.png; path = Resources/catlogo_dark.png; sourceTree = "<group>"; };
+		7F9F05A52F07291D0070E1B2 /* turndown.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = turndown.js; path = Resources/turndown.js; sourceTree = "<group>"; };
+		7F9F05A62F07291D0070E1B2 /* catlogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = catlogo.png; path = Resources/catlogo.png; sourceTree = "<group>"; };
+		7F9F05A72F07291D0070E1B2 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		7F9F05A82F07291D0070E1B2 /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; name = _locales; path = Resources/_locales; sourceTree = "<group>"; };
+		7F9F05A92F07291D0070E1B2 /* settings.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = settings.html; path = Resources/settings.html; sourceTree = "<group>"; };
+		7F9F05AA2F07291D0070E1B2 /* defaults.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = defaults.js; path = Resources/defaults.js; sourceTree = "<group>"; };
+		7F9F05AB2F07291D0070E1B2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = Resources/settings.js; sourceTree = "<group>"; };
+		7FABC0002F07400000000001 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+
+		7FABC0042F07600000000001 /* NativeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "Cat Scratches (macOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"/Localized: Resources/Main.html",
-				Assets.xcassets,
-				Resources/Icon.png,
-				Resources/Script.js,
-				Resources/Style.css,
-				ViewController.swift,
-			);
-			target = 7F57149E2E0322670079AEB5 /* Cat Scratches (macOS) */;
-		};
-		7F5714E82E0322670079AEB5 /* Exceptions for "macOS (Extension)" folder in "Cat Scratches Extension (macOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */;
-		};
-		7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "Cat Scratches Extension (macOS)" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Resources/_locales,
-				Resources/background.js,
-				Resources/defaults.js,
-				Resources/images,
-				Resources/manifest.json,
-				Resources/settings.html,
-				Resources/settings.js,
-				Resources/turndown.js,
-				SafariWebExtensionHandler.swift,
-			);
-			target = 7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		7F5714752E0322660079AEB5 /* Shared (App) */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7F5714E42E0322670079AEB5 /* Exceptions for "Shared (App)" folder in "Cat Scratches (macOS)" target */,
-			);
-			path = "Shared (App)";
-			sourceTree = "<group>";
-		};
-		7F57147E2E0322670079AEB5 /* Shared (Extension) */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7F5714EE2E0322670079AEB5 /* Exceptions for "Shared (Extension)" folder in "Cat Scratches Extension (macOS)" target */,
-			);
-			explicitFolders = (
-				Resources/_locales,
-				Resources/images,
-			);
-			path = "Shared (Extension)";
-			sourceTree = "<group>";
-		};
-		7F5714A02E0322670079AEB5 /* macOS (App) */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "macOS (App)";
-			sourceTree = "<group>";
-		};
-		7F5714B92E0322670079AEB5 /* macOS (Extension) */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				7F5714E82E0322670079AEB5 /* Exceptions for "macOS (Extension)" folder in "Cat Scratches Extension (macOS)" target */,
-			);
-			path = "macOS (Extension)";
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
-		7F57149C2E0322670079AEB5 /* Frameworks */ = {
+		7F9F05512F07291C0070E1B2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7F5714B22E0322670079AEB5 /* Frameworks */ = {
+		7F9F05632F07291D0070E1B2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F9F056F2F07291D0070E1B2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F9F05792F07291D0070E1B2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -130,299 +167,405 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		7F5714702E0322650079AEB5 = {
+		7F9F05402F07291B0070E1B2 = {
 			isa = PBXGroup;
 			children = (
-				7F5714752E0322660079AEB5 /* Shared (App) */,
-				7F57147E2E0322670079AEB5 /* Shared (Extension) */,
-				7F5714A02E0322670079AEB5 /* macOS (App) */,
-				7F5714B92E0322670079AEB5 /* macOS (Extension) */,
-				7F57148E2E0322670079AEB5 /* Products */,
+				7F9F05452F07291B0070E1B2 /* Shared (App) */,
+				7F9F054E2F07291C0070E1B2 /* Shared (Extension) */,
+				7F9F05562F07291D0070E1B2 /* iOS (App) */,
+				7F9F05672F07291D0070E1B2 /* macOS (App) */,
+				7F9F05762F07291D0070E1B2 /* iOS (Extension) */,
+				7F9F05802F07291D0070E1B2 /* macOS (Extension) */,
+				7F9F05552F07291D0070E1B2 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		7F57148E2E0322670079AEB5 /* Products */ = {
+		7F9F05452F07291B0070E1B2 /* Shared (App) */ = {
 			isa = PBXGroup;
 			children = (
-				7F57149F2E0322670079AEB5 /* Cat Scratches.app */,
-				7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */,
+				7F9F054C2F07291B0070E1B2 /* ViewController.swift */,
+				7F9F054D2F07291C0070E1B2 /* Assets.xcassets */,
+				7F9F05462F07291B0070E1B2 /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		7F9F05462F07291B0070E1B2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05472F07291B0070E1B2 /* Main.html */,
+				7F9F05492F07291B0070E1B2 /* Icon.png */,
+				7F9F054A2F07291B0070E1B2 /* Style.css */,
+				7F9F054B2F07291B0070E1B2 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		7F9F054E2F07291C0070E1B2 /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05A02F07291D0070E1B2 /* Resources */,
+				7F9F054F2F07291C0070E1B2 /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		7F9F05552F07291D0070E1B2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05542F07291D0070E1B2 /* Cat Scratches.app */,
+				7F9F05662F07291D0070E1B2 /* Cat Scratches.app */,
+				7F9F05722F07291D0070E1B2 /* Cat Scratches Extension.appex */,
+				7F9F057C2F07291D0070E1B2 /* Cat Scratches Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
+		7F9F05562F07291D0070E1B2 /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05572F07291D0070E1B2 /* AppDelegate.swift */,
+				7FABC0002F07400000000001 /* ViewController.swift */,
+
+				7FABC0042F07600000000001 /* NativeSettingsView.swift */,
+				7F9F05592F07291D0070E1B2 /* SceneDelegate.swift */,
+				7F9F055B2F07291D0070E1B2 /* LaunchScreen.storyboard */,
+				7F9F055E2F07291D0070E1B2 /* Main.storyboard */,
+				7F9F05612F07291D0070E1B2 /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		7F9F05672F07291D0070E1B2 /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05682F07291D0070E1B2 /* AppDelegate.swift */,
+				7F9F056A2F07291D0070E1B2 /* Main.storyboard */,
+				7F9F056D2F07291D0070E1B2 /* Info.plist */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		7F9F05762F07291D0070E1B2 /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05772F07291D0070E1B2 /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		7F9F05802F07291D0070E1B2 /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05812F07291D0070E1B2 /* Info.plist */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		7F9F05A02F07291D0070E1B2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7F9F05A12F07291D0070E1B2 /* catlogo_light.png */,
+				7F9F05A22F07291D0070E1B2 /* background.js */,
+				7F9F05A32F07291D0070E1B2 /* images */,
+				7F9F05A42F07291D0070E1B2 /* catlogo_dark.png */,
+				7F9F05A52F07291D0070E1B2 /* turndown.js */,
+				7F9F05A62F07291D0070E1B2 /* catlogo.png */,
+				7F9F05A72F07291D0070E1B2 /* manifest.json */,
+				7F9F05A82F07291D0070E1B2 /* _locales */,
+				7F9F05A92F07291D0070E1B2 /* settings.html */,
+				7F9F05AA2F07291D0070E1B2 /* defaults.js */,
+				7F9F05AB2F07291D0070E1B2 /* settings.js */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7F57149E2E0322670079AEB5 /* Cat Scratches (macOS) */ = {
+		7F9F05532F07291C0070E1B2 /* Cat Scratches (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7F5714EA2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches (macOS)" */;
+			buildConfigurationList = 7F9F05962F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches (iOS)" */;
 			buildPhases = (
-				7F57149B2E0322670079AEB5 /* Sources */,
-				7F57149C2E0322670079AEB5 /* Frameworks */,
-				7F57149D2E0322670079AEB5 /* Resources */,
-				7F5714E92E0322670079AEB5 /* Embed Foundation Extensions */,
+				7F9F05502F07291C0070E1B2 /* Sources */,
+				7F9F05512F07291C0070E1B2 /* Frameworks */,
+				7F9F05522F07291C0070E1B2 /* Resources */,
+				7F9F05952F07291D0070E1B2 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				7F5714B82E0322670079AEB5 /* PBXTargetDependency */,
+				7F9F05752F07291D0070E1B2 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				7F5714A02E0322670079AEB5 /* macOS (App) */,
+			name = "Cat Scratches (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Cat Scratches (iOS)";
+			productReference = 7F9F05542F07291D0070E1B2 /* Cat Scratches.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7F9F05652F07291D0070E1B2 /* Cat Scratches (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F9F059D2F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches (macOS)" */;
+			buildPhases = (
+				7F9F05622F07291D0070E1B2 /* Sources */,
+				7F9F05632F07291D0070E1B2 /* Frameworks */,
+				7F9F05642F07291D0070E1B2 /* Resources */,
+				7F9F059C2F07291D0070E1B2 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7F9F057F2F07291D0070E1B2 /* PBXTargetDependency */,
 			);
 			name = "Cat Scratches (macOS)";
 			packageProductDependencies = (
 			);
-			productName = "SafariToDrafts (macOS)";
-			productReference = 7F57149F2E0322670079AEB5 /* Cat Scratches.app */;
+			productName = "Cat Scratches (macOS)";
+			productReference = 7F9F05662F07291D0070E1B2 /* Cat Scratches.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */ = {
+		7F9F05712F07291D0070E1B2 /* Cat Scratches Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7F5714E52E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (macOS)" */;
+			buildConfigurationList = 7F9F05922F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (iOS)" */;
 			buildPhases = (
-				7F5714B12E0322670079AEB5 /* Sources */,
-				7F5714B22E0322670079AEB5 /* Frameworks */,
-				7F5714B32E0322670079AEB5 /* Resources */,
+				7F9F056E2F07291D0070E1B2 /* Sources */,
+				7F9F056F2F07291D0070E1B2 /* Frameworks */,
+				7F9F05702F07291D0070E1B2 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				7F5714B92E0322670079AEB5 /* macOS (Extension) */,
+			name = "Cat Scratches Extension (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Cat Scratches Extension (iOS)";
+			productReference = 7F9F05722F07291D0070E1B2 /* Cat Scratches Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		7F9F057B2F07291D0070E1B2 /* Cat Scratches Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F9F05992F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (macOS)" */;
+			buildPhases = (
+				7F9F05782F07291D0070E1B2 /* Sources */,
+				7F9F05792F07291D0070E1B2 /* Frameworks */,
+				7F9F057A2F07291D0070E1B2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
 			);
 			name = "Cat Scratches Extension (macOS)";
 			packageProductDependencies = (
 			);
-			productName = "SafariToDrafts Extension (macOS)";
-			productReference = 7F5714B52E0322670079AEB5 /* Cat Scratches Extension.appex */;
+			productName = "Cat Scratches Extension (macOS)";
+			productReference = 7F9F057C2F07291D0070E1B2 /* Cat Scratches Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		7F5714712E0322650079AEB5 /* Project object */ = {
+		7F9F05412F07291B0070E1B2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1640;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
-					7F57149E2E0322670079AEB5 = {
-						CreatedOnToolsVersion = 16.4;
+					7F9F05532F07291C0070E1B2 = {
+						CreatedOnToolsVersion = 26.2;
 					};
-					7F5714B42E0322670079AEB5 = {
-						CreatedOnToolsVersion = 16.4;
+					7F9F05652F07291D0070E1B2 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					7F9F05712F07291D0070E1B2 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					7F9F057B2F07291D0070E1B2 = {
+						CreatedOnToolsVersion = 26.2;
 					};
 				};
 			};
-			buildConfigurationList = 7F5714742E0322650079AEB5 /* Build configuration list for PBXProject "Cat Scratches" */;
+			buildConfigurationList = 7F9F05442F07291B0070E1B2 /* Build configuration list for PBXProject "Cat Scratches" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 7F5714702E0322650079AEB5;
+			mainGroup = 7F9F05402F07291B0070E1B2;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 7F57148E2E0322670079AEB5 /* Products */;
+			productRefGroup = 7F9F05552F07291D0070E1B2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7F57149E2E0322670079AEB5 /* Cat Scratches (macOS) */,
-				7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */,
+				7F9F05532F07291C0070E1B2 /* Cat Scratches (iOS) */,
+				7F9F05652F07291D0070E1B2 /* Cat Scratches (macOS) */,
+				7F9F05712F07291D0070E1B2 /* Cat Scratches Extension (iOS) */,
+				7F9F057B2F07291D0070E1B2 /* Cat Scratches Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		7F57149D2E0322670079AEB5 /* Resources */ = {
+		7F9F05522F07291C0070E1B2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F9F05842F07291D0070E1B2 /* Icon.png in Resources */,
+				7F9F055D2F07291D0070E1B2 /* LaunchScreen.storyboard in Resources */,
+				7F9F05822F07291D0070E1B2 /* Main.html in Resources */,
+				7F9F05882F07291D0070E1B2 /* Script.js in Resources */,
+				7F9F058C2F07291D0070E1B2 /* Assets.xcassets in Resources */,
+				7F9F05602F07291D0070E1B2 /* Main.storyboard in Resources */,
+				7F9F05862F07291D0070E1B2 /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7F5714B32E0322670079AEB5 /* Resources */ = {
+		7F9F05642F07291D0070E1B2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F9F05852F07291D0070E1B2 /* Icon.png in Resources */,
+				7F9F05872F07291D0070E1B2 /* Style.css in Resources */,
+				7F9F056C2F07291D0070E1B2 /* Main.storyboard in Resources */,
+				7F9F05892F07291D0070E1B2 /* Script.js in Resources */,
+				7F9F058D2F07291D0070E1B2 /* Assets.xcassets in Resources */,
+				7F9F05832F07291D0070E1B2 /* Main.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F9F05702F07291D0070E1B2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F9F05BF2F07291D0070E1B2 /* settings.html in Resources */,
+				7F9F05B92F07291D0070E1B2 /* images in Resources */,
+				7F9F05C02F07291D0070E1B2 /* defaults.js in Resources */,
+				7F9F05BD2F07291D0070E1B2 /* manifest.json in Resources */,
+				7F9F05BE2F07291D0070E1B2 /* _locales in Resources */,
+				7F9F05BA2F07291D0070E1B2 /* catlogo_dark.png in Resources */,
+				7F9F05B82F07291D0070E1B2 /* background.js in Resources */,
+				7F9F05BC2F07291D0070E1B2 /* catlogo.png in Resources */,
+				7F9F05C12F07291D0070E1B2 /* settings.js in Resources */,
+				7F9F05B72F07291D0070E1B2 /* catlogo_light.png in Resources */,
+				7F9F05BB2F07291D0070E1B2 /* turndown.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F9F057A2F07291D0070E1B2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F9F05B42F07291D0070E1B2 /* settings.html in Resources */,
+				7F9F05AE2F07291D0070E1B2 /* images in Resources */,
+				7F9F05B52F07291D0070E1B2 /* defaults.js in Resources */,
+				7F9F05B22F07291D0070E1B2 /* manifest.json in Resources */,
+				7F9F05B32F07291D0070E1B2 /* _locales in Resources */,
+				7F9F05AF2F07291D0070E1B2 /* catlogo_dark.png in Resources */,
+				7F9F05AD2F07291D0070E1B2 /* background.js in Resources */,
+				7F9F05B12F07291D0070E1B2 /* catlogo.png in Resources */,
+				7F9F05B62F07291D0070E1B2 /* settings.js in Resources */,
+				7F9F05AC2F07291D0070E1B2 /* catlogo_light.png in Resources */,
+				7F9F05B02F07291D0070E1B2 /* turndown.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		7F57149B2E0322670079AEB5 /* Sources */ = {
+		7F9F05502F07291C0070E1B2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F9F05582F07291D0070E1B2 /* AppDelegate.swift in Sources */,
+				7FABC0012F07400000000001 /* ViewController.swift in Sources */,
+
+				7FABC0052F07600000000001 /* NativeSettingsView.swift in Sources */,
+				7F9F055A2F07291D0070E1B2 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7F5714B12E0322670079AEB5 /* Sources */ = {
+		7F9F05622F07291D0070E1B2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F9F058B2F07291D0070E1B2 /* ViewController.swift in Sources */,
+				7F9F05692F07291D0070E1B2 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F9F056E2F07291D0070E1B2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F9F058E2F07291D0070E1B2 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7F9F05782F07291D0070E1B2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F9F058F2F07291D0070E1B2 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		7F5714B82E0322670079AEB5 /* PBXTargetDependency */ = {
+		7F9F05752F07291D0070E1B2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7F5714B42E0322670079AEB5 /* Cat Scratches Extension (macOS) */;
-			targetProxy = 7F5714B72E0322670079AEB5 /* PBXContainerItemProxy */;
+			target = 7F9F05712F07291D0070E1B2 /* Cat Scratches Extension (iOS) */;
+			targetProxy = 7F9F05742F07291D0070E1B2 /* PBXContainerItemProxy */;
+		};
+		7F9F057F2F07291D0070E1B2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7F9F057B2F07291D0070E1B2 /* Cat Scratches Extension (macOS) */;
+			targetProxy = 7F9F057E2F07291D0070E1B2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		7F9F05472F07291B0070E1B2 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7F9F05482F07291B0070E1B2 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		7F9F055B2F07291D0070E1B2 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7F9F055C2F07291D0070E1B2 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		7F9F055E2F07291D0070E1B2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7F9F055F2F07291D0070E1B2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		7F9F056A2F07291D0070E1B2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7F9F056B2F07291D0070E1B2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
-		7F5714E62E0322670079AEB5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.5;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
-				PRODUCT_NAME = "Cat Scratches Extension";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		7F5714E72E0322670079AEB5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.5;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
-				PRODUCT_NAME = "Cat Scratches Extension";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		7F5714EB2E0322670079AEB5 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.5.1;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-					"-framework",
-					WebKit,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
-				PRODUCT_NAME = "Cat Scratches";
-				REGISTER_APP_GROUPS = YES;
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		7F5714EC2E0322670079AEB5 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = Q26G342EEL;
-				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 David Degner. All rights reserved.";
-				INFOPLIST_KEY_NSMainStoryboardFile = Main;
-				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 0.5.1;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SafariServices,
-					"-framework",
-					WebKit,
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
-				PRODUCT_NAME = "Cat Scratches";
-				REGISTER_APP_GROUPS = YES;
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
-		7F5714EF2E0322670079AEB5 /* Debug */ = {
+		7F9F05902F07291D0070E1B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -457,7 +600,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -484,7 +626,7 @@
 			};
 			name = Debug;
 		};
-		7F5714F02E0322670079AEB5 /* Release */ = {
+		7F9F05912F07291D0070E1B2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -519,7 +661,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -538,37 +679,373 @@
 			};
 			name = Release;
 		};
+		7F9F05932F07291D0070E1B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = "iOS (Extension)/Cat Scratches.entitlements";
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
+				PRODUCT_NAME = "Cat Scratches Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7F9F05942F07291D0070E1B2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = "iOS (Extension)/Cat Scratches.entitlements";
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
+				PRODUCT_NAME = "Cat Scratches Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7F9F05972F07291D0070E1B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
+				PRODUCT_NAME = "Cat Scratches";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7F9F05982F07291D0070E1B2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
+				PRODUCT_NAME = "Cat Scratches";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7F9F059A2F07291D0070E1B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
+				PRODUCT_NAME = "Cat Scratches Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7F9F059B2F07291D0070E1B2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches.Extension";
+				PRODUCT_NAME = "Cat Scratches Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7F9F059E2F07291D0070E1B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
+				PRODUCT_NAME = "Cat Scratches";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7F9F059F2F07291D0070E1B2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Q26G342EEL;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.daviddegner.Cat-Scratches";
+				PRODUCT_NAME = "Cat Scratches";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7F5714742E0322650079AEB5 /* Build configuration list for PBXProject "Cat Scratches" */ = {
+		7F9F05442F07291B0070E1B2 /* Build configuration list for PBXProject "Cat Scratches" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7F5714EF2E0322670079AEB5 /* Debug */,
-				7F5714F02E0322670079AEB5 /* Release */,
+				7F9F05902F07291D0070E1B2 /* Debug */,
+				7F9F05912F07291D0070E1B2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7F5714E52E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (macOS)" */ = {
+		7F9F05922F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7F5714E62E0322670079AEB5 /* Debug */,
-				7F5714E72E0322670079AEB5 /* Release */,
+				7F9F05932F07291D0070E1B2 /* Debug */,
+				7F9F05942F07291D0070E1B2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7F5714EA2E0322670079AEB5 /* Build configuration list for PBXNativeTarget "Cat Scratches (macOS)" */ = {
+		7F9F05962F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7F5714EB2E0322670079AEB5 /* Debug */,
-				7F5714EC2E0322670079AEB5 /* Release */,
+				7F9F05972F07291D0070E1B2 /* Debug */,
+				7F9F05982F07291D0070E1B2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7F9F05992F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F9F059A2F07291D0070E1B2 /* Debug */,
+				7F9F059B2F07291D0070E1B2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7F9F059D2F07291D0070E1B2 /* Build configuration list for PBXNativeTarget "Cat Scratches (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F9F059E2F07291D0070E1B2 /* Debug */,
+				7F9F059F2F07291D0070E1B2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 7F5714712E0322650079AEB5 /* Project object */;
+	rootObject = 7F9F05412F07291B0070E1B2 /* Project object */;
 }

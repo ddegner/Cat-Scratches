@@ -3,7 +3,7 @@
     "default_locale": "en",
     "name": "__MSG_extension_name__",
     "description": "__MSG_extension_description__",
-    "version": "0.5",
+    "version": "0.6",
     "author": "David Degner",
     "homepage_url": "https://www.daviddegner.com",
     "icons": {
@@ -25,11 +25,11 @@
     },
     "action": {
         "default_icon": "images/toolbar-icon.png",
-        "default_title": "Cat Scratches - Capture content to Drafts"
+        "default_title": "Clip to Drafts"
     },
     "action_dark": {
         "default_icon": "images/toolbar-icon-dark.png",
-        "default_title": "Cat Scratches - Capture content to Drafts"
+        "default_title": "Clip to Drafts"
     },
     "commands": {
         "create_draft_command": {
@@ -43,7 +43,8 @@
     "permissions": [
         "activeTab",
         "scripting",
-        "storage"
+        "storage",
+        "nativeMessaging"
     ],
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"

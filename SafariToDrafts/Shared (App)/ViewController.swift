@@ -6,8 +6,9 @@
 //
 
 import SwiftUI
-import SafariServices
 import AppKit
+import Combine
+import SafariServices
 
 let extensionBundleIdentifier = "com.daviddegner.Cat-Scratches.Extension"
 
@@ -168,7 +169,7 @@ class ExtensionManager: ObservableObject {
             }
 
             // Safari can take a moment to become ready after launch; retry briefly if needed.
-            self.showSafariExtensionPreferencesWithRetry(remainingAttempts: 4, initialDelay: 0.2)
+            self.showSafariExtensionPreferences()
         }
     }
 
@@ -201,22 +202,21 @@ class ExtensionManager: ObservableObject {
         }
     }
 
-    private func showSafariExtensionPreferencesWithRetry(remainingAttempts: Int, initialDelay: TimeInterval) {
+    private func showSafariExtensionPreferences() {
+        // Use SFSafariApplication to directly open the extension preferences panel
         SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
             if let error = error {
-                if remainingAttempts > 0 {
-                    let nextDelay = min(initialDelay * 1.5, 1.5)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + nextDelay) {
-                        self.showSafariExtensionPreferencesWithRetry(remainingAttempts: remainingAttempts - 1, initialDelay: nextDelay)
-                    }
-                } else {
-                    print("Failed to open Safari preferences: \(error.localizedDescription)")
+                print("Error opening extension preferences: \(error.localizedDescription)")
+                // Fallback: just launch Safari
+                if let safariURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: self.safariBundleIdentifier) {
+                    NSWorkspace.shared.open(safariURL)
                 }
-                return
+            } else {
+                print("Successfully opened Safari Extensions preferences for \(extensionBundleIdentifier)")
             }
-            print("Successfully opened Safari preferences")
         }
     }
+
 
 }
 

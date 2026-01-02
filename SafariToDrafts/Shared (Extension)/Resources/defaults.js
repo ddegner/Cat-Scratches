@@ -10,6 +10,9 @@
       ? self
       : (typeof window !== 'undefined' ? window : {});
 
+  // Native messaging app ID for iCloud sync via SafariWebExtensionHandler
+  const NATIVE_APP_ID = 'com.daviddegner.Cat-Scratches';
+
   const BASE_SELECTORS = [
     '[itemtype*="Article"]',
     '[itemtype*="BlogPosting"]',
@@ -318,7 +321,6 @@
     },
     outputFormat: {
       template: '# {title}\n\n<{url}>\n\n---\n\n{content}',
-      titleFormat: 'h1',
       defaultTag: ''
     },
     advancedFiltering: {
@@ -339,8 +341,21 @@
    * @returns {Object} Migrated settings
    */
   function migrateSettings(inputSettings) {
+    const defaults = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
     const settings = JSON.parse(JSON.stringify(inputSettings || {}));
+
+    // Ensure all top-level structures exist by merging with defaults
+    settings.contentExtraction = settings.contentExtraction || {};
     settings.outputFormat = settings.outputFormat || {};
+    settings.advancedFiltering = settings.advancedFiltering || {};
+
+    // Merge contentExtraction with defaults
+    settings.contentExtraction.customSelectors = settings.contentExtraction.customSelectors || defaults.contentExtraction.customSelectors;
+
+    // Merge advancedFiltering with defaults
+    settings.advancedFiltering.customFilters = settings.advancedFiltering.customFilters || defaults.advancedFiltering.customFilters;
+    settings.advancedFiltering.minContentLength = settings.advancedFiltering.minContentLength ?? defaults.advancedFiltering.minContentLength;
+    settings.advancedFiltering.maxLinkRatio = settings.advancedFiltering.maxLinkRatio ?? defaults.advancedFiltering.maxLinkRatio;
 
     // Construct a template if missing, leveraging legacy flags if present
     if (!settings.outputFormat.template) {
@@ -350,7 +365,7 @@
         settings.outputFormat.template = legacyCustom;
       } else {
         // Build from legacy include flags or fall back to default
-        let tpl = DEFAULT_SETTINGS.outputFormat.template;
+        let tpl = defaults.outputFormat.template;
         // If legacy includeSource was false, remove {url} line
         if (legacy.hasOwnProperty('includeSource') && legacy.includeSource === false) {
           tpl = tpl.replace(/\n?\n?\{url\}\n?/g, '\n');
@@ -376,15 +391,18 @@
     delete settings.outputFormat.includeSeparator;
     delete settings.outputFormat.includeTimestamp;
     delete settings.outputFormat.customTemplate;
+    delete settings.outputFormat.titleFormat;  // No longer used
 
-    if (!settings.outputFormat.titleFormat) {
-      settings.outputFormat.titleFormat = 'h1';
+    // Ensure defaultTag exists (can be empty string)
+    if (settings.outputFormat.defaultTag === undefined) {
+      settings.outputFormat.defaultTag = defaults.outputFormat.defaultTag;
     }
 
     return settings;
   }
 
   // Expose globally for background and settings pages
+  root.NATIVE_APP_ID = NATIVE_APP_ID;
   root.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
   root.getDefaultSettings = getDefaultSettings;
   root.migrateSettings = migrateSettings;

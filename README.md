@@ -33,7 +33,7 @@ Every captured draft follows this elegant format:
 ```markdown
 # Page Title
 
-**Source:** [Original URL](https://example.com)
+<https://example.com>
 
 ---
 

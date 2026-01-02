@@ -12,60 +12,107 @@ try {
 // Global settings object
 let extensionSettings = null;
 
+// NATIVE_APP_ID is provided by defaults.js
+
+// ============================================================================
+// SETTINGS SYNC ARCHITECTURE:
+// - Primary storage: iCloud via NSUbiquitousKeyValueStore (accessed via native messaging)
+// - Cache: browser.storage.local for offline support
+// - browser.storage.sync is NOT used because Safari doesn't actually sync it across devices
+// ============================================================================
+
+// Load settings from iCloud (with local cache fallback)
+async function loadSettingsFromCloud() {
+    try {
+        // Try to get settings from iCloud via native messaging
+        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+            action: 'getSettings'
+        });
+
+        if (response && response.settings && typeof response.settings === 'object') {
+            extensionSettings = migrateSettings(response.settings);
+            // Cache locally for offline access
+            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
+            console.log('Settings loaded from iCloud');
+            return extensionSettings;
+        }
+    } catch (error) {
+        console.log('Could not load from iCloud, trying local cache:', error.message);
+    }
+
+    // Fallback to local cache
+    try {
+        const localResult = await browser.storage.local.get(['catScratchesSettings']);
+        if (localResult.catScratchesSettings) {
+            extensionSettings = migrateSettings(localResult.catScratchesSettings);
+            console.log('Settings loaded from local cache');
+            return extensionSettings;
+        }
+    } catch (error) {
+        console.log('Local cache also failed:', error.message);
+    }
+
+    // Last resort: use defaults
+    extensionSettings = getDefaultSettings();
+    console.log('Using default settings');
+    return extensionSettings;
+}
+
+// Save settings to iCloud (and local cache)
+async function saveSettingsToCloud(settings) {
+    // Always cache locally first
+    await browser.storage.local.set({ catScratchesSettings: settings });
+
+    // Then save to iCloud
+    try {
+        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+            action: 'saveSettings',
+            settings: settings
+        });
+        if (response && response.success) {
+            console.log('Settings saved to iCloud');
+        }
+    } catch (error) {
+        console.log('Could not save to iCloud (saved locally):', error.message);
+    }
+}
+
+// Sync settings - load from iCloud if available
+async function syncSettings() {
+    await loadSettingsFromCloud();
+}
+
 // Listen for extension startup
-browser.runtime.onStartup.addListener(() => {
-    loadExtensionSettings();
+browser.runtime.onStartup.addListener(async () => {
+    await loadSettingsFromCloud();
 });
 
 browser.runtime.onInstalled.addListener(async () => {
-    // Initialize with default settings on first install
+    // Initialize with default settings on first install, or load from iCloud
     try {
-        const result = await browser.storage.local.get(['catScratchesSettings']);
-        if (!result.catScratchesSettings) {
-            // First install - save default settings
-            const defaultSettings = getDefaultSettings();
-            await browser.storage.local.set({
-                catScratchesSettings: defaultSettings
-            });
-            extensionSettings = defaultSettings;
-        } else {
-            // Extension already has settings - migrate if needed
-            extensionSettings = migrateSettings(result.catScratchesSettings);
-            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
+        await loadSettingsFromCloud();
+
+        // If we have no settings, initialize with defaults and save to iCloud
+        if (!extensionSettings || Object.keys(extensionSettings).length === 0) {
+            extensionSettings = getDefaultSettings();
+            await saveSettingsToCloud(extensionSettings);
+            console.log('Initialized default settings in iCloud');
         }
     } catch (error) {
         console.error('Failed to initialize extension settings:', error);
+        extensionSettings = getDefaultSettings();
     }
 });
 
-// Listen for settings changes
-browser.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes.catScratchesSettings) {
-        extensionSettings = migrateSettings(changes.catScratchesSettings.newValue);
-    }
-});
-
-// Function to load extension settings from storage
+// Function to load extension settings (wrapper for compatibility)
 async function loadExtensionSettings() {
-    try {
-        const result = await browser.storage.local.get(['catScratchesSettings']);
-        if (result.catScratchesSettings) {
-            extensionSettings = migrateSettings(result.catScratchesSettings);
-            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
-        } else {
-            // No settings found - initialize from defaults
-            const defaults = getDefaultSettings();
-            extensionSettings = defaults;
-            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
-        }
-    } catch (error) {
-        console.error('Failed to load extension settings:', error);
-        // Last-resort fallback to in-memory defaults
-        if (!extensionSettings) {
-            extensionSettings = getDefaultSettings();
-        }
-        throw new Error('Failed to load extension settings: ' + error.message);
-    }
+    return await loadSettingsFromCloud();
+}
+
+// Function to save settings (wrapper for compatibility)
+async function saveSettingsWithSync(settings) {
+    extensionSettings = settings;
+    await saveSettingsToCloud(settings);
 }
 
 // Listen for toolbar button clicks
@@ -79,8 +126,7 @@ browser.runtime.onMessage.addListener(async (message) => {
         await createDraftFromCurrentTab();
     } else if (message.action === 'createDraftFromData') {
         const data = message.data;
-        const isSelection = data.source === 'selection';
-        await createDraft(data.title, data.url, data.body, isSelection);
+        await createDraft(data.title, data.url, data.body);
     }
 });
 
@@ -118,8 +164,7 @@ async function createDraftFromCurrentTab() {
 
         if (results && results[0] && results[0].result) {
             const pageData = results[0].result;
-            const isSelection = pageData.source === 'selection';
-            await createDraft(pageData.title, pageData.url, pageData.body, isSelection);
+            await createDraft(pageData.title, pageData.url, pageData.body);
         }
     } catch (error) {
         console.error("Error creating draft:", error);
@@ -390,6 +435,24 @@ async function createDraft(title, url, markdownBody) {
         }
     }
 
+    // Check URL length before opening - very long URLs will fail
+    const MAX_DRAFTS_URL_LENGTH = 65000;
+    if (draftsURL.length > MAX_DRAFTS_URL_LENGTH) {
+        try {
+            const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+            if (activeTab?.id) {
+                await browser.scripting.executeScript({
+                    target: { tabId: activeTab.id },
+                    func: (msg) => alert(msg),
+                    args: ["Content too large to send to Drafts. Try selecting a smaller portion of the page."]
+                });
+            }
+        } catch (e) {
+            console.error("Failed to show length warning:", e);
+        }
+        return;
+    }
+
     try {
         const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
 
@@ -417,21 +480,11 @@ async function createDraft(title, url, markdownBody) {
 function formatDraftContent(title, url, content) {
     const outputFormat = extensionSettings?.outputFormat || DEFAULT_SETTINGS.outputFormat;
 
-    const titleFormat = outputFormat.titleFormat || 'h1';
-    let formattedTitle = '';
-    if (titleFormat !== 'none') {
-        if (titleFormat === 'h1') formattedTitle = `# ${title}`;
-        else if (titleFormat === 'h2') formattedTitle = `## ${title}`;
-        else if (titleFormat === 'h3') formattedTitle = `### ${title}`;
-        else if (titleFormat === 'bold') formattedTitle = `**${title}**`;
-    }
-
     const template = (outputFormat.template || '').trim() || DEFAULT_SETTINGS.outputFormat.template;
     const timestampISO = new Date().toISOString();
     const defaultTag = outputFormat.defaultTag || '';
 
     return template
-        .replace('{formattedTitle}', formattedTitle)
         .replace('{title}', title)
         .replace('{url}', url)
         .replace('{content}', content)
