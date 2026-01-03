@@ -20,10 +20,17 @@
         }
 
         @media (prefers-color-scheme: dark) {
-            body { background: #0b0b0c; color: #f5f5f7; }
+            body {
+                background: #0b0b0c;
+                color: #f5f5f7;
+            }
         }
 
-        .container { max-width: 700px; margin: 0 auto; background: transparent; }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: transparent;
+        }
 
         .header {
             background: #ffffff;
@@ -34,8 +41,13 @@
             align-items: center;
             gap: 16px;
         }
+
         @media (prefers-color-scheme: dark) {
-            .header { background: #0b0b0c; color: #f5f5f7; border-bottom-color: #1f1f22; }
+            .header {
+                background: #0b0b0c;
+                color: #f5f5f7;
+                border-bottom-color: #1f1f22;
+            }
         }
 
         .header img {
@@ -44,13 +56,27 @@
             border-radius: 6px;
         }
 
-        .header h1 { margin: 0; font-size: 24px; font-weight: 600; color: inherit; }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: inherit;
+        }
 
-        .content { padding: 32px; }
+        .content {
+            padding: 32px;
+        }
 
-        .section { margin-bottom: 48px; padding-bottom: 40px; border-bottom: 1px solid #f0f0f0; }
+        .section {
+            margin-bottom: 48px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
         @media (prefers-color-scheme: dark) {
-            .section { border-bottom-color: #1f1f22; }
+            .section {
+                border-bottom-color: #1f1f22;
+            }
         }
 
         .section:last-child {
@@ -59,24 +85,55 @@
             padding-bottom: 0;
         }
 
-        .section h2 { font-size: 20px; font-weight: 600; margin: 0 0 24px 0; color: inherit; }
+        .section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 24px 0;
+            color: inherit;
+        }
 
         .form-group {
             margin-bottom: 28px;
         }
 
-        .form-group label { display: block; font-weight: 500; margin-bottom: 8px; color: inherit; font-size: 14px; }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: inherit;
+            font-size: 14px;
+        }
 
         .form-group input,
         .form-group select,
-        .form-group textarea { width: 100%; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; font-family: inherit; box-sizing: border-box; transition: all 0.2s ease; background: #ffffff; color: inherit; }
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: inherit;
+        }
+
         @media (prefers-color-scheme: dark) {
+
             .form-group input,
             .form-group select,
-            .form-group textarea { background: #111113; border-color: #2a2a2e; }
+            .form-group textarea {
+                background: #111113;
+                border-color: #2a2a2e;
+            }
+
             .form-group input:focus,
             .form-group select:focus,
-            .form-group textarea:focus { box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25); border-color: #0a84ff; }
+            .form-group textarea:focus {
+                box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+                border-color: #0a84ff;
+            }
         }
 
         .form-group input:focus,
@@ -95,8 +152,18 @@
             line-height: 1.5;
         }
 
-        .form-group .help-text { font-size: 13px; color: #666666; margin-top: 6px; line-height: 1.4; }
-        @media (prefers-color-scheme: dark) { .form-group .help-text { color: #a1a1aa; } }
+        .form-group .help-text {
+            font-size: 13px;
+            color: #666666;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .form-group .help-text {
+                color: #a1a1aa;
+            }
+        }
 
         .placeholder-tags {
             display: flex;
@@ -104,11 +171,34 @@
             gap: 8px;
             margin-top: 8px;
         }
-        .placeholder-tag { display: inline-block; padding: 4px 8px; border-radius: 6px; background: #f3f4f6; border: 1px solid #e5e7eb; font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace; font-size: 12px; color: #374151; cursor: pointer; user-select: none; }
-        .placeholder-tag:hover { background: #e5e7eb; }
+
+        .placeholder-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 12px;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .placeholder-tag:hover {
+            background: #e5e7eb;
+        }
+
         @media (prefers-color-scheme: dark) {
-            .placeholder-tag { background: #1f2937; border-color: #334155; color: #e5e7eb; }
-            .placeholder-tag:hover { background: #374151; }
+            .placeholder-tag {
+                background: #1f2937;
+                border-color: #334155;
+                color: #e5e7eb;
+            }
+
+            .placeholder-tag:hover {
+                background: #374151;
+            }
         }
 
 
@@ -126,7 +216,12 @@
             transform: scale(1.1);
         }
 
-        .checkbox-group label { margin: 0; font-weight: 400; font-size: 14px; color: inherit; }
+        .checkbox-group label {
+            margin: 0;
+            font-weight: 400;
+            font-size: 14px;
+            color: inherit;
+        }
 
         .button-group {
             display: flex;
@@ -135,10 +230,30 @@
             margin-top: 32px;
         }
 
-        .button { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; background: #f8f9fa; color: #1d1d1f; border: 1px solid #e0e0e0; }
+        .button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f8f9fa;
+            color: #1d1d1f;
+            border: 1px solid #e0e0e0;
+        }
+
         @media (prefers-color-scheme: dark) {
-            .button { background: #1c1c1e; color: #f5f5f7; border-color: #2a2a2e; }
-            .button:hover { background: #2c2c2e; border-color: #3a3a3e; }
+            .button {
+                background: #1c1c1e;
+                color: #f5f5f7;
+                border-color: #2a2a2e;
+            }
+
+            .button:hover {
+                background: #2c2c2e;
+                border-color: #3a3a3e;
+            }
         }
 
         .button:hover {
@@ -167,19 +282,46 @@
             border-left: 4px solid;
         }
 
-        .status-message.success { background: #f0f9f0; color: #166534; border-left-color: #22c55e; }
-        @media (prefers-color-scheme: dark) {
-            .status-message.success { background: #0f2f1a; color: #86efac; border-left-color: #22c55e; }
+        .status-message.success {
+            background: #f0f9f0;
+            color: #166534;
+            border-left-color: #22c55e;
         }
 
-        .status-message.error { background: #fef2f2; color: #dc2626; border-left-color: #ef4444; }
         @media (prefers-color-scheme: dark) {
-            .status-message.error { background: #3c0d0d; color: #fca5a5; border-left-color: #ef4444; }
+            .status-message.success {
+                background: #0f2f1a;
+                color: #86efac;
+                border-left-color: #22c55e;
+            }
         }
 
-        .status-message.info { background: #f0f9ff; color: #1e40af; border-left-color: #3b82f6; }
+        .status-message.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border-left-color: #ef4444;
+        }
+
         @media (prefers-color-scheme: dark) {
-            .status-message.info { background: #0a223a; color: #93c5fd; border-left-color: #3b82f6; }
+            .status-message.error {
+                background: #3c0d0d;
+                color: #fca5a5;
+                border-left-color: #ef4444;
+            }
+        }
+
+        .status-message.info {
+            background: #f0f9ff;
+            color: #1e40af;
+            border-left-color: #3b82f6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .status-message.info {
+                background: #0a223a;
+                color: #93c5fd;
+                border-left-color: #3b82f6;
+            }
         }
     </style>
 </head>
@@ -189,13 +331,14 @@
         <div class="header">
             <picture>
                 <source srcset="images/icon-128-dark.png" media="(prefers-color-scheme: dark)">
-                <img src="images/icon-128.png" alt="Cat Scratches Icon" width="32" height="32" style="border-radius: 6px;">
+                <img src="images/icon-128.png" alt="Cat Scratches Icon" width="32" height="32"
+                    style="border-radius: 6px;">
             </picture>
             <h1>Cat Scratches Settings</h1>
         </div>
 
         <div class="content">
-            <div class="status-message" id="statusMessage"></div>
+
 
 
 
@@ -404,12 +547,14 @@ form
 
                 <div class="form-group">
                     <label for="template">Template</label>
-                    <textarea id="template" placeholder="Use placeholders: {title}, {url}, {content}, {timestamp}, {tag}"></textarea>
+                    <textarea id="template"
+                        placeholder="Use placeholders: {title}, {url}, {content}, {timestamp}, {tag}"></textarea>
                     <div id="placeholderTags" class="placeholder-tags"></div>
                 </div>
             </div>
 
             <!-- Actions -->
+            <div class="status-message" id="statusMessage"></div>
             <div class="button-group">
                 <button class="button button-danger" id="resetSettings">Reset to Defaults</button>
                 <button class="button" id="saveSettings">Save Settings</button>

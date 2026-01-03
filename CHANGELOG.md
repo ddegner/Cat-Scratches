@@ -2,6 +2,18 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [2.0] - 2026-01-02
+
+### Changed
+- **Version bump to 2.0** for App Store distribution
+- Consolidated iOS and macOS settings UI into single shared `MainSettingsView.swift`
+- Reduced code duplication by ~277 lines through cross-platform view consolidation
+- Improved code quality with SwiftLint compliance (0 violations)
+
+### Fixed
+- Removed empty/unused iOS Assets.xcassets folder
+- Cleaned up trailing whitespace and line length issues across all Swift files
+
 ## [0.6] - 2026-01-02
 
 ### Added

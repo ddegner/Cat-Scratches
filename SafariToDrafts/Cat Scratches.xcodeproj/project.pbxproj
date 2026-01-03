@@ -51,8 +51,8 @@
 		7F9F05C02F07291D0070E1B2 /* defaults.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AA2F07291D0070E1B2 /* defaults.js */; };
 		7F9F05C12F07291D0070E1B2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AB2F07291D0070E1B2 /* settings.js */; };
 		7FABC0012F07400000000001 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0002F07400000000001 /* ViewController.swift */; };
-
-		7FABC0052F07600000000001 /* NativeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0042F07600000000001 /* NativeSettingsView.swift */; };
+		7FABC0062F07700000000001 /* MainSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0072F07700000000001 /* MainSettingsView.swift */; };
+		7FABC0082F07700000000002 /* MainSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0072F07700000000001 /* MainSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,8 +131,7 @@
 		7F9F05AA2F07291D0070E1B2 /* defaults.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = defaults.js; path = Resources/defaults.js; sourceTree = "<group>"; };
 		7F9F05AB2F07291D0070E1B2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = Resources/settings.js; sourceTree = "<group>"; };
 		7FABC0002F07400000000001 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-
-		7FABC0042F07600000000001 /* NativeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeSettingsView.swift; sourceTree = "<group>"; };
+		7FABC0072F07700000000001 /* MainSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				7F9F054C2F07291B0070E1B2 /* ViewController.swift */,
+				7FABC0072F07700000000001 /* MainSettingsView.swift */,
 				7F9F054D2F07291C0070E1B2 /* Assets.xcassets */,
 				7F9F05462F07291B0070E1B2 /* Resources */,
 			);
@@ -226,8 +226,6 @@
 			children = (
 				7F9F05572F07291D0070E1B2 /* AppDelegate.swift */,
 				7FABC0002F07400000000001 /* ViewController.swift */,
-
-				7FABC0042F07600000000001 /* NativeSettingsView.swift */,
 				7F9F05592F07291D0070E1B2 /* SceneDelegate.swift */,
 				7F9F055B2F07291D0070E1B2 /* LaunchScreen.storyboard */,
 				7F9F055E2F07291D0070E1B2 /* Main.storyboard */,
@@ -483,8 +481,7 @@
 			files = (
 				7F9F05582F07291D0070E1B2 /* AppDelegate.swift in Sources */,
 				7FABC0012F07400000000001 /* ViewController.swift in Sources */,
-
-				7FABC0052F07600000000001 /* NativeSettingsView.swift in Sources */,
+				7FABC0062F07700000000001 /* MainSettingsView.swift in Sources */,
 				7F9F055A2F07291D0070E1B2 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -494,6 +491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F9F058B2F07291D0070E1B2 /* ViewController.swift in Sources */,
+				7FABC0082F07700000000002 /* MainSettingsView.swift in Sources */,
 				7F9F05692F07291D0070E1B2 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -683,20 +681,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				GENERATE_INFOPLIST_FILE = YES;
 				CODE_SIGN_ENTITLEMENTS = "iOS (Extension)/Cat Scratches.entitlements";
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -718,20 +716,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				GENERATE_INFOPLIST_FILE = YES;
 				CODE_SIGN_ENTITLEMENTS = "iOS (Extension)/Cat Scratches.entitlements";
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Cat Scratches Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -756,7 +754,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
@@ -772,7 +770,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -798,7 +796,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
@@ -814,7 +812,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -840,7 +838,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -855,7 +853,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -877,7 +875,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Cat Scratches.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -892,7 +890,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -916,7 +914,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -933,7 +931,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -960,7 +958,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -977,7 +975,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
