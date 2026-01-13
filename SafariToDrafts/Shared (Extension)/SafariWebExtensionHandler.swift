@@ -8,6 +8,7 @@
 import SafariServices
 import os.log
 
+
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
     // iCloud Key-Value Store for cross-device sync
@@ -57,6 +58,7 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
         case "openOptions":
             os_log(.info, "Options page request received")
+
 
         default:
             os_log(.info, "Ignoring action: %{public}@", action)

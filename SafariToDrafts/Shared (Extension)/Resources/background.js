@@ -152,12 +152,12 @@ async function createDraftFromCurrentTab() {
             return;
         }
 
-        // Inject Turndown library
-        await browser.scripting.executeScript({ target: { tabId: activeTab.id }, files: ['turndown.js'] });
+        // Inject Turndown library (main frame only to avoid permission prompts for iframes)
+        await browser.scripting.executeScript({ target: { tabId: activeTab.id, frameIds: [0] }, files: ['turndown.js'] });
 
-        // Execute content script to get page content
+        // Execute content script to get page content (main frame only)
         const results = await browser.scripting.executeScript({
-            target: { tabId: activeTab.id },
+            target: { tabId: activeTab.id, frameIds: [0] },
             func: getPageContent,
             args: [extensionSettings]
         });
@@ -174,7 +174,7 @@ async function createDraftFromCurrentTab() {
             const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
             if (activeTab) {
                 await browser.scripting.executeScript({
-                    target: { tabId: activeTab.id },
+                    target: { tabId: activeTab.id, frameIds: [0] },
                     func: (errorMessage) => {
                         alert('Cat Scratches Error: ' + errorMessage);
                     },
@@ -442,7 +442,7 @@ async function createDraft(title, url, markdownBody) {
             const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
             if (activeTab?.id) {
                 await browser.scripting.executeScript({
-                    target: { tabId: activeTab.id },
+                    target: { tabId: activeTab.id, frameIds: [0] },
                     func: (msg) => alert(msg),
                     args: ["Content too large to send to Drafts. Try selecting a smaller portion of the page."]
                 });
@@ -458,23 +458,68 @@ async function createDraft(title, url, markdownBody) {
 
         if (activeTab) {
             const currentURL = activeTab.url;
+            const shareData = {
+                title: title,
+                text: draftContent
+            };
 
-            // Execute the URL scheme by navigating to it
+            // Use timeout-based detection: try Drafts first, fall back to Share Sheet
+            // if page is still visible after timeout (meaning Drafts didn't open)
             await browser.scripting.executeScript({
-                target: { tabId: activeTab.id },
-                func: function (draftsUrl, originalUrl) {
-                    window.location.href = draftsUrl;
-                    setTimeout(() => {
-                        window.location.href = originalUrl;
-                    }, 2000);
-                },
-                args: [draftsURL, currentURL]
+                target: { tabId: activeTab.id, frameIds: [0] },
+                func: openDraftsWithFallback,
+                args: [draftsURL, currentURL, shareData]
             });
         }
     } catch (error) {
-        console.error("Error opening Drafts via URL scheme:", error);
+        console.error("Error creating draft:", error);
     }
 }
+
+// Injected function: attempts to open Drafts, falls back to Share Sheet if page stays visible
+async function openDraftsWithFallback(draftsUrl, originalUrl, shareData) {
+    // Track if Drafts opened successfully via visibility change
+    let draftsOpened = false;
+
+    const visibilityHandler = () => {
+        if (document.hidden) {
+            draftsOpened = true;
+        }
+    };
+
+    document.addEventListener('visibilitychange', visibilityHandler);
+
+    // Attempt to open Drafts
+    window.location.href = draftsUrl;
+
+    // Wait to see if Drafts opened (page becomes hidden)
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    document.removeEventListener('visibilitychange', visibilityHandler);
+
+    // If page is still visible, Drafts didn't open - use Share Sheet fallback
+    if (!draftsOpened && !document.hidden) {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: shareData.title,
+                    text: shareData.text
+                });
+            } catch (e) {
+                // AbortError means user cancelled - that's fine
+                if (e.name !== 'AbortError') {
+                    console.error('Share failed:', e);
+                }
+            }
+        }
+    } else {
+        // Drafts opened successfully - return to Safari after a delay
+        setTimeout(() => {
+            window.location.href = originalUrl;
+        }, 2000);
+    }
+}
+
 
 // Format draft content using unified template engine
 function formatDraftContent(title, url, content) {
