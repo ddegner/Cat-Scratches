@@ -2,6 +2,11 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **Timeout-based Drafts detection**: Now attempts to open Drafts immediately without upfront detection. If Drafts doesn't open within 800ms, silently falls back to the Share Sheet. This preserves the instant experience for Drafts users while satisfying App Store requirements.
+
 ## [2.0] - 2026-01-02
 
 ### Changed
