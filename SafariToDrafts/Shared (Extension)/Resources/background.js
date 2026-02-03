@@ -77,11 +77,6 @@ async function saveSettingsToCloud(settings) {
     }
 }
 
-// Sync settings - load from iCloud if available
-async function syncSettings() {
-    await loadSettingsFromCloud();
-}
-
 // Listen for extension startup
 browser.runtime.onStartup.addListener(async () => {
     await loadSettingsFromCloud();
@@ -92,28 +87,38 @@ browser.runtime.onInstalled.addListener(async () => {
     try {
         await loadSettingsFromCloud();
 
-        // If we have no settings, initialize with defaults and save to iCloud
+        // If we have no settings, initialize with defaults
         if (!extensionSettings || Object.keys(extensionSettings).length === 0) {
             extensionSettings = getDefaultSettings();
-            await saveSettingsToCloud(extensionSettings);
-            console.log('Initialized default settings in iCloud');
         }
+
+        // Check if Drafts is installed and set default destination accordingly
+        // Note: iOS extension cannot check this, so it returns null
+        try {
+            const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+                action: 'checkDraftsInstalled'
+            });
+            // If draftsInstalled is null (iOS extension limitation), keep current/default setting
+            // If defined (macOS), set destination based on availability
+            if (response?.draftsInstalled !== null && response?.draftsInstalled !== undefined) {
+                const draftsInstalled = response.draftsInstalled;
+                extensionSettings.saveDestination = draftsInstalled ? 'drafts' : 'share';
+                console.log('Drafts installed:', draftsInstalled, '- default destination:', extensionSettings.saveDestination);
+            } else {
+                // iOS or unknown - keep existing setting, default to drafts
+                console.log('Cannot determine Drafts installation (iOS extension), keeping current destination:', extensionSettings.saveDestination);
+            }
+        } catch (checkError) {
+            console.log('Could not check Drafts installation, keeping current setting:', checkError.message);
+        }
+
+        await saveSettingsToCloud(extensionSettings);
+        console.log('Initialized settings in iCloud');
     } catch (error) {
         console.error('Failed to initialize extension settings:', error);
         extensionSettings = getDefaultSettings();
     }
 });
-
-// Function to load extension settings (wrapper for compatibility)
-async function loadExtensionSettings() {
-    return await loadSettingsFromCloud();
-}
-
-// Function to save settings (wrapper for compatibility)
-async function saveSettingsWithSync(settings) {
-    extensionSettings = settings;
-    await saveSettingsToCloud(settings);
-}
 
 // Listen for toolbar button clicks
 browser.action.onClicked.addListener(async () => {
@@ -130,18 +135,21 @@ browser.runtime.onMessage.addListener(async (message) => {
     }
 });
 
-// Listen for command (keyboard shortcut)
-browser.commands.onCommand.addListener(async (command) => {
-    if (command === "create_draft_command") {
-        await createDraftFromCurrentTab();
+// Listen for settings changes in storage
+browser.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes.catScratchesSettings) {
+        extensionSettings = migrateSettings(changes.catScratchesSettings.newValue);
+        console.log('Settings updated from local storage change');
     }
 });
+
+
 
 async function createDraftFromCurrentTab() {
     try {
         // Ensure settings are loaded
         if (!extensionSettings) {
-            await loadExtensionSettings();
+            await loadSettingsFromCloud();
         }
 
         // Get the active tab
@@ -416,6 +424,16 @@ async function getPageContent(extensionSettings) {
 }
 
 async function createDraft(title, url, markdownBody) {
+    const destination = extensionSettings?.saveDestination || 'drafts';
+
+    if (destination === 'notes' || destination === 'share') {
+        await invokeShareSheet(title, url, markdownBody);
+    } else {
+        await sendToDrafts(title, url, markdownBody);
+    }
+}
+
+async function sendToDrafts(title, url, markdownBody) {
     // Format draft content using settings
     const draftContent = formatDraftContent(title, url, markdownBody);
 
@@ -436,43 +454,72 @@ async function createDraft(title, url, markdownBody) {
     }
 
     // Check URL length before opening - very long URLs will fail
-    const MAX_DRAFTS_URL_LENGTH = 65000;
-    if (draftsURL.length > MAX_DRAFTS_URL_LENGTH) {
-        try {
-            const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
-            if (activeTab?.id) {
-                await browser.scripting.executeScript({
-                    target: { tabId: activeTab.id },
-                    func: (msg) => alert(msg),
-                    args: ["Content too large to send to Drafts. Try selecting a smaller portion of the page."]
-                });
-            }
-        } catch (e) {
-            console.error("Failed to show length warning:", e);
-        }
+    const MAX_URL_LENGTH = 65000;
+    if (draftsURL.length > MAX_URL_LENGTH) {
+        await showContentTooLargeError('Drafts');
         return;
     }
+
+    await openURLScheme(draftsURL);
+}
+
+async function invokeShareSheet(title, url, markdownBody) {
+    // Format content for sharing
+    const shareContent = formatDraftContent(title, url, markdownBody);
 
     try {
         const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
 
-        if (activeTab) {
-            const currentURL = activeTab.url;
-
-            // Execute the URL scheme by navigating to it
+        if (activeTab?.id) {
+            // Use the Web Share API from the page context
             await browser.scripting.executeScript({
                 target: { tabId: activeTab.id },
-                func: function (draftsUrl, originalUrl) {
-                    window.location.href = draftsUrl;
-                    setTimeout(() => {
-                        window.location.href = originalUrl;
-                    }, 2000);
+                func: (shareData) => {
+                    if (navigator.share) {
+                        navigator.share(shareData)
+                            .then(() => console.log('Shared successfully'))
+                            .catch((error) => console.log('Error sharing:', error));
+                    } else {
+                        alert('System sharing is not supported in this browser context.');
+                    }
                 },
-                args: [draftsURL, currentURL]
+                args: [{
+                    title: title,
+                    text: shareContent
+                }]
             });
         }
     } catch (error) {
-        console.error("Error opening Drafts via URL scheme:", error);
+        console.error("Failed to share:", error);
+    }
+}
+
+async function showContentTooLargeError(appName) {
+    try {
+        const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+        if (activeTab?.id) {
+            await browser.scripting.executeScript({
+                target: { tabId: activeTab.id },
+                func: (msg) => alert(msg),
+                args: [`Content too large to send to ${appName}. Try selecting a smaller portion of the page.`]
+            });
+        }
+    } catch (e) {
+        console.error("Failed to show length warning:", e);
+    }
+}
+
+async function openURLScheme(targetURL) {
+    try {
+        const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+
+        if (activeTab) {
+            // Use tabs.update to navigate to the custom scheme
+            // This is trusted from the background script and often bypasses the "Open in App?" prompt
+            await browser.tabs.update(activeTab.id, { url: targetURL });
+        }
+    } catch (error) {
+        console.error("Error opening URL scheme:", error);
     }
 }
 
@@ -491,3 +538,4 @@ function formatDraftContent(title, url, content) {
         .replace('{timestamp}', timestampISO)
         .replace('{tag}', defaultTag);
 }
+

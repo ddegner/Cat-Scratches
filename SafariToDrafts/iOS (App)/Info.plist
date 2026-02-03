@@ -4,6 +4,10 @@
 <dict>
 	<key>SFSafariWebExtensionConverterVersion</key>
 	<string>26.2</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>drafts</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -32,12 +32,11 @@
         "default_title": "Clip to Drafts"
     },
     "commands": {
-        "create_draft_command": {
+        "_execute_action": {
             "suggested_key": {
                 "default": "Ctrl+Shift+D",
                 "mac": "Command+Shift+D"
-            },
-            "description": "Create Draft from Selection/Page"
+            }
         }
     },
     "permissions": [
@@ -45,6 +44,9 @@
         "scripting",
         "storage",
         "nativeMessaging"
+    ],
+    "host_permissions": [
+        "*://*/*"
     ],
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"

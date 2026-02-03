@@ -7,6 +7,16 @@
 
 import SafariServices
 import os.log
+#if os(macOS)
+import AppKit
+#endif
+
+// MARK: - Constants (mirrors Constants.swift in main app)
+// These are duplicated because extension targets don't share code with app targets
+private enum DraftsConstants {
+    static let urlScheme = "drafts://"
+    static let macBundleID = "com.agiletortoise.Drafts-OSX"
+}
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
@@ -57,6 +67,35 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
 
         case "openOptions":
             os_log(.info, "Options page request received")
+
+        case "checkDraftsInstalled":
+            var isInstalled: Bool? = nil
+
+            #if os(iOS)
+            // iOS app extensions cannot use UIApplication.shared to check URL schemes
+            // The main app handles initial detection and sets the default
+            // Return nil to indicate the extension cannot determine this
+            isInstalled = nil
+            os_log(.info, "iOS extension cannot check Drafts installation - returning nil")
+            #else
+            // macOS: Check using NSWorkspace
+            if let url = URL(string: DraftsConstants.urlScheme),
+               NSWorkspace.shared.urlForApplication(toOpen: url) != nil {
+                isInstalled = true
+            } else if NSWorkspace.shared.urlForApplication(withBundleIdentifier: DraftsConstants.macBundleID) != nil {
+                isInstalled = true
+            } else {
+                isInstalled = false
+            }
+            #endif
+
+            if let installed = isInstalled {
+                response["draftsInstalled"] = installed
+                os_log(.info, "Drafts installed check: %{public}@", installed ? "true" : "false")
+            } else {
+                response["draftsInstalled"] = NSNull()
+                os_log(.info, "Drafts installed check: unknown (extension limitation)")
+            }
 
         default:
             os_log(.info, "Ignoring action: %{public}@", action)

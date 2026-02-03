@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Set up clickable placeholder tags
     setupPlaceholderTags();
+
+    // Check if Drafts is installed and show banner if not
+    await checkDraftsInstallation();
 });
 
 // Load settings from iCloud (with local cache fallback)
@@ -90,6 +93,23 @@ async function saveSettings() {
 
 // Set up all event listeners
 function setupEventListeners() {
+    // Destination toggle
+    document.querySelectorAll('input[name="saveDestination"]').forEach(radio => {
+        radio.addEventListener('change', async () => {
+            updateDestinationFromUI();
+            await saveSettings();
+        });
+    });
+
+    // Get Drafts link
+    const getDraftsLink = document.getElementById('getDraftsLink');
+    if (getDraftsLink) {
+        getDraftsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openDraftsAppStore();
+        });
+    }
+
     // Content selectors textarea
     document.getElementById('contentSelectors').addEventListener('input', updateContentSelectorsFromUI);
 
@@ -107,6 +127,15 @@ function setupEventListeners() {
 
 // Update UI with current settings
 function updateUI() {
+    // Update destination toggle
+    const dest = currentSettings.saveDestination || 'drafts';
+    const destDrafts = document.getElementById('destDrafts');
+    const destShare = document.getElementById('destShare');
+    if (destDrafts && destShare) {
+        destDrafts.checked = dest === 'drafts';
+        destShare.checked = dest === 'share' || dest === 'notes';
+    }
+
     // Update content selectors textarea
     updateContentSelectorsUI();
 
@@ -228,4 +257,44 @@ function setupPlaceholderTags() {
         });
         container.appendChild(el);
     });
+}
+
+// Update destination from UI toggle
+function updateDestinationFromUI() {
+    const selected = document.querySelector('input[name="saveDestination"]:checked');
+    currentSettings.saveDestination = selected?.value || 'drafts';
+}
+
+// Check if Drafts is installed and show banner if not
+async function checkDraftsInstallation() {
+    try {
+        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+            action: 'checkDraftsInstalled'
+        });
+
+        // Only show banner if we explicitly know Drafts is NOT installed (false)
+        // If null (iOS extension can't check) or undefined, don't show banner
+        if (response?.draftsInstalled === false) {
+            const banner = document.getElementById('draftsNotInstalledBanner');
+            if (banner) {
+                banner.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        console.log('Could not check Drafts installation:', error.message);
+        // Don't show banner on error - assume Drafts might be installed
+    }
+}
+
+// Open Drafts App Store page
+function openDraftsAppStore() {
+    // Detect platform and use appropriate App Store URL
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+
+    if (isIOS) {
+        window.open(DRAFTS_APP_STORE.iosURL, '_blank');
+    } else {
+        window.open(DRAFTS_APP_STORE.macURL, '_blank');
+    }
 }

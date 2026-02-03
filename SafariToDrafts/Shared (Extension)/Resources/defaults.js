@@ -13,6 +13,14 @@
   // Native messaging app ID for iCloud sync via SafariWebExtensionHandler
   const NATIVE_APP_ID = 'com.daviddegner.Cat-Scratches';
 
+  // Drafts App Store IDs (mirrors Constants.swift in main app)
+  const DRAFTS_APP_STORE = {
+    iosAppID: '1236254471',
+    macAppID: '1435957248',
+    get iosURL() { return `https://apps.apple.com/app/id${this.iosAppID}`; },
+    get macURL() { return `https://apps.apple.com/app/id${this.macAppID}`; }
+  };
+
   const BASE_SELECTORS = [
     '[itemtype*="Article"]',
     '[itemtype*="BlogPosting"]',
@@ -315,6 +323,7 @@
   const unique = arr => Array.from(new Set(arr.map(s => (typeof s === 'string' ? s.trim() : s)).filter(Boolean)));
 
   const DEFAULT_SETTINGS = {
+    saveDestination: 'drafts', // 'drafts' or 'share' - set dynamically on install based on Drafts availability
     contentExtraction: {
       strategy: 'default',
       customSelectors: unique(BASE_SELECTORS)
@@ -398,11 +407,17 @@
       settings.outputFormat.defaultTag = defaults.outputFormat.defaultTag;
     }
 
+    // Ensure saveDestination exists
+    if (settings.saveDestination === undefined) {
+      settings.saveDestination = defaults.saveDestination;
+    }
+
     return settings;
   }
 
   // Expose globally for background and settings pages
   root.NATIVE_APP_ID = NATIVE_APP_ID;
+  root.DRAFTS_APP_STORE = DRAFTS_APP_STORE;
   root.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
   root.getDefaultSettings = getDefaultSettings;
   root.migrateSettings = migrateSettings;

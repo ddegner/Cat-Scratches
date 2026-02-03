@@ -6,37 +6,43 @@
 //
 
 import SwiftUI
+import Combine
 
 #if os(iOS)
 import UIKit
 #else
 import AppKit
 import SafariServices
-import Combine
 #endif
 
 // MARK: - Main Settings View (Cross-Platform)
 
 struct MainSettingsView: View {
-    #if os(macOS)
     @StateObject private var extensionManager = ExtensionManager()
+    #if os(iOS)
+    @State private var showingExtensionInstructions = false
     #endif
 
     var body: some View {
-        #if os(macOS)
         VStack(spacing: 0) {
             if !extensionManager.isDraftsInstalled {
-                draftsRequiredBanner
+                draftsNotInstalledBanner
             }
             settingsList
         }
+        #if os(macOS)
         .frame(minWidth: 480, minHeight: 520)
+        #endif
+        #if os(iOS)
+        .alert("Enable Safari Extension", isPresented: $showingExtensionInstructions) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("To enable or configure the extension:\n\n1. Open the Settings app\n2. Scroll down and tap Safari\n3. Tap Extensions\n4. Tap Cat Scratches to enable and configure")
+        }
+        #endif
         .onAppear {
             extensionManager.checkDraftsInstalled()
         }
-        #else
-        settingsList
-        #endif
     }
 
     // MARK: - Settings List (Shared)
@@ -61,6 +67,43 @@ struct MainSettingsView: View {
                 }
                 .padding(.vertical, 20)
                 .listRowBackground(Color.clear)
+
+            }
+
+            // System Status
+            Section {
+                HStack(spacing: 12) {
+                    Image(systemName: "doc.text")
+                        .foregroundColor(extensionManager.isDraftsInstalled ? .green : .secondary)
+                        .frame(width: 24)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Drafts Application")
+                            .foregroundColor(.primary)
+                        Text(extensionManager.isDraftsInstalled ? "Installed" : "Not Detected")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    Spacer()
+
+                    if extensionManager.isDraftsInstalled {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.green)
+                    } else {
+                        Button("Get") {
+                            extensionManager.openDraftsAppStore()
+                        }
+                        #if os(macOS)
+                        .buttonStyle(.link)
+                        #else
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                        #endif
+                    }
+                }
+            } header: {
+                Text("System Check")
             }
 
             // Setup Section
@@ -167,19 +210,18 @@ struct MainSettingsView: View {
         #endif
     }
 
-    // MARK: - Drafts Required Banner (macOS only)
+    // MARK: - Drafts Not Installed Banner (Cross-Platform)
 
-    #if os(macOS)
-    private var draftsRequiredBanner: some View {
+    private var draftsNotInstalledBanner: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(.orange)
                 .font(.title3)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Drafts for Mac is required")
+                Text("Drafts is not installed")
                     .font(.headline)
-                Text("Cat Scratches sends content to the Drafts app.")
+                Text("The extension will use the Share Sheet because Drafts is not detected.")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
@@ -189,28 +231,29 @@ struct MainSettingsView: View {
             Button("Get Drafts") {
                 extensionManager.openDraftsAppStore()
             }
+            #if os(macOS)
             .buttonStyle(.borderedProminent)
+            #else
+            .buttonStyle(.bordered)
+            #endif
         }
         .padding(16)
         .background(Color.orange.opacity(0.1))
+        #if os(macOS)
         .overlay(
             Rectangle()
                 .frame(height: 1)
                 .foregroundColor(Color(NSColor.separatorColor)),
             alignment: .bottom
         )
+        #endif
     }
-    #endif
 
     // MARK: - Platform Actions
 
     private func openSafariExtensions() {
         #if os(iOS)
-        if let url = URL(string: "App-Prefs:com.apple.mobilesafari") {
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
-        }
+        showingExtensionInstructions = true
         #else
         extensionManager.openSafariPreferences()
         #endif
@@ -218,7 +261,7 @@ struct MainSettingsView: View {
 
     private func openExtensionSettings() {
         #if os(iOS)
-        openSafariExtensions()
+        showingExtensionInstructions = true
         #else
         extensionManager.openSafariPreferences()
         #endif
@@ -306,38 +349,77 @@ struct InstructionRow: View {
     }
 }
 
-// MARK: - Extension Manager (macOS only)
+// MARK: - Constants
 
-#if os(macOS)
-let extensionBundleIdentifier = "com.daviddegner.Cat-Scratches.Extension"
+private enum AppIdentifiers {
+    static let extensionBundle = "com.daviddegner.Cat-Scratches.Extension"
+    static let draftsURLScheme = "drafts://"
+    static let draftsMacBundleID = "com.agiletortoise.Drafts-OSX"
+    static let safariBundleID = "com.apple.Safari"
+}
+
+private enum AppStoreIDs {
+    static let draftsIOS = "1236254471"
+    static let draftsMac = "1435957248"
+    
+    static var draftsURL_iOS: URL? {
+        URL(string: "itms-apps://apps.apple.com/app/id\(draftsIOS)")
+    }
+    
+    static var draftsURL_Mac: URL? {
+        URL(string: "macappstore://itunes.apple.com/app/id\(draftsMac)")
+    }
+    
+    static var draftsURL_MacFallback: URL? {
+        URL(string: "https://apps.apple.com/us/app/drafts/id\(draftsMac)?mt=12")
+    }
+}
+
+// MARK: - Extension Manager (Cross-Platform)
 
 class ExtensionManager: ObservableObject {
     @Published var isDraftsInstalled: Bool = false
-    private let safariBundleIdentifier = "com.apple.Safari"
+
+    #if os(macOS)
+    private let safariBundleIdentifier = AppIdentifiers.safariBundleID
+    #endif
 
     func checkDraftsInstalled() {
-        if let url = URL(string: "drafts://"),
+        #if os(iOS)
+        guard let url = URL(string: AppIdentifiers.draftsURLScheme) else {
+            isDraftsInstalled = false
+            return
+        }
+        isDraftsInstalled = UIApplication.shared.canOpenURL(url)
+        #else
+        // First check URL scheme
+        if let url = URL(string: AppIdentifiers.draftsURLScheme),
            NSWorkspace.shared.urlForApplication(toOpen: url) != nil {
             isDraftsInstalled = true
             return
         }
-
-        if NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.agiletortoise.Drafts-OSX") != nil {
-            isDraftsInstalled = true
-            return
-        }
-
-        isDraftsInstalled = false
+        // Fallback to bundle identifier
+        isDraftsInstalled = NSWorkspace.shared.urlForApplication(withBundleIdentifier: AppIdentifiers.draftsMacBundleID) != nil
+        #endif
     }
 
     func openDraftsAppStore() {
-        if let deepLink = URL(string: "macappstore://itunes.apple.com/app/id1435957248") {
-            if NSWorkspace.shared.open(deepLink) { return }
+        #if os(iOS)
+        if let url = AppStoreIDs.draftsURL_iOS {
+            UIApplication.shared.open(url)
         }
-        guard let url = URL(string: "https://apps.apple.com/us/app/drafts/id1435957248?mt=12") else { return }
-        NSWorkspace.shared.open(url)
+        #else
+        if let deepLink = AppStoreIDs.draftsURL_Mac,
+           NSWorkspace.shared.open(deepLink) {
+            return
+        }
+        if let fallback = AppStoreIDs.draftsURL_MacFallback {
+            NSWorkspace.shared.open(fallback)
+        }
+        #endif
     }
 
+    #if os(macOS)
     func openSafariPreferences() {
         launchSafariIfNeeded { [weak self] launchedOrAlreadyRunning in
             guard let self = self, launchedOrAlreadyRunning else { return }
@@ -369,7 +451,7 @@ class ExtensionManager: ObservableObject {
 
     private func showSafariExtensionPreferences() {
         SFSafariApplication.showPreferencesForExtension(
-            withIdentifier: extensionBundleIdentifier
+            withIdentifier: AppIdentifiers.extensionBundle
         ) { error in
             if error != nil {
                 let bundleId = self.safariBundleIdentifier
@@ -379,8 +461,8 @@ class ExtensionManager: ObservableObject {
             }
         }
     }
+    #endif
 }
-#endif
 
 #Preview {
     MainSettingsView()
