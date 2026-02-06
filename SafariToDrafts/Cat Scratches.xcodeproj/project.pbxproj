@@ -50,6 +50,8 @@
 		7F9F05BF2F07291D0070E1B2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05A92F07291D0070E1B2 /* settings.html */; };
 		7F9F05C02F07291D0070E1B2 /* defaults.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AA2F07291D0070E1B2 /* defaults.js */; };
 		7F9F05C12F07291D0070E1B2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05AB2F07291D0070E1B2 /* settings.js */; };
+		7FCONTENT0012F07291D0070E1B2 /* content-extractor.js in Resources */ = {isa = PBXBuildFile; fileRef = 7FCONTENT0002F07291D0070E1B2 /* content-extractor.js */; };
+		7FCONTENT0022F07291D0070E1B2 /* content-extractor.js in Resources */ = {isa = PBXBuildFile; fileRef = 7FCONTENT0002F07291D0070E1B2 /* content-extractor.js */; };
 		7FABC0012F07400000000001 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0002F07400000000001 /* ViewController.swift */; };
 		7FABC0062F07700000000001 /* MainSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0072F07700000000001 /* MainSettingsView.swift */; };
 		7FABC0082F07700000000002 /* MainSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FABC0072F07700000000001 /* MainSettingsView.swift */; };
@@ -132,6 +134,7 @@
 		7F9F05A92F07291D0070E1B2 /* settings.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = settings.html; path = Resources/settings.html; sourceTree = "<group>"; };
 		7F9F05AA2F07291D0070E1B2 /* defaults.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = defaults.js; path = Resources/defaults.js; sourceTree = "<group>"; };
 		7F9F05AB2F07291D0070E1B2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = Resources/settings.js; sourceTree = "<group>"; };
+		7FCONTENT0002F07291D0070E1B2 /* content-extractor.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "content-extractor.js"; path = "Resources/content-extractor.js"; sourceTree = "<group>"; };
 		7FABC0002F07400000000001 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		7FABC0072F07700000000001 /* MainSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSettingsView.swift; sourceTree = "<group>"; };
 		7FABC00A2F07800000000001 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -278,6 +281,7 @@
 				7F9F05A92F07291D0070E1B2 /* settings.html */,
 				7F9F05AA2F07291D0070E1B2 /* defaults.js */,
 				7F9F05AB2F07291D0070E1B2 /* settings.js */,
+				7FCONTENT0002F07291D0070E1B2 /* content-extractor.js */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -457,6 +461,7 @@
 				7F9F05C12F07291D0070E1B2 /* settings.js in Resources */,
 				7F9F05B72F07291D0070E1B2 /* catlogo_light.png in Resources */,
 				7F9F05BB2F07291D0070E1B2 /* turndown.js in Resources */,
+				7FCONTENT0012F07291D0070E1B2 /* content-extractor.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,6 +480,7 @@
 				7F9F05B62F07291D0070E1B2 /* settings.js in Resources */,
 				7F9F05AC2F07291D0070E1B2 /* catlogo_light.png in Resources */,
 				7F9F05B02F07291D0070E1B2 /* turndown.js in Resources */,
+				7FCONTENT0022F07291D0070E1B2 /* content-extractor.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

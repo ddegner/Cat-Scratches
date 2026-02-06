@@ -415,10 +415,32 @@
     return settings;
   }
 
+  // Format draft content using unified template engine
+  // Shared by background.js and settings.js (preview)
+  function formatDraftContent(title, url, content, settings) {
+    // If settings not provided (background.js context often relies on global extensionSettings),
+    // fallback to provided defaults.
+    // However, in background.js context, it's safer to pass settings explicitly.
+    // If settings is null/undefined, use defaults.
+    const outputFormat = settings?.outputFormat || DEFAULT_SETTINGS.outputFormat;
+
+    const template = (outputFormat.template || '').trim() || DEFAULT_SETTINGS.outputFormat.template;
+    const timestampISO = new Date().toISOString();
+    const defaultTag = outputFormat.defaultTag || '';
+
+    return template
+      .replace('{title}', title)
+      .replace('{url}', url)
+      .replace('{content}', content)
+      .replace('{timestamp}', timestampISO)
+      .replace('{tag}', defaultTag);
+  }
+
   // Expose globally for background and settings pages
   root.NATIVE_APP_ID = NATIVE_APP_ID;
   root.DRAFTS_APP_STORE = DRAFTS_APP_STORE;
   root.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
   root.getDefaultSettings = getDefaultSettings;
   root.migrateSettings = migrateSettings;
+  root.formatDraftContent = formatDraftContent;
 })();

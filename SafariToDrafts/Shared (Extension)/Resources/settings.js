@@ -298,3 +298,192 @@ function openDraftsAppStore() {
         window.open(DRAFTS_APP_STORE.macURL, '_blank');
     }
 }
+
+// ============================================
+// Selector Finder
+// ============================================
+
+const SELECTOR_FINDER_API = 'https://selector-finder.catscratches.workers.dev/api/analyze';
+
+// State for storing found selectors
+let foundSelectors = {
+    contentSelector: '',
+    elementsToRemove: []
+};
+
+// Initialize Selector Finder when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const addSelectorsBtn = document.getElementById('addSelectorsBtn');
+    const finderUrl = document.getElementById('finderUrl');
+
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', handleAnalyze);
+    }
+
+    if (addSelectorsBtn) {
+        addSelectorsBtn.addEventListener('click', handleAddSelectors);
+    }
+
+    // Allow Enter key to submit
+    if (finderUrl) {
+        finderUrl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleAnalyze();
+            }
+        });
+    }
+});
+
+async function handleAnalyze() {
+    const finderUrl = document.getElementById('finderUrl');
+    const finderLoading = document.getElementById('finderLoading');
+    const finderError = document.getElementById('finderError');
+    const finderResults = document.getElementById('finderResults');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+
+    const url = finderUrl.value.trim();
+
+    if (!url) {
+        showFinderError('Please enter a URL');
+        return;
+    }
+
+    // Validate URL
+    try {
+        new URL(url);
+    } catch {
+        showFinderError('Please enter a valid URL');
+        return;
+    }
+
+    // Reset UI
+    hideFinderError();
+    finderResults.classList.remove('visible');
+    finderLoading.classList.add('visible');
+    analyzeBtn.disabled = true;
+
+    try {
+        // Step 1: Get selectors from AI Worker
+        const apiResponse = await fetch(SELECTOR_FINDER_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url }),
+        });
+
+        const apiData = await apiResponse.json();
+
+        if (!apiResponse.ok || apiData.error) {
+            throw new Error(apiData.error || 'Analysis failed');
+        }
+
+        // Store found selectors
+        foundSelectors.contentSelector = apiData.contentSelector || '';
+        foundSelectors.elementsToRemove = apiData.elementsToRemove || [];
+
+        // Step 2: Fetch the actual page content locally
+        // We do this to ensure we use the EXACT same parsing logic as the extension
+        const pageResponse = await fetch(url);
+        if (!pageResponse.ok) {
+            throw new Error('Could not fetch page content for preview');
+        }
+        const html = await pageResponse.text();
+
+        // Step 3: Generate preview using local engine
+        const previewText = await generatePreview(html, foundSelectors.contentSelector, foundSelectors.elementsToRemove, url);
+
+        // Display results
+        document.getElementById('foundContentSelector').textContent = foundSelectors.contentSelector;
+        document.getElementById('foundElementsToRemove').textContent = foundSelectors.elementsToRemove.join('\n');
+        document.getElementById('finderPreview').textContent = previewText;
+        finderResults.classList.add('visible');
+
+    } catch (error) {
+        console.error('Selector Finder error:', error);
+        let errorMsg = error.message;
+
+        // Safari often returns "Load failed" for CSP or network errors
+        if (errorMsg === 'Load failed') {
+            errorMsg = 'Connection blocked. Please rebuild in Xcode, or toggle the extension Off/On in Safari Settings to apply permissions.';
+        }
+
+        showFinderError(errorMsg);
+    } finally {
+        finderLoading.classList.remove('visible');
+        analyzeBtn.disabled = false;
+    }
+}
+
+// Generate preview using the same logic as background.js
+async function generatePreview(html, contentSelector, elementsToRemove, url) {
+    try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        // Mock the extension settings for the extraction function
+        const mockSettings = {
+            contentExtraction: {
+                customSelectors: [contentSelector] // Use ONLY the finding selector
+            },
+            advancedFiltering: {
+                customFilters: elementsToRemove, // Use the found filters
+                minContentLength: currentSettings.advancedFiltering?.minContentLength || 150,
+                maxLinkRatio: currentSettings.advancedFiltering?.maxLinkRatio || 0.3
+            },
+            outputFormat: currentSettings.outputFormat // Use current Output Format settings
+        };
+
+        // Extract content (adapted from background.js getPageContent)
+        const extractionResult = extractContentFromDoc(doc, mockSettings, url);
+
+        // Apply template (adapted from background.js formatDraftContent)
+        return formatDraftContent(extractionResult.title, url, extractionResult.body, mockSettings);
+
+    } catch (e) {
+        console.error("Preview generation failed:", e);
+        return `(Preview generation failed: ${e.message})`;
+    }
+}
+
+function handleAddSelectors() {
+    // Get current selectors
+    const contentSelectorsTextarea = document.getElementById('contentSelectors');
+    const customFiltersTextarea = document.getElementById('customFilters');
+
+    // Add content selector to the beginning of the list (highest priority)
+    if (foundSelectors.contentSelector) {
+        const currentSelectors = contentSelectorsTextarea.value.trim();
+        const newSelectors = currentSelectors
+            ? foundSelectors.contentSelector + '\n' + currentSelectors
+            : foundSelectors.contentSelector;
+        contentSelectorsTextarea.value = newSelectors;
+        updateContentSelectorsFromUI();
+    }
+
+    // Add elements to remove to the list
+    if (foundSelectors.elementsToRemove.length > 0) {
+        const currentFilters = customFiltersTextarea.value.trim();
+        const newFilters = foundSelectors.elementsToRemove.join('\n');
+        customFiltersTextarea.value = currentFilters
+            ? currentFilters + '\n' + newFilters
+            : newFilters;
+        updateAdvancedFilteringFromUI();
+    }
+
+    // Show success message
+    showStatus('Selectors added! Click "Save Settings" to keep them.', 'success');
+
+    // Scroll to the Page Parsing section
+    document.getElementById('contentSelectors').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function showFinderError(message) {
+    const finderError = document.getElementById('finderError');
+    finderError.textContent = message;
+    finderError.style.display = 'block';
+}
+
+function hideFinderError() {
+    const finderError = document.getElementById('finderError');
+    finderError.style.display = 'none';
+}

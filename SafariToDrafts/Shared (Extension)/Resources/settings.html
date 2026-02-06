@@ -386,6 +386,115 @@
                 border-left-color: #3b82f6;
             }
         }
+
+        /* Selector Finder Styles */
+        .finder-loading {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            color: #666666;
+        }
+
+        .finder-loading.visible {
+            display: flex;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .finder-loading {
+                color: #a1a1aa;
+            }
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e0e0e0;
+            border-top-color: #007aff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .spinner {
+                border-color: #2a2a2e;
+                border-top-color: #0a84ff;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .finder-results {
+            display: none;
+        }
+
+        .finder-results.visible {
+            display: block;
+        }
+
+        .preview-content {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #1d1d1f;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-bottom: 16px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .preview-content {
+                background: #1c1c1e;
+                color: #f5f5f7;
+            }
+        }
+
+        .button-primary {
+            background: #007aff;
+            color: #ffffff;
+            border-color: #007aff;
+        }
+
+        .button-primary:hover {
+            background: #0066d6;
+            border-color: #0066d6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .button-primary {
+                background: #0a84ff;
+                border-color: #0a84ff;
+            }
+
+            .button-primary:hover {
+                background: #409cff;
+                border-color: #409cff;
+            }
+        }
+
+        .finder-selectors {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 13px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .finder-selectors {
+                background: #1c1c1e;
+            }
+        }
     </style>
 </head>
 
@@ -425,6 +534,7 @@
 
                 </div>
             </div>
+
 
 
 
@@ -632,6 +742,48 @@ form
                 </div>
             </div>
 
+
+
+            <!-- Selector Finder Section -->
+            <div class="section">
+                <h2>Selector Finder</h2>
+                <div class="help-text" style="margin-bottom: 16px;">Analyze a web page to find the best CSS selectors
+                    for extracting article content.</div>
+
+                <div class="form-group">
+                    <label for="finderUrl">Article URL</label>
+                    <input type="url" id="finderUrl" placeholder="https://example.com/article">
+                </div>
+
+                <button class="button button-primary" id="analyzeBtn">Analyze Page</button>
+
+                <div class="finder-loading" id="finderLoading">
+                    <div class="spinner"></div>
+                    <span>Analyzing page structure...</span>
+                </div>
+
+                <div class="status-message error" id="finderError" style="margin-top: 16px;"></div>
+
+                <div class="finder-results" id="finderResults">
+                    <div class="form-group" style="margin-top: 24px;">
+                        <label>Found Content Selector</label>
+                        <div class="finder-selectors" id="foundContentSelector"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Found Elements to Remove</label>
+                        <div class="finder-selectors" id="foundElementsToRemove" style="white-space: pre-wrap;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Extraction Preview</label>
+                        <div class="preview-content" id="finderPreview"></div>
+                    </div>
+
+                    <button class="button button-primary" id="addSelectorsBtn">Add to Current Selectors</button>
+                </div>
+            </div>
+
             <!-- Actions -->
             <div class="status-message" id="statusMessage"></div>
             <div class="button-group">
@@ -642,6 +794,8 @@ form
     </div>
 
     <script src="defaults.js"></script>
+    <script src="turndown.js"></script>
+    <script src="content-extractor.js"></script>
     <script src="settings.js"></script>
 </body>
 

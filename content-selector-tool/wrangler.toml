@@ -1,0 +1,6 @@
+name = "selector-finder"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# GEMINI_API_KEY is set via `wrangler secret put GEMINI_API_KEY`
+# Do not add secrets to this file

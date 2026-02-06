@@ -160,18 +160,75 @@ async function createDraftFromCurrentTab() {
             return;
         }
 
-        // Inject Turndown library
-        await browser.scripting.executeScript({ target: { tabId: activeTab.id }, files: ['turndown.js'] });
+        // Inject Turndown library AND Shared Content Extractor
+        await browser.scripting.executeScript({
+            target: { tabId: activeTab.id },
+            files: ['turndown.js', 'content-extractor.js']
+        });
 
         // Execute content script to get page content
         const results = await browser.scripting.executeScript({
             target: { tabId: activeTab.id },
-            func: getPageContent,
+            func: (settings) => {
+                // This runs in the Tab context
+                // Check for user selection first
+                const selection = window.getSelection();
+                const hasSelection = selection && !selection.isCollapsed && selection.rangeCount > 0;
+
+                if (hasSelection) {
+                    // User has selected text - prioritize this
+                    try {
+                        const range = selection.getRangeAt(0);
+                        const container = document.createElement("div");
+                        container.appendChild(range.cloneContents());
+
+                        // Use Turndown if available
+                        let content;
+                        if (typeof TurndownService !== 'undefined') {
+                            const turndownService = new TurndownService({
+                                headingStyle: 'atx',
+                                hr: '---',
+                                bulletListMarker: '*',
+                                codeBlockStyle: 'fenced',
+                                linkStyle: 'inline'
+                            });
+                            content = turndownService.turndown(container.innerHTML);
+                        } else {
+                            content = container.textContent || '';
+                        }
+
+                        return {
+                            title: document.title || 'Untitled',
+                            url: window.location.href,
+                            body: content || 'No content in selection',
+                            source: 'selection'
+                        };
+                    } catch (e) {
+                        console.error("Selection extraction failed:", e);
+                        // Fall through to page extraction
+                    }
+                }
+
+                // No selection - use full page extraction via shared function
+                try {
+                    const result = window.extractContentFromDoc(document, settings, window.location.href);
+                    return {
+                        title: result.title,
+                        url: window.location.href,
+                        body: result.body,
+                        source: 'page'
+                    };
+                } catch (e) {
+                    return { error: e.toString() };
+                }
+            },
             args: [extensionSettings]
         });
 
         if (results && results[0] && results[0].result) {
             const pageData = results[0].result;
+            if (pageData.error) throw new Error(pageData.error);
+
             await createDraft(pageData.title, pageData.url, pageData.body);
         }
     } catch (error) {
@@ -195,234 +252,6 @@ async function createDraftFromCurrentTab() {
     }
 }
 
-// Function that will be executed in the content script context
-async function getPageContent(extensionSettings) {
-    // Try to initialize Turndown for markdown conversion
-    let turndownService = null;
-    let useMarkdownConversion = false;
-
-    try {
-        if (typeof TurndownService !== 'undefined') {
-            turndownService = new TurndownService({
-                headingStyle: 'atx',
-                hr: '---',
-                bulletListMarker: '*',
-                codeBlockStyle: 'fenced',
-                linkStyle: 'inline'
-            });
-
-            // Add custom rules to filter out unwanted elements
-            turndownService.addRule('removeUnwanted', {
-                filter: function (node) {
-                    // Remove script/style/noscript elements
-                    if (node.nodeName === 'SCRIPT' || node.nodeName === 'STYLE' || node.nodeName === 'NOSCRIPT') {
-                        return true;
-                    }
-
-                    // Use customFilters for removal logic
-                    if (!extensionSettings?.advancedFiltering?.customFilters) {
-                        return false;
-                    }
-                    const customFilters = extensionSettings.advancedFiltering.customFilters;
-
-                    // Check for image/media elements
-                    if (customFilters.some(filter =>
-                        filter.includes('img') || filter.includes('picture') || filter.includes('figure') ||
-                        filter.includes('video') || filter.includes('audio') || filter.includes('media')
-                    )) {
-                        if (node.nodeName === 'IMG' || node.nodeName === 'PICTURE' || node.nodeName === 'FIGURE' ||
-                            node.nodeName === 'VIDEO' || node.nodeName === 'AUDIO' || node.nodeName === 'FIGCAPTION') {
-                            return true;
-                        }
-                    }
-
-                    // Remove links to images
-                    if (node.nodeName === 'A' && node.getAttribute('href')) {
-                        const href = node.getAttribute('href').toLowerCase();
-                        if (href.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff?)(\?.*)?$/i)) {
-                            return true;
-                        }
-                    }
-
-                    // Check all customFilters for element matching
-                    for (const filter of customFilters) {
-                        try {
-                            if (node.matches && node.matches(filter)) {
-                                return true;
-                            }
-                        } catch (e) {
-                            // Ignore selector errors
-                        }
-                    }
-
-                    // Remove JSON-LD scripts
-                    if (node.getAttribute && node.getAttribute('type') === 'application/ld+json') {
-                        return true;
-                    }
-
-                    return false;
-                },
-                replacement: function () {
-                    return '';
-                }
-            });
-
-            useMarkdownConversion = true;
-        }
-    } catch (error) {
-        console.error("Failed to initialize TurndownService:", error);
-    }
-
-    const selection = window.getSelection();
-    let content = "";
-    let selectionSource = "page";
-
-    try {
-        // Prioritize a non-empty selection
-        if (selection && !selection.isCollapsed && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            if (useMarkdownConversion) {
-                const container = document.createElement("div");
-                container.appendChild(range.cloneContents());
-                content = turndownService.turndown(container.innerHTML);
-            } else {
-                content = selection.toString();
-            }
-            selectionSource = "selection";
-        } else {
-            // Full page content extraction
-            let mainContent = null;
-
-            if (!extensionSettings?.contentExtraction?.customSelectors) {
-                throw new Error('No content selectors configured.');
-            }
-            const contentSelectors = extensionSettings.contentExtraction.customSelectors;
-
-            // Find the best content element using scoring
-            let bestElement = null;
-            let bestScore = 0;
-
-            for (const selector of contentSelectors) {
-                try {
-                    const elements = document.querySelectorAll(selector);
-                    for (const element of elements) {
-                        const textLength = (element.textContent || '').trim().length;
-                        const minContentLength = extensionSettings?.advancedFiltering?.minContentLength || 150;
-
-                        if (textLength >= minContentLength) {
-                            // Calculate link ratio
-                            const linkLength = Array.from(element.querySelectorAll('a'))
-                                .reduce((total, link) => total + (link.textContent || '').length, 0);
-                            const linkRatio = textLength > 0 ? linkLength / textLength : 1;
-                            const maxLinkRatio = extensionSettings?.advancedFiltering?.maxLinkRatio || 0.3;
-
-                            if (linkRatio < maxLinkRatio) {
-                                let score = textLength;
-
-                                // Bonus for semantic elements
-                                if (element.tagName === 'ARTICLE') score += 1000;
-                                if (element.getAttribute('role') === 'main') score += 800;
-                                if (element.getAttribute('itemtype')) score += 600;
-
-                                // Bonus for content-indicating classes/IDs
-                                const classAndId = ((element.className || '') + ' ' + (element.id || '')).toLowerCase();
-                                if (classAndId.includes('article') || classAndId.includes('content') ||
-                                    classAndId.includes('post') || classAndId.includes('entry')) {
-                                    score += 400;
-                                }
-
-                                // Penalty for navigation elements
-                                if (classAndId.includes('nav') || classAndId.includes('menu') ||
-                                    classAndId.includes('header') || classAndId.includes('footer')) {
-                                    score -= 2000;
-                                }
-
-                                if (score > bestScore) {
-                                    bestScore = score;
-                                    bestElement = element;
-                                }
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // Skip selectors that cause errors
-                }
-            }
-
-            mainContent = bestElement;
-
-            if (mainContent) {
-                if (useMarkdownConversion) {
-                    content = turndownService.turndown(mainContent.innerHTML);
-                } else {
-                    content = mainContent.textContent || mainContent.innerText || '';
-                }
-            } else {
-                // Fallback to body
-                if (useMarkdownConversion) {
-                    const bodyClone = document.body.cloneNode(true);
-
-                    if (extensionSettings?.advancedFiltering?.customFilters) {
-                        const customFilters = extensionSettings.advancedFiltering.customFilters;
-                        try {
-                            const elementsToRemove = bodyClone.querySelectorAll(customFilters.join(', '));
-                            elementsToRemove.forEach(el => el.remove());
-                        } catch (e) {
-                            // Ignore selector errors
-                        }
-                    }
-
-                    content = turndownService.turndown(bodyClone.innerHTML);
-                } else {
-                    content = document.body.textContent || document.body.innerText || '';
-                    content = content.substring(0, 10000);
-                }
-            }
-        }
-
-        // Content cleanup (single normalized pass)
-        content = content
-            .replace(/\n\s*\n\s*\n+/g, '\n\n')  // Multiple blank lines to double
-            .replace(/ +/g, ' ')                 // Multiple spaces to single
-            .replace(/.*click here to subscribe.*$/gim, '')
-            .replace(/.*sign up for our newsletter.*$/gim, '')
-            .replace(/.*download our app.*$/gim, '')
-            .replace(/.*get breaking news alerts.*$/gim, '')
-            .replace(/.*follow us on (twitter|facebook|instagram).*$/gim, '')
-            .replace(/^\s*.*\(Getty Images\).*$/gm, '')
-            .replace(/^\s*.*\(AP Photo.*\).*$/gm, '')
-            .replace(/^\s*.*Photo credit:.*$/gm, '')
-            .replace(/^\s*.*Image credit:.*$/gm, '')
-            .replace(/^\s*.*\(Corbis\).*$/gm, '')
-            .replace(/^\s*subscribe today\s*$/gim, '')
-            .replace(/^\s*join our newsletter\s*$/gim, '')
-            .replace(/^\s*advertisement\s*$/gim, '')
-            .replace(/^\s*sponsored content\s*$/gim, '')
-            .replace(/<!--.*?-->/g, '')
-            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-            .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-            .replace(/&nbsp;/g, ' ')
-            .replace(/&[a-zA-Z]+;/g, ' ')
-            .trim();
-
-        return {
-            title: document.title || 'Untitled',
-            url: window.location.href,
-            body: content || 'No content extracted',
-            source: selectionSource
-        };
-
-    } catch (error) {
-        console.error("Error in content extraction:", error);
-        return {
-            title: document.title || 'Untitled',
-            url: window.location.href,
-            body: 'Content extraction failed: ' + error.message,
-            source: 'error'
-        };
-    }
-}
-
 async function createDraft(title, url, markdownBody) {
     const destination = extensionSettings?.saveDestination || 'drafts';
 
@@ -434,8 +263,8 @@ async function createDraft(title, url, markdownBody) {
 }
 
 async function sendToDrafts(title, url, markdownBody) {
-    // Format draft content using settings
-    const draftContent = formatDraftContent(title, url, markdownBody);
+    // Format draft content using settings (from defaults.js)
+    const draftContent = formatDraftContent(title, url, markdownBody, extensionSettings);
 
     // URL encode the content for the Drafts URL scheme
     const encodedContent = encodeURIComponent(draftContent);
@@ -464,8 +293,8 @@ async function sendToDrafts(title, url, markdownBody) {
 }
 
 async function invokeShareSheet(title, url, markdownBody) {
-    // Format content for sharing
-    const shareContent = formatDraftContent(title, url, markdownBody);
+    // Format content for sharing (from defaults.js)
+    const shareContent = formatDraftContent(title, url, markdownBody, extensionSettings);
 
     try {
         const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
@@ -521,21 +350,5 @@ async function openURLScheme(targetURL) {
     } catch (error) {
         console.error("Error opening URL scheme:", error);
     }
-}
-
-// Format draft content using unified template engine
-function formatDraftContent(title, url, content) {
-    const outputFormat = extensionSettings?.outputFormat || DEFAULT_SETTINGS.outputFormat;
-
-    const template = (outputFormat.template || '').trim() || DEFAULT_SETTINGS.outputFormat.template;
-    const timestampISO = new Date().toISOString();
-    const defaultTag = outputFormat.defaultTag || '';
-
-    return template
-        .replace('{title}', title)
-        .replace('{url}', url)
-        .replace('{content}', content)
-        .replace('{timestamp}', timestampISO)
-        .replace('{tag}', defaultTag);
 }
 
