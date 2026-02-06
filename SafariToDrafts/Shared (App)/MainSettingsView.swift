@@ -10,6 +10,7 @@ import Combine
 
 #if os(iOS)
 import UIKit
+import SafariServices
 #else
 import AppKit
 import SafariServices
@@ -37,7 +38,7 @@ struct MainSettingsView: View {
         .alert("Enable Safari Extension", isPresented: $showingExtensionInstructions) {
             Button("OK", role: .cancel) { }
         } message: {
-            Text("To enable or configure the extension:\n\n1. Open the Settings app\n2. Scroll down and tap Safari\n3. Tap Extensions\n4. Tap Cat Scratches to enable and configure")
+            Text("To enable or configure the extension:\n\n1. Open Settings → Apps → Safari\n2. Tap Extensions\n3. Tap Cat Scratches to enable and configure")
         }
         #endif
         .onAppear {
@@ -253,7 +254,9 @@ struct MainSettingsView: View {
 
     private func openSafariExtensions() {
         #if os(iOS)
-        showingExtensionInstructions = true
+        extensionManager.openSafariExtensionSettings {
+            showingExtensionInstructions = true
+        }
         #else
         extensionManager.openSafariPreferences()
         #endif
@@ -261,7 +264,9 @@ struct MainSettingsView: View {
 
     private func openExtensionSettings() {
         #if os(iOS)
-        showingExtensionInstructions = true
+        extensionManager.openSafariExtensionSettings {
+            showingExtensionInstructions = true
+        }
         #else
         extensionManager.openSafariPreferences()
         #endif
@@ -418,6 +423,25 @@ class ExtensionManager: ObservableObject {
         }
         #endif
     }
+
+    #if os(iOS)
+    /// Opens Safari extension settings using iOS 26.2+ API, or falls back to showing instructions
+    func openSafariExtensionSettings(fallback: @escaping () -> Void) {
+        if #available(iOS 26.2, *) {
+            Task { @MainActor in
+                do {
+                    try await SFSafariSettings.openExtensionsSettings(
+                        forIdentifiers: [AppIdentifiers.extensionBundle]
+                    )
+                } catch {
+                    fallback()
+                }
+            }
+        } else {
+            fallback()
+        }
+    }
+    #endif
 
     #if os(macOS)
     func openSafariPreferences() {
