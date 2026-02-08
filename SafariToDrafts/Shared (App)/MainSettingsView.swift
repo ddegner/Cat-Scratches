@@ -20,6 +20,7 @@ import SafariServices
 
 struct MainSettingsView: View {
     @StateObject private var extensionManager = ExtensionManager()
+    @State private var isHelpExpanded = false
     #if os(iOS)
     @State private var showingExtensionInstructions = false
     #endif
@@ -109,23 +110,13 @@ struct MainSettingsView: View {
 
             // Setup Section
             Section {
-                Button(action: openSafariExtensions) {
+                Button(action: openExtensionSettings) {
                     SettingsRow(
                         icon: "safari",
                         iconColor: .blue,
-                        title: "Enable Extension",
-                        subtitle: platformSubtitle(ios: "Safari → Extensions", mac: "Safari → Settings → Extensions")
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Button(action: openExtensionSettings) {
-                    SettingsRow(
-                        icon: "gearshape",
-                        iconColor: .blue,
-                        title: "Extension Settings",
+                        title: "Open Extension Settings",
                         subtitle: platformSubtitle(
-                            ios: "Extensions → Cat Scratches",
+                            ios: "Safari → Extensions → Cat Scratches",
                             mac: "Extensions → Cat Scratches → Settings"
                         )
                     )
@@ -135,53 +126,50 @@ struct MainSettingsView: View {
                 Text("Setup")
             }
 
-            // How to Use Section
+            // Help Section
             Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    InstructionRow(number: 1, text: "Enable the extension in Safari settings")
-                    InstructionRow(number: 2, text: "Visit any webpage in Safari")
-                    #if os(iOS)
-                    InstructionRow(number: 3, text: "Tap the Extensions button (puzzle icon)")
-                    InstructionRow(number: 4, text: "Select Cat Scratches to clip the page")
-                    #else
-                    InstructionRow(number: 3, text: "Click the Cat Scratches icon in the toolbar")
-                    InstructionRow(number: 4, text: "Content is clipped to Drafts")
-                    #endif
-                }
-                .padding(.vertical, 8)
-            } header: {
-                Text("How to Use")
-            }
+                DisclosureGroup(isExpanded: $isHelpExpanded) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        InstructionRow(number: 1, text: "Open Extension Settings and enable Cat Scratches")
+                        InstructionRow(number: 2, text: "Visit any webpage in Safari")
+                        #if os(iOS)
+                        InstructionRow(number: 3, text: "Tap the Extensions button (puzzle icon)")
+                        InstructionRow(number: 4, text: "Select Cat Scratches to clip the page")
+                        #else
+                        InstructionRow(number: 3, text: "Click the Cat Scratches icon in the toolbar")
+                        InstructionRow(number: 4, text: "Content is clipped to Drafts")
+                        #endif
 
-            // About Section
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Settings Sync")
-                        .font(.subheadline.bold())
-                    Text("Extension settings sync automatically via iCloud between Safari on all your devices.")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
+                        Divider()
+                            .padding(.vertical, 4)
 
-                    Divider()
-                        .padding(.vertical, 4)
+                        Text("Settings Sync")
+                            .font(.subheadline.bold())
+                        Text("Extension settings sync automatically via iCloud between Safari on all your devices.")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
 
-                    Text("Edit Settings")
-                        .font(.subheadline.bold())
-                    #if os(iOS)
-                    // swiftlint:disable:next line_length
-                    Text("To change template, filters, or other settings, go to Settings → Safari → Extensions → Cat Scratches → Settings.")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                    #else
-                    // swiftlint:disable:next line_length
-                    Text("To change template, filters, or other settings, go to Safari → Settings → Extensions → Cat Scratches → Settings.")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                    #endif
+                        Text("Edit Rules")
+                            .font(.subheadline.bold())
+                        #if os(iOS)
+                        // swiftlint:disable:next line_length
+                        Text("To change templates, capture rules, or filtering rules, go to Settings → Safari → Extensions → Cat Scratches → Settings.")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        #else
+                        // swiftlint:disable:next line_length
+                        Text("To change templates, capture rules, or filtering rules, go to Safari → Settings → Extensions → Cat Scratches → Settings.")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        #endif
+                    }
+                    .padding(.vertical, 8)
+                } label: {
+                    Text("Setup steps, sync, and troubleshooting")
                 }
                 .padding(.vertical, 4)
             } header: {
-                Text("About")
+                Text("Help")
             }
 
             // Connect Section
@@ -251,16 +239,6 @@ struct MainSettingsView: View {
     }
 
     // MARK: - Platform Actions
-
-    private func openSafariExtensions() {
-        #if os(iOS)
-        extensionManager.openSafariExtensionSettings {
-            showingExtensionInstructions = true
-        }
-        #else
-        extensionManager.openSafariPreferences()
-        #endif
-    }
 
     private func openExtensionSettings() {
         #if os(iOS)

@@ -343,6 +343,38 @@
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   }
 
+  function normalizeTemplate(template) {
+    return template
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  function removeTemplateLine(template, predicate) {
+    return template
+      .split(/\r?\n/)
+      .filter(line => !predicate(line))
+      .join('\n');
+  }
+
+  function insertTimestampIntoTemplate(template) {
+    if (template.includes('{timestamp}')) {
+      return template;
+    }
+
+    const lines = template.split(/\r?\n/);
+    let insertionIndex = lines.findIndex(line => line.includes('{url}'));
+    if (insertionIndex === -1) {
+      insertionIndex = lines.findIndex(line => line.includes('{title}'));
+    }
+
+    if (insertionIndex === -1) {
+      return `{timestamp}\n\n${template}`;
+    }
+
+    lines.splice(insertionIndex + 1, 0, '', '{timestamp}');
+    return lines.join('\n');
+  }
+
   /**
    * Migrate older settings structure to the unified template approach.
    * Shared by background.js and settings.js.
@@ -375,23 +407,22 @@
       } else {
         // Build from legacy include flags or fall back to default
         let tpl = defaults.outputFormat.template;
-        // If legacy includeSource was false, remove {url} line
+        // If legacy includeSource was false, remove the entire line containing {url}
         if (legacy.hasOwnProperty('includeSource') && legacy.includeSource === false) {
-          tpl = tpl.replace(/\n?\n?\{url\}\n?/g, '\n');
+          tpl = removeTemplateLine(tpl, line => line.includes('{url}'));
         }
-        // If legacy includeSeparator was false, remove separator line
+
+        // If legacy includeSeparator was false, remove separator line(s)
         if (legacy.hasOwnProperty('includeSeparator') && legacy.includeSeparator === false) {
-          tpl = tpl.replace(/\n?\n?---\n?/g, '\n');
+          tpl = removeTemplateLine(tpl, line => line.trim() === '---');
         }
-        // If legacy includeTimestamp true, append timestamp after URL line
+
+        // If legacy includeTimestamp true, append timestamp after URL or title line
         if (legacy.hasOwnProperty('includeTimestamp') && legacy.includeTimestamp === true) {
-          if (tpl.includes('{url}')) {
-            tpl = tpl.replace('{url}', '{url}\n\n{timestamp}');
-          } else {
-            tpl = tpl.replace('{formattedTitle}', '{formattedTitle}\n\n{timestamp}');
-          }
+          tpl = insertTimestampIntoTemplate(tpl);
         }
-        settings.outputFormat.template = tpl;
+
+        settings.outputFormat.template = normalizeTemplate(tpl);
       }
     }
 
@@ -427,13 +458,17 @@
     const template = (outputFormat.template || '').trim() || DEFAULT_SETTINGS.outputFormat.template;
     const timestampISO = new Date().toISOString();
     const defaultTag = outputFormat.defaultTag || '';
+    const tokenValues = {
+      title: String(title ?? ''),
+      url: String(url ?? ''),
+      content: String(content ?? ''),
+      timestamp: timestampISO,
+      tag: String(defaultTag ?? '')
+    };
 
-    return template
-      .replace('{title}', title)
-      .replace('{url}', url)
-      .replace('{content}', content)
-      .replace('{timestamp}', timestampISO)
-      .replace('{tag}', defaultTag);
+    return template.replace(/\{(title|url|content|timestamp|tag)\}/g, (match, token) => {
+      return tokenValues[token] ?? match;
+    });
   }
 
   // Expose globally for background and settings pages

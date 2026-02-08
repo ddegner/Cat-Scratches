@@ -2,12 +2,17 @@
 // Handles keyboard shortcuts and toolbar button clicks
 'use strict';
 
-// Load defaults.js in service worker context
-try {
-    self.importScripts('defaults.js');
-} catch (e) {
-    console.error('Failed to load defaults.js:', e);
+// Load shared scripts in service worker context
+function importSharedScript(fileName) {
+    try {
+        self.importScripts(fileName);
+    } catch (error) {
+        console.error(`Failed to load ${fileName}:`, error);
+    }
 }
+
+importSharedScript('defaults.js');
+importSharedScript('settings-store.js');
 
 // Global settings object
 let extensionSettings = null;
@@ -21,99 +26,93 @@ let extensionSettings = null;
 // - browser.storage.sync is NOT used because Safari doesn't actually sync it across devices
 // ============================================================================
 
-// Load settings from iCloud (with local cache fallback)
-async function loadSettingsFromCloud() {
-    try {
-        // Try to get settings from iCloud via native messaging
-        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
-            action: 'getSettings'
-        });
+const LOCAL_SETTINGS_KEY = (typeof SETTINGS_CACHE_KEY === 'string' && SETTINGS_CACHE_KEY)
+    ? SETTINGS_CACHE_KEY
+    : 'catScratchesSettings';
 
-        if (response && response.settings && typeof response.settings === 'object') {
-            extensionSettings = migrateSettings(response.settings);
-            // Cache locally for offline access
-            await browser.storage.local.set({ catScratchesSettings: extensionSettings });
-            console.log('Settings loaded from iCloud');
-            return extensionSettings;
-        }
-    } catch (error) {
-        console.log('Could not load from iCloud, trying local cache:', error.message);
+async function loadSettingsFromStore() {
+    if (typeof loadCatScratchesSettings !== 'function') {
+        extensionSettings = getDefaultSettings();
+        console.error('loadCatScratchesSettings is unavailable; using defaults.');
+        return extensionSettings;
     }
 
-    // Fallback to local cache
-    try {
-        const localResult = await browser.storage.local.get(['catScratchesSettings']);
-        if (localResult.catScratchesSettings) {
-            extensionSettings = migrateSettings(localResult.catScratchesSettings);
-            console.log('Settings loaded from local cache');
-            return extensionSettings;
-        }
-    } catch (error) {
-        console.log('Local cache also failed:', error.message);
+    const result = await loadCatScratchesSettings();
+    extensionSettings = result.settings;
+
+    if (result.source === 'icloud') {
+        console.log('Settings loaded from iCloud');
+    } else if (result.source === 'local') {
+        console.log('Settings loaded from local cache');
+    } else {
+        console.log('Using default settings');
     }
 
-    // Last resort: use defaults
-    extensionSettings = getDefaultSettings();
-    console.log('Using default settings');
     return extensionSettings;
 }
 
-// Save settings to iCloud (and local cache)
-async function saveSettingsToCloud(settings) {
-    // Always cache locally first
-    await browser.storage.local.set({ catScratchesSettings: settings });
+async function saveSettingsToStore(settings) {
+    if (typeof saveCatScratchesSettings !== 'function') {
+        console.error('saveCatScratchesSettings is unavailable; settings were not persisted.');
+        return;
+    }
 
-    // Then save to iCloud
-    try {
-        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
-            action: 'saveSettings',
-            settings: settings
-        });
-        if (response && response.success) {
-            console.log('Settings saved to iCloud');
-        }
-    } catch (error) {
-        console.log('Could not save to iCloud (saved locally):', error.message);
+    const result = await saveCatScratchesSettings(settings);
+    extensionSettings = result.settings;
+
+    if (result.savedToCloud) {
+        console.log('Settings saved to iCloud');
+    } else {
+        console.log('Could not save to iCloud (saved locally).');
     }
 }
 
 // Listen for extension startup
 browser.runtime.onStartup.addListener(async () => {
-    await loadSettingsFromCloud();
+    await loadSettingsFromStore();
 });
 
-browser.runtime.onInstalled.addListener(async () => {
+browser.runtime.onInstalled.addListener(async (details) => {
     // Initialize with default settings on first install, or load from iCloud
     try {
-        await loadSettingsFromCloud();
+        await loadSettingsFromStore();
 
         // If we have no settings, initialize with defaults
         if (!extensionSettings || Object.keys(extensionSettings).length === 0) {
             extensionSettings = getDefaultSettings();
         }
 
-        // Check if Drafts is installed and set default destination accordingly
-        // Note: iOS extension cannot check this, so it returns null
-        try {
-            const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
-                action: 'checkDraftsInstalled'
-            });
-            // If draftsInstalled is null (iOS extension limitation), keep current/default setting
-            // If defined (macOS), set destination based on availability
-            if (response?.draftsInstalled !== null && response?.draftsInstalled !== undefined) {
-                const draftsInstalled = response.draftsInstalled;
-                extensionSettings.saveDestination = draftsInstalled ? 'drafts' : 'share';
-                console.log('Drafts installed:', draftsInstalled, '- default destination:', extensionSettings.saveDestination);
-            } else {
-                // iOS or unknown - keep existing setting, default to drafts
-                console.log('Cannot determine Drafts installation (iOS extension), keeping current destination:', extensionSettings.saveDestination);
+        // Only set default destination on first install (or if missing/invalid).
+        // This preserves an existing user preference during extension updates.
+        const isFirstInstall = details?.reason === 'install';
+        const hasValidDestination = ['drafts', 'share', 'notes'].includes(extensionSettings.saveDestination);
+
+        if (isFirstInstall || !hasValidDestination) {
+            // Check if Drafts is installed and set default destination accordingly
+            // Note: iOS extension cannot check this, so it returns null
+            try {
+                const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+                    action: 'checkDraftsInstalled'
+                });
+                // If draftsInstalled is null (iOS extension limitation), keep current/default setting
+                // If defined (macOS), set destination based on availability
+                if (response?.draftsInstalled !== null && response?.draftsInstalled !== undefined) {
+                    const draftsInstalled = response.draftsInstalled;
+                    extensionSettings.saveDestination = draftsInstalled ? 'drafts' : 'share';
+                    console.log('Drafts installed:', draftsInstalled, '- default destination:', extensionSettings.saveDestination);
+                } else {
+                    // iOS or unknown - keep existing setting, default to drafts
+                    console.log('Cannot determine Drafts installation (iOS extension), keeping current destination:', extensionSettings.saveDestination);
+                }
+            } catch (checkError) {
+                console.log('Could not check Drafts installation, keeping current setting:', checkError.message);
             }
-        } catch (checkError) {
-            console.log('Could not check Drafts installation, keeping current setting:', checkError.message);
+        } else {
+            console.log('Preserving existing destination setting:', extensionSettings.saveDestination);
         }
 
-        await saveSettingsToCloud(extensionSettings);
-        console.log('Initialized settings in iCloud');
+        await saveSettingsToStore(extensionSettings);
+        console.log('Initialized extension settings');
     } catch (error) {
         console.error('Failed to initialize extension settings:', error);
         extensionSettings = getDefaultSettings();
@@ -137,8 +136,8 @@ browser.runtime.onMessage.addListener(async (message) => {
 
 // Listen for settings changes in storage
 browser.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && changes.catScratchesSettings) {
-        extensionSettings = migrateSettings(changes.catScratchesSettings.newValue);
+    if (areaName === 'local' && changes[LOCAL_SETTINGS_KEY]) {
+        extensionSettings = migrateSettings(changes[LOCAL_SETTINGS_KEY].newValue);
         console.log('Settings updated from local storage change');
     }
 });
@@ -149,7 +148,7 @@ async function createDraftFromCurrentTab() {
     try {
         // Ensure settings are loaded
         if (!extensionSettings) {
-            await loadSettingsFromCloud();
+            await loadSettingsFromStore();
         }
 
         // Get the active tab
@@ -351,4 +350,3 @@ async function openURLScheme(targetURL) {
         console.error("Error opening URL scheme:", error);
     }
 }
-

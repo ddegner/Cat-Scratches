@@ -46,7 +46,7 @@
         "nativeMessaging"
     ],
     "content_security_policy": {
-        "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https: http: https://selector-finder.catscratches.workers.dev; img-src 'self' data:; style-src 'self' 'unsafe-inline'"
+        "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://selector-finder.catscratches.workers.dev; img-src 'self' data:; style-src 'self' 'unsafe-inline'"
     },
     "options_ui": {
         "page": "settings.html",

@@ -24,6 +24,40 @@
         // Assumes TurndownService is globally available (injected scripts)
         let turndownService = null;
         let useMarkdownConversion = false;
+        const configuredFilters = Array.isArray(settings?.advancedFiltering?.customFilters)
+            ? settings.advancedFiltering.customFilters
+            : [];
+        const validCustomFilters = [];
+        const mediaNodeNames = new Set(['IMG', 'PICTURE', 'FIGURE', 'VIDEO', 'AUDIO', 'FIGCAPTION']);
+
+        for (const filter of configuredFilters) {
+            if (typeof filter !== 'string') {
+                continue;
+            }
+
+            const trimmed = filter.trim();
+            if (!trimmed) {
+                continue;
+            }
+
+            try {
+                // Validate selector once up front instead of failing repeatedly per node.
+                doc.querySelector(trimmed);
+                validCustomFilters.push(trimmed);
+            } catch (e) {
+                // Ignore invalid selectors
+            }
+        }
+
+        const hasMediaFilter = validCustomFilters.some(filter => {
+            const lower = filter.toLowerCase();
+            return lower.includes('img') ||
+                lower.includes('picture') ||
+                lower.includes('figure') ||
+                lower.includes('video') ||
+                lower.includes('audio') ||
+                lower.includes('media');
+        });
 
         try {
             if (typeof TurndownService !== 'undefined') {
@@ -44,20 +78,13 @@
                         }
 
                         // Use customFilters for removal logic
-                        if (!settings?.advancedFiltering?.customFilters) {
+                        if (validCustomFilters.length === 0) {
                             return false;
                         }
-                        const customFilters = settings.advancedFiltering.customFilters;
 
                         // Check for image/media elements
-                        if (customFilters.some(filter =>
-                            filter.includes('img') || filter.includes('picture') || filter.includes('figure') ||
-                            filter.includes('video') || filter.includes('audio') || filter.includes('media')
-                        )) {
-                            if (node.nodeName === 'IMG' || node.nodeName === 'PICTURE' || node.nodeName === 'FIGURE' ||
-                                node.nodeName === 'VIDEO' || node.nodeName === 'AUDIO' || node.nodeName === 'FIGCAPTION') {
-                                return true;
-                            }
+                        if (hasMediaFilter && mediaNodeNames.has(node.nodeName)) {
+                            return true;
                         }
 
                         // Remove links to images
@@ -69,7 +96,7 @@
                         }
 
                         // Check all customFilters for element matching
-                        for (const filter of customFilters) {
+                        for (const filter of validCustomFilters) {
                             try {
                                 if (node.matches && node.matches(filter)) {
                                     return true;
@@ -190,13 +217,10 @@
             if (useMarkdownConversion) {
                 const bodyClone = doc.body.cloneNode(true);
 
-                if (settings?.advancedFiltering?.customFilters) {
-                    const customFilters = settings.advancedFiltering.customFilters;
-                    try {
-                        const elementsToRemove = bodyClone.querySelectorAll(customFilters.join(', '));
+                if (validCustomFilters.length > 0) {
+                    for (const filter of validCustomFilters) {
+                        const elementsToRemove = bodyClone.querySelectorAll(filter);
                         elementsToRemove.forEach(el => el.remove());
-                    } catch (e) {
-                        // Ignore selector errors
                     }
                 }
 

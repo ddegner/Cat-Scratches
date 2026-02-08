@@ -31,13 +31,16 @@ echo "📋 Checking required files:"
 # Check for required files
 FILES_TO_CHECK=(
     "manifest.json"
-    "popup.html"
-    "popup.js"
+    "background.js"
+    "defaults.js"
+    "settings-store.js"
+    "content-extractor.js"
+    "turndown.js"
     "settings.html"
     "settings.js"
-    "background.js"
-    "content.js"
-    "turndown.js"
+    "_locales/en/messages.json"
+    "images/toolbar-icon.png"
+    "images/toolbar-icon-dark.png"
 )
 
 ALL_PRESENT=true
@@ -55,13 +58,13 @@ echo ""
 
 if [ "$ALL_PRESENT" = true ]; then
     echo "🎉 All required files are present in the extension bundle!"
-    echo "💡 The settings page should now work correctly."
+    echo "💡 The extension should have the required resources for capture + settings."
     echo ""
     echo "🧪 To test:"
     echo "1. Install/update the extension in Safari"
-    echo "2. Click the extension icon in Safari toolbar"
-    echo "3. Click the 'Settings' button"
-    echo "4. Settings page should open without errors"
+    echo "2. Open Cat Scratches settings from Safari extension settings"
+    echo "3. Trigger a capture on any article page"
+    echo "4. Confirm content is sent to Drafts or Share Sheet"
 else
     echo "⚠️  Some files are missing from the extension bundle."
     echo "💡 Make sure you've updated the Xcode project file and rebuilt."

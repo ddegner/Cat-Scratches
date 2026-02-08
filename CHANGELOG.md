@@ -2,6 +2,28 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [2.1] - 2026-02-08
+
+### Added
+- Shared settings storage module (`settings-store.js`) used by both background and settings pages
+- Basic/Advanced view toggle for extension settings to reduce default UI complexity
+- Worker response now includes raw page HTML for selector preview generation
+
+### Changed
+- Refactored extension settings loading/saving to use shared storage helpers (iCloud first, local cache fallback)
+- Updated extension settings UX to a single explicit save model with unsaved-change state
+- Simplified settings terminology to outcome-focused labels (for example: "Where to send clips", "What to capture", "What to ignore")
+- Simplified native app settings page by consolidating setup actions and merging guidance into a single expandable Help section
+- Updated extension bundle verification script to check current required resource files
+- Added `settings-store.js` to Xcode project resources for iOS/macOS extension targets
+- Tightened extension page CSP `connect-src` to the selector worker endpoint instead of broad `https/http`
+
+### Fixed
+- Preserved user-selected destination on extension updates (instead of always resetting during install/update flow)
+- Improved legacy template migration and token replacement logic for safer formatting behavior
+- Hardened content extraction filter handling by validating selectors before matching/removal
+- Eliminated selector preview CORS fetch dependency by using HTML returned from the selector worker
+
 ## [2.0] - 2026-01-02
 
 ### Changed

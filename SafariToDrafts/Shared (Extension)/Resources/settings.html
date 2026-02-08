@@ -85,6 +85,19 @@
             padding-bottom: 0;
         }
 
+        .section-compact {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+        }
+
+        .advanced-only {
+            display: none;
+        }
+
+        body[data-settings-view="advanced"] .advanced-only {
+            display: block;
+        }
+
         .section h2 {
             font-size: 20px;
             font-weight: 600;
@@ -324,6 +337,11 @@
             border-color: #d0d0d0;
         }
 
+        .button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
         .button-danger {
             color: #6c757d;
             background: #f8f9fa;
@@ -495,6 +513,11 @@
                 background: #1c1c1e;
             }
         }
+
+        .save-model-note {
+            text-align: right;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 
@@ -510,10 +533,22 @@
         </div>
 
         <div class="content">
+            <div class="section section-compact">
+                <h2>Settings View</h2>
+                <div class="form-group">
+                    <div class="segmented-control">
+                        <input type="radio" name="settingsView" value="basic" id="viewBasic" checked>
+                        <label for="viewBasic"><span>Basic</span></label>
+                        <input type="radio" name="settingsView" value="advanced" id="viewAdvanced">
+                        <label for="viewAdvanced"><span>Advanced</span></label>
+                    </div>
+                    <div class="help-text">Advanced includes custom selectors and Selector Finder.</div>
+                </div>
+            </div>
 
             <!-- Destination Section -->
             <div class="section">
-                <h2>Destination</h2>
+                <h2>Where to send clips</h2>
                 <div id="draftsNotInstalledBanner" class="status-message info"
                     style="display: none; margin-bottom: 16px;">
                     <strong>Drafts is not installed.</strong> Content will be saved to Share Sheet.
@@ -539,11 +574,11 @@
 
 
             <!-- Content Extraction Section -->
-            <div class="section">
-                <h2>Page Parsing</h2>
+            <div class="section advanced-only">
+                <h2>What to capture</h2>
 
                 <div class="form-group">
-                    <label for="contentSelectors">Content Selectors</label>
+                    <label for="contentSelectors">Where to find article text (CSS selectors)</label>
                     <textarea id="contentSelectors"
                         placeholder="Enter CSS selectors to find article content, one per line">[itemtype*="Article"]
 [itemtype*="BlogPosting"]
@@ -572,7 +607,7 @@ main
                 </div>
 
                 <div class="form-group">
-                    <label for="customFilters">Elements to Remove</label>
+                    <label for="customFilters">What to ignore (CSS selectors)</label>
                     <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line">img
 picture
 figure
@@ -727,7 +762,7 @@ form
 
             <!-- Output Format Section -->
             <div class="section">
-                <h2>Draft Format</h2>
+                <h2>How to format drafts</h2>
 
                 <div class="form-group">
                     <label for="defaultTag">Default Tag</label>
@@ -745,7 +780,7 @@ form
 
 
             <!-- Selector Finder Section -->
-            <div class="section">
+            <div class="section advanced-only">
                 <h2>Selector Finder</h2>
                 <div class="help-text" style="margin-bottom: 16px;">Analyze a web page to find the best CSS selectors
                     for extracting article content.</div>
@@ -771,7 +806,7 @@ form
                     </div>
 
                     <div class="form-group">
-                        <label>Found Elements to Remove</label>
+                        <label>Found elements to ignore</label>
                         <div class="finder-selectors" id="foundElementsToRemove" style="white-space: pre-wrap;"></div>
                     </div>
 
@@ -786,14 +821,16 @@ form
 
             <!-- Actions -->
             <div class="status-message" id="statusMessage"></div>
+            <div class="help-text save-model-note">Changes are applied when you click Save Settings.</div>
             <div class="button-group">
                 <button class="button button-danger" id="resetSettings">Reset to Defaults</button>
-                <button class="button" id="saveSettings">Save Settings</button>
+                <button class="button" id="saveSettings" disabled>Save Settings</button>
             </div>
         </div>
     </div>
 
     <script src="defaults.js"></script>
+    <script src="settings-store.js"></script>
     <script src="turndown.js"></script>
     <script src="content-extractor.js"></script>
     <script src="settings.js"></script>

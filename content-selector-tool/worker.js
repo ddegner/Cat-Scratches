@@ -103,6 +103,7 @@ async function handleAnalyze(request, env) {
         return new Response(JSON.stringify({
             success: true,
             url: targetUrl,
+            html: htmlContent,  // Include HTML for client-side preview (avoids CORS issues)
             ...geminiResponse,
         }), {
             headers: corsHeaders,

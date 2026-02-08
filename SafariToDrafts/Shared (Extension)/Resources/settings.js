@@ -1,10 +1,13 @@
 // Settings script for Cat Scratches extension
 'use strict';
 
-// Default settings, migrateSettings, and NATIVE_APP_ID are provided by defaults.js
+// Shared defaults and settings-store helpers are provided by defaults.js + settings-store.js
 
 // Global settings object
 let currentSettings = {};
+let isDirty = false;
+
+const SETTINGS_VIEW_STORAGE_KEY = 'catScratches.settingsView';
 
 // Initialize settings page
 document.addEventListener('DOMContentLoaded', async () => {
@@ -14,6 +17,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set up event listeners
     setupEventListeners();
 
+    // Restore basic/advanced view preference
+    initializeSettingsView();
+
     // Update UI with current settings
     updateUI();
 
@@ -22,72 +28,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Check if Drafts is installed and show banner if not
     await checkDraftsInstallation();
+
+    setDirtyState(false);
 });
 
-// Load settings from iCloud (with local cache fallback)
+// Load settings using shared storage logic
 async function loadSettings() {
     try {
-        // Try to get settings from iCloud via native messaging
-        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
-            action: 'getSettings'
-        });
+        const result = await loadCatScratchesSettings();
+        currentSettings = result.settings;
 
-        if (response && response.settings && typeof response.settings === 'object') {
-            currentSettings = migrateSettings(response.settings);
-            // Cache locally for offline access
-            await browser.storage.local.set({ catScratchesSettings: currentSettings });
+        if (result.source === 'icloud') {
             console.log('Settings loaded from iCloud');
-            return;
-        }
-    } catch (error) {
-        console.log('Could not load from iCloud, trying local cache:', error.message);
-    }
-
-    // Fallback to local cache
-    try {
-        const localResult = await browser.storage.local.get(['catScratchesSettings']);
-        if (localResult.catScratchesSettings) {
-            currentSettings = migrateSettings(localResult.catScratchesSettings);
+        } else if (result.source === 'local') {
             console.log('Settings loaded from local cache');
-            return;
+        } else {
+            showStatus('Using default settings.', 'info');
         }
     } catch (error) {
-        console.log('Local cache also failed:', error.message);
+        console.error('Failed to load settings:', error);
+        currentSettings = getDefaultSettings();
+        showStatus('Using default settings.', 'info');
     }
-
-    // Last resort: use defaults
-    currentSettings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-    showStatus('Using default settings.', 'info');
 }
 
-// Save settings to iCloud (and local cache)
+// Save settings using shared storage logic
 async function saveSettings() {
     try {
-        // Always cache locally first
-        await browser.storage.local.set({ catScratchesSettings: currentSettings });
+        const result = await saveCatScratchesSettings(currentSettings);
+        currentSettings = result.settings;
 
-        console.log('Attempting to save settings via native messaging...');
-        console.log('Settings object:', JSON.stringify(currentSettings).substring(0, 200) + '...');
-
-        // Then save to iCloud
-        const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
-            action: 'saveSettings',
-            settings: currentSettings
-        });
-
-        console.log('Native messaging response:', JSON.stringify(response));
-
-        if (response && response.success) {
+        if (result.savedToCloud) {
             showStatus('Settings saved to iCloud!', 'success');
         } else {
-            console.log('Response did not indicate success:', response);
-            showStatus('Settings saved locally.', 'success');
+            showStatus('Settings saved locally (iCloud unavailable).', 'success');
         }
+        setDirtyState(false);
+        return true;
     } catch (error) {
-        console.error('Native messaging error:', error);
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        showStatus('Settings saved locally (iCloud unavailable).', 'success');
+        console.error('Failed to save settings:', error);
+        showStatus('Failed to save settings. Please try again.', 'error');
+        return false;
     }
 }
 
@@ -95,9 +76,17 @@ async function saveSettings() {
 function setupEventListeners() {
     // Destination toggle
     document.querySelectorAll('input[name="saveDestination"]').forEach(radio => {
-        radio.addEventListener('change', async () => {
+        radio.addEventListener('change', () => {
             updateDestinationFromUI();
-            await saveSettings();
+        });
+    });
+
+    // Basic/Advanced view toggle (UI only)
+    document.querySelectorAll('input[name="settingsView"]').forEach(radio => {
+        radio.addEventListener('change', (event) => {
+            const view = event.target?.value || 'basic';
+            applySettingsView(view);
+            saveSettingsViewPreference(view);
         });
     });
 
@@ -147,6 +136,39 @@ function updateUI() {
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
 }
 
+function initializeSettingsView() {
+    applySettingsView(loadSettingsViewPreference());
+}
+
+function loadSettingsViewPreference() {
+    try {
+        return localStorage.getItem(SETTINGS_VIEW_STORAGE_KEY) || 'basic';
+    } catch (error) {
+        console.log('Could not read settings view preference:', error.message);
+        return 'basic';
+    }
+}
+
+function saveSettingsViewPreference(view) {
+    try {
+        localStorage.setItem(SETTINGS_VIEW_STORAGE_KEY, view === 'advanced' ? 'advanced' : 'basic');
+    } catch (error) {
+        console.log('Could not save settings view preference:', error.message);
+    }
+}
+
+function applySettingsView(view) {
+    const normalizedView = view === 'advanced' ? 'advanced' : 'basic';
+    document.body.setAttribute('data-settings-view', normalizedView);
+
+    const basicRadio = document.getElementById('viewBasic');
+    const advancedRadio = document.getElementById('viewAdvanced');
+    if (basicRadio && advancedRadio) {
+        basicRadio.checked = normalizedView === 'basic';
+        advancedRadio.checked = normalizedView === 'advanced';
+    }
+}
+
 // Update content selectors textarea display
 function updateContentSelectorsUI() {
     const contentSelectorsTextarea = document.getElementById('contentSelectors');
@@ -164,12 +186,14 @@ function updateContentSelectorsFromUI() {
         .filter(line => line);
 
     currentSettings.contentExtraction.customSelectors = selectors;
+    setDirtyState(true);
 }
 
 // Update output format from UI
 function updateOutputFormatFromUI() {
     currentSettings.outputFormat.template = document.getElementById('template').value;
     currentSettings.outputFormat.defaultTag = document.getElementById('defaultTag').value.trim();
+    setDirtyState(true);
 }
 
 // Update advanced filtering from UI
@@ -180,13 +204,20 @@ function updateAdvancedFilteringFromUI() {
         .filter(line => line);
 
     currentSettings.advancedFiltering.customFilters = customFilters;
+    setDirtyState(true);
 }
 
 // Handle save settings
 async function handleSaveSettings() {
+    if (!isDirty) {
+        showStatus('No unsaved changes.', 'info');
+        return;
+    }
+
     if (!validateSettings()) {
         return;
     }
+
     await saveSettings();
 }
 
@@ -196,8 +227,11 @@ async function handleResetSettings() {
         const defaults = getDefaultSettings();
         currentSettings = JSON.parse(JSON.stringify(defaults));
         updateUI();
-        await saveSettings();  // Uses native messaging to save to iCloud
-        showStatus('Settings reset to defaults.', 'success');
+        setDirtyState(true);
+        const saved = await saveSettings();  // Uses native messaging to save to iCloud
+        if (saved) {
+            showStatus('Settings reset to defaults.', 'success');
+        }
     } catch (error) {
         console.error('Failed to reset settings:', error);
         showStatus('Failed to reset settings. Please try again.', 'error');
@@ -219,6 +253,18 @@ function validateSettings() {
     }
 
     return true;
+}
+
+function setDirtyState(dirty) {
+    isDirty = Boolean(dirty);
+
+    const saveButton = document.getElementById('saveSettings');
+    if (!saveButton) {
+        return;
+    }
+
+    saveButton.disabled = !isDirty;
+    saveButton.classList.toggle('button-primary', isDirty);
 }
 
 // Show status message
@@ -263,6 +309,7 @@ function setupPlaceholderTags() {
 function updateDestinationFromUI() {
     const selected = document.querySelector('input[name="saveDestination"]:checked');
     currentSettings.saveDestination = selected?.value || 'drafts';
+    setDirtyState(true);
 }
 
 // Check if Drafts is installed and show banner if not
@@ -381,15 +428,13 @@ async function handleAnalyze() {
         foundSelectors.contentSelector = apiData.contentSelector || '';
         foundSelectors.elementsToRemove = apiData.elementsToRemove || [];
 
-        // Step 2: Fetch the actual page content locally
-        // We do this to ensure we use the EXACT same parsing logic as the extension
-        const pageResponse = await fetch(url);
-        if (!pageResponse.ok) {
-            throw new Error('Could not fetch page content for preview');
+        // Use HTML from API response (Worker already fetched it - avoids CORS issues)
+        const html = apiData.html;
+        if (!html) {
+            throw new Error('No HTML content returned from analysis');
         }
-        const html = await pageResponse.text();
 
-        // Step 3: Generate preview using local engine
+        // Generate preview using local engine
         const previewText = await generatePreview(html, foundSelectors.contentSelector, foundSelectors.elementsToRemove, url);
 
         // Display results
@@ -400,14 +445,7 @@ async function handleAnalyze() {
 
     } catch (error) {
         console.error('Selector Finder error:', error);
-        let errorMsg = error.message;
-
-        // Safari often returns "Load failed" for CSP or network errors
-        if (errorMsg === 'Load failed') {
-            errorMsg = 'Connection blocked. Please rebuild in Xcode, or toggle the extension Off/On in Safari Settings to apply permissions.';
-        }
-
-        showFinderError(errorMsg);
+        showFinderError(error.message);
     } finally {
         finderLoading.classList.remove('visible');
         analyzeBtn.disabled = false;
@@ -449,31 +487,41 @@ function handleAddSelectors() {
     // Get current selectors
     const contentSelectorsTextarea = document.getElementById('contentSelectors');
     const customFiltersTextarea = document.getElementById('customFilters');
+    const toUniqueLines = (lines) => {
+        const seen = new Set();
+        const unique = [];
+
+        for (const line of lines) {
+            if (typeof line !== 'string') continue;
+            const trimmed = line.trim();
+            if (!trimmed || seen.has(trimmed)) continue;
+            seen.add(trimmed);
+            unique.push(trimmed);
+        }
+
+        return unique;
+    };
 
     // Add content selector to the beginning of the list (highest priority)
     if (foundSelectors.contentSelector) {
-        const currentSelectors = contentSelectorsTextarea.value.trim();
-        const newSelectors = currentSelectors
-            ? foundSelectors.contentSelector + '\n' + currentSelectors
-            : foundSelectors.contentSelector;
-        contentSelectorsTextarea.value = newSelectors;
+        const currentSelectors = contentSelectorsTextarea.value.split('\n');
+        const mergedSelectors = toUniqueLines([foundSelectors.contentSelector, ...currentSelectors]);
+        contentSelectorsTextarea.value = mergedSelectors.join('\n');
         updateContentSelectorsFromUI();
     }
 
     // Add elements to remove to the list
     if (foundSelectors.elementsToRemove.length > 0) {
-        const currentFilters = customFiltersTextarea.value.trim();
-        const newFilters = foundSelectors.elementsToRemove.join('\n');
-        customFiltersTextarea.value = currentFilters
-            ? currentFilters + '\n' + newFilters
-            : newFilters;
+        const currentFilters = customFiltersTextarea.value.split('\n');
+        const mergedFilters = toUniqueLines([...currentFilters, ...foundSelectors.elementsToRemove]);
+        customFiltersTextarea.value = mergedFilters.join('\n');
         updateAdvancedFilteringFromUI();
     }
 
     // Show success message
     showStatus('Selectors added! Click "Save Settings" to keep them.', 'success');
 
-    // Scroll to the Page Parsing section
+    // Scroll to the "What to capture" section
     document.getElementById('contentSelectors').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
