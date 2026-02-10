@@ -65,9 +65,6 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 os_log(.error, "Failed to save settings: not a dictionary")
             }
 
-        case "openOptions":
-            os_log(.info, "Options page request received")
-
         case "checkDraftsInstalled":
             var isInstalled: Bool? = nil
 

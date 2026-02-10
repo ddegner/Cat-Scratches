@@ -7,7 +7,7 @@
 let currentSettings = {};
 let isDirty = false;
 
-const SETTINGS_VIEW_STORAGE_KEY = 'catScratches.settingsView';
+const ADVANCED_ACCORDION_STORAGE_KEY = 'catScratches.advancedAccordionOpen';
 
 // Initialize settings page
 document.addEventListener('DOMContentLoaded', async () => {
@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Set up event listeners
     setupEventListeners();
 
-    // Restore basic/advanced view preference
-    initializeSettingsView();
+    // Restore advanced accordion state
+    initializeAdvancedAccordion();
 
     // Update UI with current settings
     updateUI();
@@ -81,14 +81,13 @@ function setupEventListeners() {
         });
     });
 
-    // Basic/Advanced view toggle (UI only)
-    document.querySelectorAll('input[name="settingsView"]').forEach(radio => {
-        radio.addEventListener('change', (event) => {
-            const view = event.target?.value || 'basic';
-            applySettingsView(view);
-            saveSettingsViewPreference(view);
+    // Advanced settings accordion (UI only)
+    const advancedAccordion = document.getElementById('advancedSettingsAccordion');
+    if (advancedAccordion) {
+        advancedAccordion.addEventListener('toggle', () => {
+            saveAdvancedAccordionPreference(advancedAccordion.open);
         });
-    });
+    }
 
     // Get Drafts link
     const getDraftsLink = document.getElementById('getDraftsLink');
@@ -117,12 +116,12 @@ function setupEventListeners() {
 // Update UI with current settings
 function updateUI() {
     // Update destination toggle
-    const dest = currentSettings.saveDestination || 'drafts';
+    const dest = currentSettings.saveDestination === 'share' ? 'share' : 'drafts';
     const destDrafts = document.getElementById('destDrafts');
     const destShare = document.getElementById('destShare');
     if (destDrafts && destShare) {
         destDrafts.checked = dest === 'drafts';
-        destShare.checked = dest === 'share' || dest === 'notes';
+        destShare.checked = dest === 'share';
     }
 
     // Update content selectors textarea
@@ -136,36 +135,35 @@ function updateUI() {
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
 }
 
-function initializeSettingsView() {
-    applySettingsView(loadSettingsViewPreference());
+function initializeAdvancedAccordion() {
+    const advancedAccordion = document.getElementById('advancedSettingsAccordion');
+    if (!advancedAccordion) {
+        return;
+    }
+    advancedAccordion.open = loadAdvancedAccordionPreference();
 }
 
-function loadSettingsViewPreference() {
+function loadAdvancedAccordionPreference() {
     try {
-        return localStorage.getItem(SETTINGS_VIEW_STORAGE_KEY) || 'basic';
+        const saved = localStorage.getItem(ADVANCED_ACCORDION_STORAGE_KEY);
+        if (saved === 'open') {
+            return true;
+        }
+        if (saved === 'closed') {
+            return false;
+        }
+        return false;
     } catch (error) {
-        console.log('Could not read settings view preference:', error.message);
-        return 'basic';
+        console.log('Could not read advanced accordion preference:', error.message);
+        return false;
     }
 }
 
-function saveSettingsViewPreference(view) {
+function saveAdvancedAccordionPreference(isOpen) {
     try {
-        localStorage.setItem(SETTINGS_VIEW_STORAGE_KEY, view === 'advanced' ? 'advanced' : 'basic');
+        localStorage.setItem(ADVANCED_ACCORDION_STORAGE_KEY, isOpen ? 'open' : 'closed');
     } catch (error) {
-        console.log('Could not save settings view preference:', error.message);
-    }
-}
-
-function applySettingsView(view) {
-    const normalizedView = view === 'advanced' ? 'advanced' : 'basic';
-    document.body.setAttribute('data-settings-view', normalizedView);
-
-    const basicRadio = document.getElementById('viewBasic');
-    const advancedRadio = document.getElementById('viewAdvanced');
-    if (basicRadio && advancedRadio) {
-        basicRadio.checked = normalizedView === 'basic';
-        advancedRadio.checked = normalizedView === 'advanced';
+        console.log('Could not save advanced accordion preference:', error.message);
     }
 }
 

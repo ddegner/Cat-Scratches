@@ -343,40 +343,8 @@
     return JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   }
 
-  function normalizeTemplate(template) {
-    return template
-      .replace(/\n{3,}/g, '\n\n')
-      .trim();
-  }
-
-  function removeTemplateLine(template, predicate) {
-    return template
-      .split(/\r?\n/)
-      .filter(line => !predicate(line))
-      .join('\n');
-  }
-
-  function insertTimestampIntoTemplate(template) {
-    if (template.includes('{timestamp}')) {
-      return template;
-    }
-
-    const lines = template.split(/\r?\n/);
-    let insertionIndex = lines.findIndex(line => line.includes('{url}'));
-    if (insertionIndex === -1) {
-      insertionIndex = lines.findIndex(line => line.includes('{title}'));
-    }
-
-    if (insertionIndex === -1) {
-      return `{timestamp}\n\n${template}`;
-    }
-
-    lines.splice(insertionIndex + 1, 0, '', '{timestamp}');
-    return lines.join('\n');
-  }
-
   /**
-   * Migrate older settings structure to the unified template approach.
+   * Normalize settings by merging with defaults.
    * Shared by background.js and settings.js.
    * @param {Object} inputSettings - Settings object to migrate
    * @returns {Object} Migrated settings
@@ -398,48 +366,21 @@
     settings.advancedFiltering.minContentLength = settings.advancedFiltering.minContentLength ?? defaults.advancedFiltering.minContentLength;
     settings.advancedFiltering.maxLinkRatio = settings.advancedFiltering.maxLinkRatio ?? defaults.advancedFiltering.maxLinkRatio;
 
-    // Construct a template if missing, leveraging legacy flags if present
+    // Ensure template exists
     if (!settings.outputFormat.template) {
-      const legacy = settings.outputFormat;
-      const legacyCustom = (legacy.customTemplate || '').trim();
-      if (legacyCustom) {
-        settings.outputFormat.template = legacyCustom;
-      } else {
-        // Build from legacy include flags or fall back to default
-        let tpl = defaults.outputFormat.template;
-        // If legacy includeSource was false, remove the entire line containing {url}
-        if (legacy.hasOwnProperty('includeSource') && legacy.includeSource === false) {
-          tpl = removeTemplateLine(tpl, line => line.includes('{url}'));
-        }
-
-        // If legacy includeSeparator was false, remove separator line(s)
-        if (legacy.hasOwnProperty('includeSeparator') && legacy.includeSeparator === false) {
-          tpl = removeTemplateLine(tpl, line => line.trim() === '---');
-        }
-
-        // If legacy includeTimestamp true, append timestamp after URL or title line
-        if (legacy.hasOwnProperty('includeTimestamp') && legacy.includeTimestamp === true) {
-          tpl = insertTimestampIntoTemplate(tpl);
-        }
-
-        settings.outputFormat.template = normalizeTemplate(tpl);
-      }
+      settings.outputFormat.template = defaults.outputFormat.template;
     }
-
-    // Cleanup legacy fields
-    delete settings.outputFormat.includeSource;
-    delete settings.outputFormat.includeSeparator;
-    delete settings.outputFormat.includeTimestamp;
-    delete settings.outputFormat.customTemplate;
-    delete settings.outputFormat.titleFormat;  // No longer used
 
     // Ensure defaultTag exists (can be empty string)
     if (settings.outputFormat.defaultTag === undefined) {
       settings.outputFormat.defaultTag = defaults.outputFormat.defaultTag;
     }
 
-    // Ensure saveDestination exists
-    if (settings.saveDestination === undefined) {
+    // Migrate removed legacy destination and normalize invalid values.
+    if (settings.saveDestination === 'notes') {
+      settings.saveDestination = 'share';
+    }
+    if (!['drafts', 'share'].includes(settings.saveDestination)) {
       settings.saveDestination = defaults.saveDestination;
     }
 

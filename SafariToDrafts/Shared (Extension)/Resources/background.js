@@ -85,7 +85,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
         // Only set default destination on first install (or if missing/invalid).
         // This preserves an existing user preference during extension updates.
         const isFirstInstall = details?.reason === 'install';
-        const hasValidDestination = ['drafts', 'share', 'notes'].includes(extensionSettings.saveDestination);
+        const hasValidDestination = ['drafts', 'share'].includes(extensionSettings.saveDestination);
 
         if (isFirstInstall || !hasValidDestination) {
             // Check if Drafts is installed and set default destination accordingly
@@ -254,41 +254,101 @@ async function createDraftFromCurrentTab() {
 async function createDraft(title, url, markdownBody) {
     const destination = extensionSettings?.saveDestination || 'drafts';
 
-    if (destination === 'notes' || destination === 'share') {
+    if (destination === 'share') {
         await invokeShareSheet(title, url, markdownBody);
     } else {
         await sendToDrafts(title, url, markdownBody);
     }
 }
 
-async function sendToDrafts(title, url, markdownBody) {
-    // Format draft content using settings (from defaults.js)
-    const draftContent = formatDraftContent(title, url, markdownBody, extensionSettings);
+function getEncodedDraftTags(settings) {
+    const defaultTag = settings?.outputFormat?.defaultTag;
+    if (!defaultTag || !defaultTag.trim()) {
+        return '';
+    }
 
-    // URL encode the content for the Drafts URL scheme
+    const tags = defaultTag.split(',').map(tag => tag.trim()).filter(tag => tag);
+    if (tags.length === 0) {
+        return '';
+    }
+
+    return encodeURIComponent(tags.join(','));
+}
+
+function buildDraftsCreateURL(draftContent, encodedTags) {
     const encodedContent = encodeURIComponent(draftContent);
-
-    // Build the Drafts URL with optional tag
     let draftsURL = `drafts://x-callback-url/create?text=${encodedContent}`;
 
-    // Add tag if specified in settings
-    const defaultTag = extensionSettings?.outputFormat?.defaultTag;
-    if (defaultTag && defaultTag.trim()) {
-        const tags = defaultTag.split(',').map(tag => tag.trim()).filter(tag => tag);
-        if (tags.length > 0) {
-            const encodedTags = encodeURIComponent(tags.join(','));
-            draftsURL += `&tag=${encodedTags}`;
+    if (encodedTags) {
+        draftsURL += `&tag=${encodedTags}`;
+    }
+
+    return draftsURL;
+}
+
+function truncateToCodePointBoundary(text, maxLength) {
+    if (maxLength <= 0) {
+        return '';
+    }
+
+    let truncated = text.slice(0, maxLength);
+
+    // Avoid ending on an unpaired high surrogate.
+    const lastCodeUnit = truncated.charCodeAt(truncated.length - 1);
+    if (lastCodeUnit >= 0xD800 && lastCodeUnit <= 0xDBFF) {
+        truncated = truncated.slice(0, -1);
+    }
+
+    return truncated;
+}
+
+function buildMaxLengthDraftsURL(draftContent, encodedTags, maxURLLength) {
+    const fullURL = buildDraftsCreateURL(draftContent, encodedTags);
+    if (fullURL.length <= maxURLLength) {
+        return { url: fullURL, wasTruncated: false };
+    }
+
+    let low = 0;
+    let high = draftContent.length;
+    let bestURL = null;
+
+    while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const candidateContent = truncateToCodePointBoundary(draftContent, mid);
+        const candidateURL = buildDraftsCreateURL(candidateContent, encodedTags);
+
+        if (candidateURL.length <= maxURLLength) {
+            bestURL = candidateURL;
+            low = mid + 1;
+        } else {
+            high = mid - 1;
         }
     }
 
-    // Check URL length before opening - very long URLs will fail
+    if (!bestURL) {
+        return null;
+    }
+
+    return { url: bestURL, wasTruncated: true };
+}
+
+async function sendToDrafts(title, url, markdownBody) {
+    // Format draft content using settings (from defaults.js)
+    const draftContent = formatDraftContent(title, url, markdownBody, extensionSettings);
+    const encodedTags = getEncodedDraftTags(extensionSettings);
     const MAX_URL_LENGTH = 65000;
-    if (draftsURL.length > MAX_URL_LENGTH) {
+    const result = buildMaxLengthDraftsURL(draftContent, encodedTags, MAX_URL_LENGTH);
+
+    if (!result) {
         await showContentTooLargeError('Drafts');
         return;
     }
 
-    await openURLScheme(draftsURL);
+    if (result.wasTruncated) {
+        console.warn('Draft content exceeded URL length limit and was truncated to fit.');
+    }
+
+    await openURLScheme(result.url);
 }
 
 async function invokeShareSheet(title, url, markdownBody) {

@@ -686,9 +686,15 @@ const HTML_PAGE = `<!DOCTYPE html>
                 }
 
                 // Display results
-                contentSelector.value = data.contentSelector || '';
-                elementsToRemove.value = (data.elementsToRemove || []).join('\\n');
-                previewText.textContent = data.preview || '(No preview available)';
+                const foundContentSelector = (typeof data.contentSelector === 'string') ? data.contentSelector : '';
+                const foundElementsToRemove = Array.isArray(data.elementsToRemove) ? data.elementsToRemove : [];
+                contentSelector.value = foundContentSelector;
+                elementsToRemove.value = foundElementsToRemove.join('\\n');
+                previewText.textContent = data.preview || generatePreviewFromHtml(
+                    data.html,
+                    foundContentSelector,
+                    foundElementsToRemove
+                );
                 resultsSection.classList.add('visible');
 
             } catch (error) {
@@ -706,6 +712,76 @@ const HTML_PAGE = `<!DOCTYPE html>
 
         function hideError() {
             errorMessage.style.display = 'none';
+        }
+
+        function generatePreviewFromHtml(html, contentSelectorValue, elementsToRemoveList) {
+            if (typeof html !== 'string' || !html.trim()) {
+                return '(No preview available: no HTML returned)';
+            }
+
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const candidateSelectors = [contentSelectorValue, 'article', 'main', '[role="main"]']
+                    .filter(selector => typeof selector === 'string' && selector.trim());
+
+                let contentElement = null;
+                for (const selector of candidateSelectors) {
+                    try {
+                        contentElement = doc.querySelector(selector);
+                    } catch {
+                        continue; // Ignore invalid selectors from AI output
+                    }
+
+                    if (contentElement) {
+                        break;
+                    }
+                }
+
+                if (!contentElement) {
+                    return '(No preview available: content selector did not match)';
+                }
+
+                const workingNode = contentElement.cloneNode(true);
+                for (const selector of elementsToRemoveList) {
+                    if (typeof selector !== 'string' || !selector.trim()) {
+                        continue;
+                    }
+                    try {
+                        workingNode.querySelectorAll(selector).forEach((el) => el.remove());
+                    } catch {
+                        continue; // Ignore invalid selectors from AI output
+                    }
+                }
+
+                let text = '';
+                const paragraphNodes = workingNode.querySelectorAll('h1, h2, h3, h4, h5, h6, p, li, blockquote');
+                if (paragraphNodes.length > 0) {
+                    text = Array.from(paragraphNodes)
+                        .map(node => node.textContent ? node.textContent.trim() : '')
+                        .filter(Boolean)
+                        .join('\\n\\n');
+                } else {
+                    text = workingNode.textContent ? workingNode.textContent.trim() : '';
+                }
+
+                text = text.replace(/[ \\t]+/g, ' ').replace(/\\n{3,}/g, '\\n\\n');
+
+                if (!text) {
+                    return '(Preview is empty after applying selectors)';
+                }
+
+                const maxPreviewLength = 3000;
+                if (text.length > maxPreviewLength) {
+                    return text.substring(0, maxPreviewLength) + '...';
+                }
+
+                return text;
+            } catch (error) {
+                console.error('Preview generation failed:', error);
+                return '(Preview generation failed)';
+            }
         }
 
         function copyToClipboard(elementId) {

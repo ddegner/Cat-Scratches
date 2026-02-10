@@ -15,14 +15,6 @@
 		7F9F056C2F07291D0070E1B2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F056A2F07291D0070E1B2 /* Main.storyboard */; };
 		7F9F05732F07291D0070E1B2 /* Cat Scratches Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F9F05722F07291D0070E1B2 /* Cat Scratches Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7F9F057D2F07291D0070E1B2 /* Cat Scratches Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7F9F057C2F07291D0070E1B2 /* Cat Scratches Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		7F9F05822F07291D0070E1B2 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05472F07291B0070E1B2 /* Main.html */; };
-		7F9F05832F07291D0070E1B2 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05472F07291B0070E1B2 /* Main.html */; };
-		7F9F05842F07291D0070E1B2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05492F07291B0070E1B2 /* Icon.png */; };
-		7F9F05852F07291D0070E1B2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F05492F07291B0070E1B2 /* Icon.png */; };
-		7F9F05862F07291D0070E1B2 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054A2F07291B0070E1B2 /* Style.css */; };
-		7F9F05872F07291D0070E1B2 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054A2F07291B0070E1B2 /* Style.css */; };
-		7F9F05882F07291D0070E1B2 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054B2F07291B0070E1B2 /* Script.js */; };
-		7F9F05892F07291D0070E1B2 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054B2F07291B0070E1B2 /* Script.js */; };
 		7F9F058B2F07291D0070E1B2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9F054C2F07291B0070E1B2 /* ViewController.swift */; };
 		7F9F058C2F07291D0070E1B2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054D2F07291C0070E1B2 /* Assets.xcassets */; };
 		7F9F058D2F07291D0070E1B2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F9F054D2F07291C0070E1B2 /* Assets.xcassets */; };
@@ -104,10 +96,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7F9F05482F07291B0070E1B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
-		7F9F05492F07291B0070E1B2 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
-		7F9F054A2F07291B0070E1B2 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
-		7F9F054B2F07291B0070E1B2 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
 		7F9F054C2F07291B0070E1B2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		7F9F054D2F07291C0070E1B2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7F9F054F2F07291C0070E1B2 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
@@ -188,29 +176,17 @@
 			);
 			sourceTree = "<group>";
 		};
-		7F9F05452F07291B0070E1B2 /* Shared (App) */ = {
-			isa = PBXGroup;
-			children = (
-				7F9F054C2F07291B0070E1B2 /* ViewController.swift */,
-				7FABC0072F07700000000001 /* MainSettingsView.swift */,
-				7FABC00A2F07800000000001 /* PrivacyInfo.xcprivacy */,
-				7F9F054D2F07291C0070E1B2 /* Assets.xcassets */,
-				7F9F05462F07291B0070E1B2 /* Resources */,
-			);
-			path = "Shared (App)";
-			sourceTree = "<group>";
-		};
-		7F9F05462F07291B0070E1B2 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				7F9F05472F07291B0070E1B2 /* Main.html */,
-				7F9F05492F07291B0070E1B2 /* Icon.png */,
-				7F9F054A2F07291B0070E1B2 /* Style.css */,
-				7F9F054B2F07291B0070E1B2 /* Script.js */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
+			7F9F05452F07291B0070E1B2 /* Shared (App) */ = {
+				isa = PBXGroup;
+				children = (
+					7F9F054C2F07291B0070E1B2 /* ViewController.swift */,
+					7FABC0072F07700000000001 /* MainSettingsView.swift */,
+					7FABC00A2F07800000000001 /* PrivacyInfo.xcprivacy */,
+					7F9F054D2F07291C0070E1B2 /* Assets.xcassets */,
+				);
+				path = "Shared (App)";
+				sourceTree = "<group>";
+			};
 		7F9F054E2F07291C0070E1B2 /* Shared (Extension) */ = {
 			isa = PBXGroup;
 			children = (
@@ -421,35 +397,27 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		7F9F05522F07291C0070E1B2 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7F9F05842F07291D0070E1B2 /* Icon.png in Resources */,
-				7F9F055D2F07291D0070E1B2 /* LaunchScreen.storyboard in Resources */,
-				7F9F05822F07291D0070E1B2 /* Main.html in Resources */,
-				7F9F05882F07291D0070E1B2 /* Script.js in Resources */,
-				7F9F058C2F07291D0070E1B2 /* Assets.xcassets in Resources */,
-				7F9F05602F07291D0070E1B2 /* Main.storyboard in Resources */,
-				7F9F05862F07291D0070E1B2 /* Style.css in Resources */,
-				7FABC0092F07800000000001 /* PrivacyInfo.xcprivacy in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7F9F05642F07291D0070E1B2 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7F9F05852F07291D0070E1B2 /* Icon.png in Resources */,
-				7F9F05872F07291D0070E1B2 /* Style.css in Resources */,
-				7F9F056C2F07291D0070E1B2 /* Main.storyboard in Resources */,
-				7F9F05892F07291D0070E1B2 /* Script.js in Resources */,
-				7F9F058D2F07291D0070E1B2 /* Assets.xcassets in Resources */,
-				7F9F05832F07291D0070E1B2 /* Main.html in Resources */,
-				7FABC00B2F07800000000002 /* PrivacyInfo.xcprivacy in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
+			7F9F05522F07291C0070E1B2 /* Resources */ = {
+				isa = PBXResourcesBuildPhase;
+				buildActionMask = 2147483647;
+				files = (
+					7F9F055D2F07291D0070E1B2 /* LaunchScreen.storyboard in Resources */,
+					7F9F058C2F07291D0070E1B2 /* Assets.xcassets in Resources */,
+					7F9F05602F07291D0070E1B2 /* Main.storyboard in Resources */,
+					7FABC0092F07800000000001 /* PrivacyInfo.xcprivacy in Resources */,
+				);
+				runOnlyForDeploymentPostprocessing = 0;
+			};
+			7F9F05642F07291D0070E1B2 /* Resources */ = {
+				isa = PBXResourcesBuildPhase;
+				buildActionMask = 2147483647;
+				files = (
+					7F9F056C2F07291D0070E1B2 /* Main.storyboard in Resources */,
+					7F9F058D2F07291D0070E1B2 /* Assets.xcassets in Resources */,
+					7FABC00B2F07800000000002 /* PrivacyInfo.xcprivacy in Resources */,
+				);
+				runOnlyForDeploymentPostprocessing = 0;
+			};
 		7F9F05702F07291D0070E1B2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -546,16 +514,8 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		7F9F05472F07291B0070E1B2 /* Main.html */ = {
-			isa = PBXVariantGroup;
-			children = (
-				7F9F05482F07291B0070E1B2 /* Base */,
-			);
-			name = Main.html;
-			sourceTree = "<group>";
-		};
-		7F9F055B2F07291D0070E1B2 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
+			7F9F055B2F07291D0070E1B2 /* LaunchScreen.storyboard */ = {
+				isa = PBXVariantGroup;
 			children = (
 				7F9F055C2F07291D0070E1B2 /* Base */,
 			);
@@ -769,7 +729,7 @@
 		7F9F05972F07291D0070E1B2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconiOS;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
@@ -811,7 +771,7 @@
 		7F9F05982F07291D0070E1B2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIconiOS;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
@@ -976,7 +936,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Cat Scratches.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = Q26G342EEL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;

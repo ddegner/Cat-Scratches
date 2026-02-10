@@ -90,14 +90,6 @@
             padding-bottom: 24px;
         }
 
-        .advanced-only {
-            display: none;
-        }
-
-        body[data-settings-view="advanced"] .advanced-only {
-            display: block;
-        }
-
         .section h2 {
             font-size: 20px;
             font-weight: 600;
@@ -518,6 +510,64 @@
             text-align: right;
             margin-bottom: 8px;
         }
+
+        .advanced-accordion {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            background: #fbfbfc;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .advanced-accordion {
+                border-color: #2a2a2e;
+                background: #121214;
+            }
+        }
+
+        .advanced-accordion summary {
+            cursor: pointer;
+            padding: 18px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            list-style: none;
+        }
+
+        .advanced-accordion summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .advanced-accordion summary::after {
+            content: "Show";
+            font-size: 13px;
+            font-weight: 500;
+            color: #666666;
+        }
+
+        .advanced-accordion[open] summary::after {
+            content: "Hide";
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .advanced-accordion summary::after {
+                color: #a1a1aa;
+            }
+        }
+
+        .advanced-accordion-content {
+            padding: 0 24px 24px 24px;
+            border-top: 1px solid #ececec;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .advanced-accordion-content {
+                border-top-color: #2a2a2e;
+            }
+        }
     </style>
 </head>
 
@@ -533,19 +583,6 @@
         </div>
 
         <div class="content">
-            <div class="section section-compact">
-                <h2>Settings View</h2>
-                <div class="form-group">
-                    <div class="segmented-control">
-                        <input type="radio" name="settingsView" value="basic" id="viewBasic" checked>
-                        <label for="viewBasic"><span>Basic</span></label>
-                        <input type="radio" name="settingsView" value="advanced" id="viewAdvanced">
-                        <label for="viewAdvanced"><span>Advanced</span></label>
-                    </div>
-                    <div class="help-text">Advanced includes custom selectors and Selector Finder.</div>
-                </div>
-            </div>
-
             <!-- Destination Section -->
             <div class="section">
                 <h2>Where to send clips</h2>
@@ -573,14 +610,34 @@
 
 
 
-            <!-- Content Extraction Section -->
-            <div class="section advanced-only">
-                <h2>What to capture</h2>
+            <!-- Output Format Section -->
+            <div class="section">
+                <h2>How to format drafts</h2>
 
                 <div class="form-group">
-                    <label for="contentSelectors">Where to find article text (CSS selectors)</label>
-                    <textarea id="contentSelectors"
-                        placeholder="Enter CSS selectors to find article content, one per line">[itemtype*="Article"]
+                    <label for="defaultTag">Default Tag</label>
+                    <input type="text" id="defaultTag" placeholder="e.g., reading, web, article">
+                </div>
+
+                <div class="form-group">
+                    <label for="template">Template</label>
+                    <textarea id="template"
+                        placeholder="Use placeholders: {title}, {url}, {content}, {timestamp}, {tag}"></textarea>
+                    <div id="placeholderTags" class="placeholder-tags"></div>
+                </div>
+            </div>
+
+            <details class="advanced-accordion" id="advancedSettingsAccordion">
+                <summary>Advanced Settings</summary>
+                <div class="advanced-accordion-content">
+                    <!-- Content Extraction Section -->
+                    <div class="section">
+                        <h2>What to capture</h2>
+
+                        <div class="form-group">
+                            <label for="contentSelectors">Where to find article text (CSS selectors)</label>
+                            <textarea id="contentSelectors"
+                                placeholder="Enter CSS selectors to find article content, one per line">[itemtype*="Article"]
 [itemtype*="BlogPosting"]
 [itemtype*="NewsArticle"]
 article[role="main"]
@@ -604,11 +661,11 @@ main
 .post
 .entry
 .article</textarea>
-                </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="customFilters">What to ignore (CSS selectors)</label>
-                    <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line">img
+                        <div class="form-group">
+                            <label for="customFilters">What to ignore (CSS selectors)</label>
+                            <textarea id="customFilters" placeholder="Enter CSS selectors for elements to remove, one per line">img
 picture
 figure
 figcaption
@@ -755,73 +812,53 @@ form
 .invisible
 .meta
 #outbrain</textarea>
-                </div>
-
-
-            </div>
-
-            <!-- Output Format Section -->
-            <div class="section">
-                <h2>How to format drafts</h2>
-
-                <div class="form-group">
-                    <label for="defaultTag">Default Tag</label>
-                    <input type="text" id="defaultTag" placeholder="e.g., reading, web, article">
-                </div>
-
-                <div class="form-group">
-                    <label for="template">Template</label>
-                    <textarea id="template"
-                        placeholder="Use placeholders: {title}, {url}, {content}, {timestamp}, {tag}"></textarea>
-                    <div id="placeholderTags" class="placeholder-tags"></div>
-                </div>
-            </div>
-
-
-
-            <!-- Selector Finder Section -->
-            <div class="section advanced-only">
-                <h2>Selector Finder</h2>
-                <div class="help-text" style="margin-bottom: 16px;">Analyze a web page to find the best CSS selectors
-                    for extracting article content.</div>
-
-                <div class="form-group">
-                    <label for="finderUrl">Article URL</label>
-                    <input type="url" id="finderUrl" placeholder="https://example.com/article">
-                </div>
-
-                <button class="button button-primary" id="analyzeBtn">Analyze Page</button>
-
-                <div class="finder-loading" id="finderLoading">
-                    <div class="spinner"></div>
-                    <span>Analyzing page structure...</span>
-                </div>
-
-                <div class="status-message error" id="finderError" style="margin-top: 16px;"></div>
-
-                <div class="finder-results" id="finderResults">
-                    <div class="form-group" style="margin-top: 24px;">
-                        <label>Found Content Selector</label>
-                        <div class="finder-selectors" id="foundContentSelector"></div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Found elements to ignore</label>
-                        <div class="finder-selectors" id="foundElementsToRemove" style="white-space: pre-wrap;"></div>
-                    </div>
+                    <!-- Selector Finder Section -->
+                    <div class="section">
+                        <h2>Selector Finder</h2>
+                        <div class="help-text" style="margin-bottom: 16px;">Analyze a web page to find the best CSS selectors
+                            for extracting article content.</div>
 
-                    <div class="form-group">
-                        <label>Extraction Preview</label>
-                        <div class="preview-content" id="finderPreview"></div>
-                    </div>
+                        <div class="form-group">
+                            <label for="finderUrl">Article URL</label>
+                            <input type="url" id="finderUrl" placeholder="https://example.com/article">
+                        </div>
 
-                    <button class="button button-primary" id="addSelectorsBtn">Add to Current Selectors</button>
+                        <button class="button button-primary" id="analyzeBtn">Analyze Page</button>
+
+                        <div class="finder-loading" id="finderLoading">
+                            <div class="spinner"></div>
+                            <span>Analyzing page structure...</span>
+                        </div>
+
+                        <div class="status-message error" id="finderError" style="margin-top: 16px;"></div>
+
+                        <div class="finder-results" id="finderResults">
+                            <div class="form-group" style="margin-top: 24px;">
+                                <label>Found Content Selector</label>
+                                <div class="finder-selectors" id="foundContentSelector"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Found elements to ignore</label>
+                                <div class="finder-selectors" id="foundElementsToRemove" style="white-space: pre-wrap;"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Extraction Preview</label>
+                                <div class="preview-content" id="finderPreview"></div>
+                            </div>
+
+                            <button class="button button-primary" id="addSelectorsBtn">Add to Current Selectors</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </details>
 
             <!-- Actions -->
             <div class="status-message" id="statusMessage"></div>
-            <div class="help-text save-model-note">Changes are applied when you click Save Settings.</div>
             <div class="button-group">
                 <button class="button button-danger" id="resetSettings">Reset to Defaults</button>
                 <button class="button" id="saveSettings" disabled>Save Settings</button>

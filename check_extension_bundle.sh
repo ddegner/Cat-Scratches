@@ -6,7 +6,7 @@
 echo "🔍 Checking Cat Scratches extension bundle..."
 
 # Find the most recent built extension (sort by modification time)
-EXTENSION_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "Cat Scratches Extension.appex" -path "*SafariToDrafts*" -not -path "*/Index.noindex/*" 2>/dev/null | while read -r path; do
+EXTENSION_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "Cat Scratches Extension.appex" -not -path "*/Index.noindex/*" 2>/dev/null | while read -r path; do
     echo "$(stat -f %m "$path") $path"
 done | sort -nr | head -1 | cut -d' ' -f2-)
 
@@ -19,9 +19,13 @@ fi
 echo "📦 Found extension at: $EXTENSION_PATH"
 echo ""
 
-RESOURCES_PATH="$EXTENSION_PATH/Contents/Resources"
-
-if [ ! -d "$RESOURCES_PATH" ]; then
+# macOS extension bundles place resources in Contents/Resources.
+# iOS extension bundles place resources at the bundle root.
+if [ -d "$EXTENSION_PATH/Contents/Resources" ]; then
+    RESOURCES_PATH="$EXTENSION_PATH/Contents/Resources"
+elif [ -f "$EXTENSION_PATH/manifest.json" ]; then
+    RESOURCES_PATH="$EXTENSION_PATH"
+else
     echo "❌ Resources directory not found in extension bundle"
     exit 1
 fi
