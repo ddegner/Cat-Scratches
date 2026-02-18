@@ -2,12 +2,13 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
-## [2.1] - 2026-02-08
+## [2.0.2] - 2026-02-15
 
 ### Added
 - Shared settings storage module (`settings-store.js`) used by both background and settings pages
 - Basic/Advanced view toggle for extension settings to reduce default UI complexity
 - Worker response now includes raw page HTML for selector preview generation
+- Direct iOS link path to Safari extension settings for iOS 26.2 behavior
 
 ### Changed
 - Refactored extension settings loading/saving to use shared storage helpers (iCloud first, local cache fallback)
@@ -17,6 +18,7 @@ All notable changes to Cat Scratches will be documented in this file.
 - Updated extension bundle verification script to check current required resource files
 - Added `settings-store.js` to Xcode project resources for iOS/macOS extension targets
 - Tightened extension page CSP `connect-src` to the selector worker endpoint instead of broad `https/http`
+- Removed `host_permissions` from extension manifest while preserving capture behavior through the selector worker/native extraction pipeline
 
 ### Fixed
 - Preserved user-selected destination on extension updates (instead of always resetting during install/update flow)

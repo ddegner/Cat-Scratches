@@ -1,4 +1,23 @@
-# Cat Scratches App Store Release Kit (February 9, 2026)
+# Cat Scratches App Store Release Kit (February 15, 2026)
+
+## 0) Change Review Since Last App Store Submission (`v2.0.1`)
+
+### User-facing updates included in this submission
+- Native macOS app setup screen simplified (single action flow + consolidated Help section)
+- Extension settings UI simplified with Basic/Advanced mode and explicit save behavior
+- Extension settings language updated to outcome-focused labels ("Where to send clips", "What to capture", "What to ignore")
+- iOS app includes updated deep link handling for Safari extension settings on iOS 26.2
+
+### Reliability and migration updates
+- Shared extension settings storage module now used by background and settings pages
+- Destination selection persistence hardened across updates
+- Legacy template migration and token replacement behavior improved
+- Selector handling hardened by validating selectors before filter/remove operations
+- Selector preview no longer depends on cross-origin fetch from settings page (uses worker-returned HTML)
+
+### Permissions and security posture
+- Extension `host_permissions` removed for lower requested permissions
+- Extension settings CSP narrowed for `connect-src` to the selector worker endpoint
 
 ## 1) Review Findings (Past 3 Days)
 
@@ -49,7 +68,7 @@ Use it to:
 How it works:
 1. Enable the Cat Scratches Safari extension
 2. Open any page in Safari
-3. Run Cat Scratches from the extensions menu
+3. Run Cat Scratches from the menu bar or keyboard shortcut
 4. Continue writing in Drafts or another app via Share Sheet
 
 Cat Scratches is built for writers, researchers, and anyone who wants a fast, clean web clipping workflow.`
@@ -96,9 +115,9 @@ Expected behavior:
 
 - Streamlined settings and help flow in the app
 - Unified extension settings storage with iCloud + local fallback
-- Improved long-content handling before sending to Drafts
-- Updated extension settings UI with cleaner advanced controls
-- Removed legacy resources and old destination paths`
+- Simplified extension settings with Basic/Advanced views and explicit save state
+- Improved migration for older saved settings and template formats
+- Lower requested extension permissions by removing host permissions`
 
 ### Description (if you want to refresh macOS listing)
 `Cat Scratches is a Safari companion that clips web content into Drafts in seconds.
@@ -123,28 +142,20 @@ Expected behavior:
 
 ---
 
-## 3) Final Screenshot Set (v5, recommended)
+## 3) Screenshot Set for Submission
 
-> Simulator note: iPhone simulator install of Drafts failed code-sign validation. iPad simulator has Drafts installed, but Cat Scratches still reports “Not Detected” in simulator. Screenshots reflect real simulator behavior.
+### macOS App Store-ready (2880 x 1800)
+1. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v6/macos/macos-flow-v6-01.png`
+2. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v6/macos/macos-flow-v6-02.png`
+3. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v6/macos/macos-flow-v6-04-source-to-drafts.png`
+4. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v6/macos/macos-flow-v6-03.png`
 
-## iPhone 6.9" (1320 x 2868)
-1. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/iphone-flow-v5-01.png`
-2. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/iphone-flow-v5-02.png`
-3. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/iphone-flow-v5-03.png`
-4. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/iphone-flow-v5-04.png`
-5. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/iphone-flow-v5-05.png`
-
-## iPad 13" (2064 x 2752)
-1. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/ipad-flow-v5-01.png`
-2. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/ipad-flow-v5-02.png`
-3. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/ipad-flow-v5-03.png`
-4. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/ipad-flow-v5-04.png`
-5. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/ios/ipad-flow-v5-05.png`
-
-## macOS (2880 x 1800)
-1. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/macos/macos-flow-v5-01.png`
-2. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/macos/macos-flow-v5-02.png`
-3. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/final-flow-v5/macos/macos-flow-v5-03.png`
+### iOS (latest raw capture set)
+1. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/raw/ios/IMG_1849.PNG`
+2. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/raw/ios/IMG_1850.PNG`
+3. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/raw/ios/IMG_1851.PNG`
+4. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/raw/ios/IMG_1852.PNG`
+5. `/Users/degner/Documents/GitHub/SafariToDrafts/app-store-assets/screenshots/raw/ios/IMG_1853.PNG`
 
 ---
 

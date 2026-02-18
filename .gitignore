@@ -1,2 +1,12 @@
-SafariToDrafts/.DS_Store
+# macOS
 .DS_Store
+
+# Xcode user-specific state
+**/xcuserdata/
+**/*.xcuserstate
+
+# Local build/distribution outputs
+dist/
+
+# App Store media artifacts (kept local, not versioned)
+app-store-assets/screenshots/
