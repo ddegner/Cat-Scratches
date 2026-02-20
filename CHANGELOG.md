@@ -2,6 +2,20 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [2.1.0] - 2026-02-20
+
+### Added
+- Advanced Drafts URL Scheme controls in extension settings with `Create URL` and `Action URL` modes
+- Configurable Drafts action name for post-processing captured content in Drafts
+
+### Changed
+- Drafts capture pipeline now supports both `drafts://x-callback-url/create` and `drafts://x-callback-url/runAction`
+- `Create URL` mode can optionally run a Drafts action while preserving tag support
+- Updated Advanced settings UI so the Drafts action field is always visible and the URL mode toggle matches the main segmented control style
+
+### Fixed
+- Removed an extra divider before Advanced Settings in the extension settings layout
+
 ## [2.0.2] - 2026-02-15
 
 ### Added

@@ -332,6 +332,10 @@
       template: '# {title}\n\n<{url}>\n\n---\n\n{content}',
       defaultTag: ''
     },
+    draftsURL: {
+      mode: 'create', // 'create' or 'runAction'
+      actionName: ''
+    },
     advancedFiltering: {
       customFilters: unique(BASE_FILTERS),
       minContentLength: 150,
@@ -356,6 +360,7 @@
     // Ensure all top-level structures exist by merging with defaults
     settings.contentExtraction = settings.contentExtraction || {};
     settings.outputFormat = settings.outputFormat || {};
+    settings.draftsURL = settings.draftsURL || {};
     settings.advancedFiltering = settings.advancedFiltering || {};
 
     // Merge contentExtraction with defaults
@@ -375,6 +380,15 @@
     if (settings.outputFormat.defaultTag === undefined) {
       settings.outputFormat.defaultTag = defaults.outputFormat.defaultTag;
     }
+
+    // Ensure drafts URL mode and action name exist.
+    if (!['create', 'runAction'].includes(settings.draftsURL.mode)) {
+      settings.draftsURL.mode = defaults.draftsURL.mode;
+    }
+    if (typeof settings.draftsURL.actionName !== 'string') {
+      settings.draftsURL.actionName = defaults.draftsURL.actionName;
+    }
+    settings.draftsURL.actionName = settings.draftsURL.actionName.trim();
 
     // Migrate removed legacy destination and normalize invalid values.
     if (settings.saveDestination === 'notes') {

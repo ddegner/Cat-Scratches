@@ -275,7 +275,20 @@ function getEncodedDraftTags(settings) {
     return encodeURIComponent(tags.join(','));
 }
 
-function buildDraftsCreateURL(draftContent, encodedTags) {
+function getDraftsURLMode(settings) {
+    return settings?.draftsURL?.mode === 'runAction' ? 'runAction' : 'create';
+}
+
+function getEncodedDraftAction(settings) {
+    const actionName = settings?.draftsURL?.actionName;
+    if (!actionName || !actionName.trim()) {
+        return '';
+    }
+
+    return encodeURIComponent(actionName.trim());
+}
+
+function buildDraftsCreateURL(draftContent, encodedTags, encodedAction) {
     const encodedContent = encodeURIComponent(draftContent);
     let draftsURL = `drafts://x-callback-url/create?text=${encodedContent}`;
 
@@ -283,7 +296,30 @@ function buildDraftsCreateURL(draftContent, encodedTags) {
         draftsURL += `&tag=${encodedTags}`;
     }
 
+    if (encodedAction) {
+        draftsURL += `&action=${encodedAction}`;
+    }
+
     return draftsURL;
+}
+
+function buildDraftsRunActionURL(draftContent, encodedAction) {
+    const encodedContent = encodeURIComponent(draftContent);
+    let draftsURL = `drafts://x-callback-url/runAction?text=${encodedContent}`;
+
+    if (encodedAction) {
+        draftsURL += `&action=${encodedAction}`;
+    }
+
+    return draftsURL;
+}
+
+function buildDraftsURL(draftContent, encodedTags, draftsURLMode, encodedAction) {
+    if (draftsURLMode === 'runAction') {
+        return buildDraftsRunActionURL(draftContent, encodedAction);
+    }
+
+    return buildDraftsCreateURL(draftContent, encodedTags, encodedAction);
 }
 
 function truncateToCodePointBoundary(text, maxLength) {
@@ -302,8 +338,8 @@ function truncateToCodePointBoundary(text, maxLength) {
     return truncated;
 }
 
-function buildMaxLengthDraftsURL(draftContent, encodedTags, maxURLLength) {
-    const fullURL = buildDraftsCreateURL(draftContent, encodedTags);
+function buildMaxLengthDraftsURL(draftContent, encodedTags, maxURLLength, draftsURLMode, encodedAction) {
+    const fullURL = buildDraftsURL(draftContent, encodedTags, draftsURLMode, encodedAction);
     if (fullURL.length <= maxURLLength) {
         return { url: fullURL, wasTruncated: false };
     }
@@ -315,7 +351,7 @@ function buildMaxLengthDraftsURL(draftContent, encodedTags, maxURLLength) {
     while (low <= high) {
         const mid = Math.floor((low + high) / 2);
         const candidateContent = truncateToCodePointBoundary(draftContent, mid);
-        const candidateURL = buildDraftsCreateURL(candidateContent, encodedTags);
+        const candidateURL = buildDraftsURL(candidateContent, encodedTags, draftsURLMode, encodedAction);
 
         if (candidateURL.length <= maxURLLength) {
             bestURL = candidateURL;
@@ -336,8 +372,22 @@ async function sendToDrafts(title, url, markdownBody) {
     // Format draft content using settings (from defaults.js)
     const draftContent = formatDraftContent(title, url, markdownBody, extensionSettings);
     const encodedTags = getEncodedDraftTags(extensionSettings);
+    const encodedAction = getEncodedDraftAction(extensionSettings);
+    const draftsURLMode = getDraftsURLMode(extensionSettings);
     const MAX_URL_LENGTH = 65000;
-    const result = buildMaxLengthDraftsURL(draftContent, encodedTags, MAX_URL_LENGTH);
+
+    if (draftsURLMode === 'runAction' && !encodedAction) {
+        await showDraftsActionRequiredError();
+        return;
+    }
+
+    const result = buildMaxLengthDraftsURL(
+        draftContent,
+        encodedTags,
+        MAX_URL_LENGTH,
+        draftsURLMode,
+        encodedAction
+    );
 
     if (!result) {
         await showContentTooLargeError('Drafts');
@@ -379,6 +429,22 @@ async function invokeShareSheet(title, url, markdownBody) {
         }
     } catch (error) {
         console.error("Failed to share:", error);
+    }
+}
+
+async function showDraftsActionRequiredError() {
+    try {
+        const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+        if (activeTab?.id) {
+            await browser.scripting.executeScript({
+                target: { tabId: activeTab.id },
+                func: () => {
+                    alert('Cat Scratches Error: Action URL mode requires a Drafts Action Name in Advanced Settings.');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Could not show Drafts action required error:', error);
     }
 }
 

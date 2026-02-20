@@ -107,6 +107,10 @@ function setupEventListeners() {
 
     // Advanced filtering inputs
     document.getElementById('customFilters').addEventListener('input', updateAdvancedFilteringFromUI);
+    document.querySelectorAll('input[name="draftsUrlMode"]').forEach((input) => {
+        input.addEventListener('change', updateDraftsURLFromUI);
+    });
+    document.getElementById('draftsActionName').addEventListener('input', updateDraftsActionFromUI);
 
     // Action buttons
     document.getElementById('saveSettings').addEventListener('click', handleSaveSettings);
@@ -130,6 +134,17 @@ function updateUI() {
     // Output format
     document.getElementById('template').value = currentSettings.outputFormat.template || '';
     document.getElementById('defaultTag').value = currentSettings.outputFormat.defaultTag || '';
+
+    // Drafts URL scheme
+    const draftsMode = currentSettings?.draftsURL?.mode === 'runAction' ? 'runAction' : 'create';
+    const draftsUrlCreate = document.getElementById('draftsUrlCreate');
+    const draftsUrlRunAction = document.getElementById('draftsUrlRunAction');
+    if (draftsUrlCreate && draftsUrlRunAction) {
+        draftsUrlCreate.checked = draftsMode === 'create';
+        draftsUrlRunAction.checked = draftsMode === 'runAction';
+    }
+    document.getElementById('draftsActionName').value = currentSettings?.draftsURL?.actionName || '';
+    updateDraftsActionVisibility(draftsMode);
 
     // Advanced filtering
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
@@ -194,6 +209,38 @@ function updateOutputFormatFromUI() {
     setDirtyState(true);
 }
 
+// Update Drafts URL mode from UI
+function updateDraftsURLFromUI() {
+    const selected = document.querySelector('input[name="draftsUrlMode"]:checked');
+    const mode = selected?.value === 'runAction' ? 'runAction' : 'create';
+
+    currentSettings.draftsURL = currentSettings.draftsURL || {};
+    currentSettings.draftsURL.mode = mode;
+    updateDraftsActionVisibility(mode);
+    setDirtyState(true);
+}
+
+// Update Drafts action name from UI
+function updateDraftsActionFromUI() {
+    currentSettings.draftsURL = currentSettings.draftsURL || {};
+    currentSettings.draftsURL.actionName = document.getElementById('draftsActionName').value.trim();
+    setDirtyState(true);
+}
+
+function updateDraftsActionVisibility(mode) {
+    const resolvedMode = mode === 'runAction' ? 'runAction' : 'create';
+    const actionGroup = document.getElementById('draftsActionNameGroup');
+    const actionInput = document.getElementById('draftsActionName');
+
+    if (actionGroup) {
+        actionGroup.style.display = 'block';
+    }
+
+    if (actionInput) {
+        actionInput.required = resolvedMode === 'runAction';
+    }
+}
+
 // Update advanced filtering from UI
 function updateAdvancedFilteringFromUI() {
     const customFilters = document.getElementById('customFilters').value
@@ -247,6 +294,13 @@ function validateSettings() {
     const linkRatio = currentSettings.advancedFiltering.maxLinkRatio;
     if (linkRatio < 0 || linkRatio > 1 || isNaN(linkRatio)) {
         showStatus('Link ratio must be between 0 and 1', 'error');
+        return false;
+    }
+
+    const draftsMode = currentSettings?.draftsURL?.mode === 'runAction' ? 'runAction' : 'create';
+    const actionName = (currentSettings?.draftsURL?.actionName || '').trim();
+    if (currentSettings.saveDestination === 'drafts' && draftsMode === 'runAction' && !actionName) {
+        showStatus('Drafts Action Name is required when Action URL is selected.', 'error');
         return false;
     }
 

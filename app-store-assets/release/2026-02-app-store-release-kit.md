@@ -99,9 +99,9 @@ Expected behavior:
 - If Drafts is not installed, content is sent via Share Sheet fallback.`
 
 ### Support / Marketing / Privacy URLs
-- Support URL: `https://github.com/ddegner/Cat-Scratches`
+- Support URL: `https://github.com/ddegner/cat-scratches`
 - Marketing URL: `https://www.daviddegner.com`
-- Privacy Policy URL: `https://github.com/ddegner/Cat-Scratches/blob/main/PRIVACY_POLICY.md`
+- Privacy Policy URL: `https://github.com/ddegner/cat-scratches/blob/main/PRIVACY_POLICY.md`
 
 ---
 

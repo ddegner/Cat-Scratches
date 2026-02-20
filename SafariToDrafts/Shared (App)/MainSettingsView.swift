@@ -174,7 +174,7 @@ struct MainSettingsView: View {
 
             // Connect Section
             Section {
-                Link(destination: URL(string: "https://github.com/ddegner/Cat-Scratches")!) {
+                Link(destination: URL(string: "https://github.com/ddegner/cat-scratches")!) {
                     SettingsLinkRow(
                         icon: "chevron.left.forwardslash.chevron.right",
                         title: "View on GitHub"

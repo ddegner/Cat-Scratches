@@ -4,24 +4,26 @@ The fastest and most elegant way to capture content from the web and send it dir
 
 **Author:** David Degner
 **Website:** [daviddegner.com](https://www.daviddegner.com)
-**Source Code, bugs, and feature requests:** [github.com/ddegner/Cat-Scratches](https://github.com/ddegner/Cat-Scratches)
+**Source Code, bugs, and feature requests:** [github.com/ddegner/cat-scratches](https://github.com/ddegner/cat-scratches)
 
-## App Store Update (v2.0.2)
+## App Store Update (v2.1.0)
 
 Over the past month, I have been improving Cat Scratches in many small but important ways.
 
 I use it daily to save articles for later, send clean text to Drafts for AI actions, and capture readable content from cluttered pages.
 
-Version 2.0.2 is now available in the App Store:
+Version 2.1.0 is now available in the App Store:
 [Cat Scratches on the App Store](https://apps.apple.com/us/app/cat-scratches/id6749605278)
 
 The macOS extension is still here, and its update should be approved soon:
 [Cat Scratches for macOS](https://apps.apple.com/us/app/cat-scratches/id6749605278)
 
+New in this update: Advanced settings now include a Drafts URL Scheme toggle (`Create URL` or `Action URL`) plus a Drafts action field, so you can run post-processing actions from Drafts.
+
 One useful feature: if a page is not parsing correctly, enter its URL under the Advanced tab to get new parsing suggestions.
 
 If you run into issues or want to tinker, the source is here:
-[Cat Scratches on GitHub](https://github.com/ddegner/Cat-Scratches/tree/main)
+[Cat Scratches on GitHub](https://github.com/ddegner/cat-scratches/tree/main)
 
 - David
 
@@ -134,7 +136,7 @@ Your captured content here, perfectly formatted in Markdown...
 
 ## 📞 Support
 
-For bug reports, feature requests, or contributions, please visit our [GitHub repository](https://github.com/ddegner/Cat-Scratches).
+For bug reports, feature requests, or contributions, please visit our [GitHub repository](https://github.com/ddegner/cat-scratches).
 
 **Author:** David Degner
 **Website:** https://www.daviddegner.com
