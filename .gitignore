@@ -10,3 +10,8 @@ dist/
 
 # App Store media artifacts (kept local, not versioned)
 app-store-assets/screenshots/
+
+# Never commit credential/private key material
+*.p8
+private_keys/
+.appstoreconnect/

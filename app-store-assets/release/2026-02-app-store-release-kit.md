@@ -202,6 +202,11 @@ Expected behavior:
    - Watch for “Missing Compliance” or metadata warnings.
    - Respond quickly to reviewer questions.
 
+10. **GitHub release artifact policy**
+   - Upload only a macOS binary asset to GitHub releases.
+   - The macOS GitHub asset must be Developer ID signed, notarized, and stapled.
+   - Do not upload iOS binaries to GitHub release assets.
+
 ---
 
 ## 5) Launch & Growth Plan (Practical)

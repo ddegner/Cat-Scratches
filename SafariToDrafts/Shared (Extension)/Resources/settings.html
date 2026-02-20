@@ -92,8 +92,12 @@
 
         .section-no-divider {
             border-bottom: none;
-            margin-bottom: 24px;
-            padding-bottom: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+
+        .section-no-divider .form-group:last-child {
+            margin-bottom: 0;
         }
 
         .section h2 {
@@ -163,6 +167,12 @@
             line-height: 1.5;
         }
 
+        #template {
+            min-height: 178px;
+            resize: none;
+            overflow-y: hidden;
+        }
+
         .form-group .help-text {
             font-size: 13px;
             color: #666666;
@@ -191,6 +201,7 @@
             border: 1px solid #e5e7eb;
             font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
             font-size: 12px;
+            font-weight: 400;
             color: #374151;
             cursor: pointer;
             user-select: none;
@@ -209,6 +220,106 @@
 
             .placeholder-tag:hover {
                 background: #374151;
+            }
+        }
+
+        .accordion {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fbfbfc;
+        }
+
+        .accordion summary {
+            cursor: pointer;
+            padding: 14px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+            color: #374151;
+            user-select: none;
+        }
+
+        .accordion summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .accordion summary::before {
+            content: "▸";
+            font-size: 14px;
+            line-height: 1;
+            color: #666666;
+            transform-origin: 45% 50%;
+            transition: transform 0.15s ease;
+        }
+
+        .accordion[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        .accordion-content {
+            padding: 0 24px 24px 24px;
+            border-top: 1px solid #ececec;
+        }
+
+        .accordion--placeholder {
+            margin-top: 8px;
+            border-color: #e5e7eb;
+            border-radius: 8px;
+            padding: 6px 8px;
+            background: #fafafa;
+        }
+
+        .accordion--placeholder summary {
+            padding: 0;
+        }
+
+        .accordion--placeholder[open] summary {
+            margin-bottom: 6px;
+        }
+
+        .accordion-content--placeholder {
+            padding: 0;
+            border-top: 0;
+        }
+
+        .placeholder-summary-tags {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 0;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .accordion--placeholder[open] .placeholder-summary-tags {
+            display: none;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .accordion {
+                border-color: #2a2a2e;
+                background: #121214;
+            }
+
+            .accordion summary {
+                color: #e5e7eb;
+            }
+
+            .accordion summary::before {
+                color: #a1a1aa;
+            }
+
+            .accordion-content {
+                border-top-color: #2a2a2e;
+            }
+
+            .accordion--placeholder {
+                border-color: #334155;
+                background: #111827;
             }
         }
 
@@ -517,62 +628,8 @@
             margin-bottom: 8px;
         }
 
-        .advanced-accordion {
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            overflow: hidden;
+        .accordion--advanced {
             margin-bottom: 40px;
-            background: #fbfbfc;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .advanced-accordion {
-                border-color: #2a2a2e;
-                background: #121214;
-            }
-        }
-
-        .advanced-accordion summary {
-            cursor: pointer;
-            padding: 18px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            list-style: none;
-        }
-
-        .advanced-accordion summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .advanced-accordion summary::after {
-            content: "Show";
-            font-size: 13px;
-            font-weight: 500;
-            color: #666666;
-        }
-
-        .advanced-accordion[open] summary::after {
-            content: "Hide";
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .advanced-accordion summary::after {
-                color: #a1a1aa;
-            }
-        }
-
-        .advanced-accordion-content {
-            padding: 0 24px 24px 24px;
-            border-top: 1px solid #ececec;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .advanced-accordion-content {
-                border-top-color: #2a2a2e;
-            }
         }
     </style>
 </head>
@@ -628,14 +685,21 @@
                 <div class="form-group">
                     <label for="template">Template</label>
                     <textarea id="template"
-                        placeholder="Use placeholders: {title}, {url}, {content}, {timestamp}, {tag}"></textarea>
-                    <div id="placeholderTags" class="placeholder-tags"></div>
+                        placeholder="Use placeholders: {title}, {url}, {content}, {timestamp}, {tag}. More date/time options are below."></textarea>
+                    <details class="accordion accordion--placeholder">
+                        <summary>
+                            <span id="collapsedPlaceholderTags" class="placeholder-tags placeholder-summary-tags"></span>
+                        </summary>
+                        <div class="accordion-content accordion-content--placeholder">
+                            <div id="expandedPlaceholderTags" class="placeholder-tags"></div>
+                        </div>
+                    </details>
                 </div>
             </div>
 
-            <details class="advanced-accordion" id="advancedSettingsAccordion">
+            <details class="accordion accordion--advanced" id="advancedSettingsAccordion">
                 <summary>Advanced Settings</summary>
-                <div class="advanced-accordion-content">
+                <div class="accordion-content">
                     <!-- Drafts URL Section -->
                     <div class="section">
                         <h2>Drafts URL Scheme</h2>
@@ -857,8 +921,8 @@ form
                             for extracting article content.</div>
 
                         <div class="form-group">
-                            <label for="finderUrl">Article URL</label>
-                            <input type="url" id="finderUrl" placeholder="https://example.com/article">
+                            <input type="url" id="finderUrl" aria-label="Article URL"
+                                placeholder="https://example.com/article">
                         </div>
 
                         <button class="button button-primary" id="analyzeBtn">Analyze Page</button>

@@ -26,17 +26,9 @@ let extensionSettings = null;
 // - browser.storage.sync is NOT used because Safari doesn't actually sync it across devices
 // ============================================================================
 
-const LOCAL_SETTINGS_KEY = (typeof SETTINGS_CACHE_KEY === 'string' && SETTINGS_CACHE_KEY)
-    ? SETTINGS_CACHE_KEY
-    : 'catScratchesSettings';
+const LOCAL_SETTINGS_KEY = SETTINGS_CACHE_KEY;
 
 async function loadSettingsFromStore() {
-    if (typeof loadCatScratchesSettings !== 'function') {
-        extensionSettings = getDefaultSettings();
-        console.error('loadCatScratchesSettings is unavailable; using defaults.');
-        return extensionSettings;
-    }
-
     const result = await loadCatScratchesSettings();
     extensionSettings = result.settings;
 
@@ -52,11 +44,6 @@ async function loadSettingsFromStore() {
 }
 
 async function saveSettingsToStore(settings) {
-    if (typeof saveCatScratchesSettings !== 'function') {
-        console.error('saveCatScratchesSettings is unavailable; settings were not persisted.');
-        return;
-    }
-
     const result = await saveCatScratchesSettings(settings);
     extensionSettings = result.settings;
 
@@ -76,11 +63,6 @@ browser.runtime.onInstalled.addListener(async (details) => {
     // Initialize with default settings on first install, or load from iCloud
     try {
         await loadSettingsFromStore();
-
-        // If we have no settings, initialize with defaults
-        if (!extensionSettings || Object.keys(extensionSettings).length === 0) {
-            extensionSettings = getDefaultSettings();
-        }
 
         // Only set default destination on first install (or if missing/invalid).
         // This preserves an existing user preference during extension updates.
@@ -276,7 +258,7 @@ function getEncodedDraftTags(settings) {
 }
 
 function getDraftsURLMode(settings) {
-    return settings?.draftsURL?.mode === 'runAction' ? 'runAction' : 'create';
+    return settings.draftsURL.mode;
 }
 
 function getEncodedDraftAction(settings) {

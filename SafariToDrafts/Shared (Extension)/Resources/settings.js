@@ -8,6 +8,7 @@ let currentSettings = {};
 let isDirty = false;
 
 const ADVANCED_ACCORDION_STORAGE_KEY = 'catScratches.advancedAccordionOpen';
+const PLACEHOLDER_TAGS = TEMPLATE_PLACEHOLDER_TAGS;
 
 // Initialize settings page
 document.addEventListener('DOMContentLoaded', async () => {
@@ -134,6 +135,7 @@ function updateUI() {
     // Output format
     document.getElementById('template').value = currentSettings.outputFormat.template || '';
     document.getElementById('defaultTag').value = currentSettings.outputFormat.defaultTag || '';
+    autoResizeTemplateTextarea();
 
     // Drafts URL scheme
     const draftsMode = currentSettings?.draftsURL?.mode === 'runAction' ? 'runAction' : 'create';
@@ -148,6 +150,13 @@ function updateUI() {
 
     // Advanced filtering
     document.getElementById('customFilters').value = currentSettings.advancedFiltering.customFilters.join('\n');
+}
+
+function autoResizeTemplateTextarea() {
+    const textarea = document.getElementById('template');
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
 }
 
 function initializeAdvancedAccordion() {
@@ -206,6 +215,7 @@ function updateContentSelectorsFromUI() {
 function updateOutputFormatFromUI() {
     currentSettings.outputFormat.template = document.getElementById('template').value;
     currentSettings.outputFormat.defaultTag = document.getElementById('defaultTag').value.trim();
+    autoResizeTemplateTextarea();
     setDirtyState(true);
 }
 
@@ -214,7 +224,6 @@ function updateDraftsURLFromUI() {
     const selected = document.querySelector('input[name="draftsUrlMode"]:checked');
     const mode = selected?.value === 'runAction' ? 'runAction' : 'create';
 
-    currentSettings.draftsURL = currentSettings.draftsURL || {};
     currentSettings.draftsURL.mode = mode;
     updateDraftsActionVisibility(mode);
     setDirtyState(true);
@@ -222,7 +231,6 @@ function updateDraftsURLFromUI() {
 
 // Update Drafts action name from UI
 function updateDraftsActionFromUI() {
-    currentSettings.draftsURL = currentSettings.draftsURL || {};
     currentSettings.draftsURL.actionName = document.getElementById('draftsActionName').value.trim();
     setDirtyState(true);
 }
@@ -334,27 +342,68 @@ function showStatus(message, type) {
 
 // Set up clickable placeholder tags to insert into template
 function setupPlaceholderTags() {
-    const container = document.getElementById('placeholderTags');
-    if (!container) return;
+    const collapsedContainer = document.getElementById('collapsedPlaceholderTags');
+    const expandedContainer = document.getElementById('expandedPlaceholderTags');
 
-    const placeholders = ['{title}', '{url}', '{content}', '{timestamp}', '{tag}'];
-    placeholders.forEach(ph => {
+    if (collapsedContainer) {
+        renderPlaceholderTags(collapsedContainer, PLACEHOLDER_TAGS.base);
+    }
+    if (expandedContainer) {
+        renderPlaceholderTags(expandedContainer, PLACEHOLDER_TAGS.all, getPlaceholderExampleMap(PLACEHOLDER_TAGS.extraTime));
+    }
+}
+
+function renderPlaceholderTags(container, placeholders, exampleMap = {}) {
+    if (!container) return;
+    container.textContent = '';
+    placeholders.forEach((placeholder) => {
         const el = document.createElement('span');
         el.className = 'placeholder-tag';
-        el.textContent = ph;
-        el.addEventListener('click', () => {
-            const textarea = document.getElementById('template');
-            if (!textarea) return;
-            const start = textarea.selectionStart || 0;
-            const end = textarea.selectionEnd || 0;
-            const value = textarea.value || '';
-            textarea.value = value.substring(0, start) + ph + value.substring(end);
-            textarea.dispatchEvent(new Event('input'));
-            textarea.focus();
-            textarea.selectionStart = textarea.selectionEnd = start + ph.length;
+        el.textContent = placeholder;
+        const example = exampleMap[placeholder];
+        if (example) {
+            el.title = `${placeholder} => ${example}`;
+            el.setAttribute('aria-label', `${placeholder}: ${example}`);
+        }
+        el.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            insertTemplatePlaceholder(placeholder);
         });
         container.appendChild(el);
     });
+}
+
+function insertTemplatePlaceholder(placeholder) {
+    const textarea = document.getElementById('template');
+    if (!textarea) return;
+    const start = textarea.selectionStart || 0;
+    const end = textarea.selectionEnd || 0;
+    const value = textarea.value || '';
+    textarea.value = value.substring(0, start) + placeholder + value.substring(end);
+    textarea.dispatchEvent(new Event('input'));
+    textarea.focus();
+    textarea.selectionStart = textarea.selectionEnd = start + placeholder.length;
+}
+
+function getPlaceholderExampleMap(placeholders) {
+    const delimiter = '\n';
+    const sampleTemplate = placeholders.join(delimiter);
+    const sampleSettings = {
+        outputFormat: {
+            template: sampleTemplate,
+            defaultTag: ''
+        }
+    };
+
+    const values = formatDraftContent('', '', '', sampleSettings)
+        .split(delimiter)
+        .map(value => value || '(empty)');
+
+    return placeholders.reduce((map, placeholder, index) => {
+        map[placeholder] = values[index];
+        return map;
+    }, {});
 }
 
 // Update destination from UI toggle
@@ -517,8 +566,8 @@ async function generatePreview(html, contentSelector, elementsToRemove, url) {
             },
             advancedFiltering: {
                 customFilters: elementsToRemove, // Use the found filters
-                minContentLength: currentSettings.advancedFiltering?.minContentLength || 150,
-                maxLinkRatio: currentSettings.advancedFiltering?.maxLinkRatio || 0.3
+                minContentLength: currentSettings.advancedFiltering.minContentLength,
+                maxLinkRatio: currentSettings.advancedFiltering.maxLinkRatio
             },
             outputFormat: currentSettings.outputFormat // Use current Output Format settings
         };

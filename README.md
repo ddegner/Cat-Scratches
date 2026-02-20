@@ -25,6 +25,8 @@ One useful feature: if a page is not parsing correctly, enter its URL under the 
 If you run into issues or want to tinker, the source is here:
 [Cat Scratches on GitHub](https://github.com/ddegner/cat-scratches/tree/main)
 
+GitHub release binaries are macOS-only: each release publishes one Developer ID-signed, notarized, stapled macOS zip. iOS binaries are distributed through TestFlight/App Store, not GitHub assets.
+
 - David
 
 ## 🚀 Features

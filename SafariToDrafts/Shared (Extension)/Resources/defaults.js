@@ -21,6 +21,20 @@
     get macURL() { return `https://apps.apple.com/app/id${this.macAppID}`; }
   };
 
+  const TEMPLATE_TOKENS = {
+    base: ['title', 'url', 'content', 'timestamp', 'tag'],
+    extraTime: ['date', 'time', 'datesort', 'timesort', 'year4', 'month0', 'day0', 'hour24', 'minute', 'dow3', 'gmtoffset']
+  };
+  TEMPLATE_TOKENS.all = [...TEMPLATE_TOKENS.base, ...TEMPLATE_TOKENS.extraTime];
+
+  const TEMPLATE_PLACEHOLDER_TAGS = {
+    base: TEMPLATE_TOKENS.base.map(token => `{${token}}`),
+    extraTime: TEMPLATE_TOKENS.extraTime.map(token => `{${token}}`)
+  };
+  TEMPLATE_PLACEHOLDER_TAGS.all = [...TEMPLATE_PLACEHOLDER_TAGS.base, ...TEMPLATE_PLACEHOLDER_TAGS.extraTime];
+
+  const TEMPLATE_TOKEN_RE = new RegExp(`\\{(${TEMPLATE_TOKENS.all.join('|')})\\}`, 'g');
+
   const BASE_SELECTORS = [
     '[itemtype*="Article"]',
     '[itemtype*="BlogPosting"]',
@@ -401,6 +415,46 @@
     return settings;
   }
 
+  function getTimezoneOffsetCompact(date) {
+    const offsetMinutes = -date.getTimezoneOffset();
+    const sign = offsetMinutes >= 0 ? '+' : '-';
+    const absolute = Math.abs(offsetMinutes);
+    const hours = String(Math.floor(absolute / 60)).padStart(2, '0');
+    const minutes = String(absolute % 60).padStart(2, '0');
+    return `${sign}${hours}${minutes}`;
+  }
+
+  function buildTemplateTokenValues(title, url, content, outputFormat, now = new Date()) {
+    const timestampISO = now.toISOString();
+    const defaultTag = outputFormat.defaultTag || '';
+    const year4 = String(now.getFullYear());
+    const month0 = String(now.getMonth() + 1).padStart(2, '0');
+    const day0 = String(now.getDate()).padStart(2, '0');
+    const hour24 = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    const dow3 = now.toLocaleDateString('en-US', { weekday: 'short' });
+
+    return {
+      title: String(title ?? ''),
+      url: String(url ?? ''),
+      content: String(content ?? ''),
+      timestamp: timestampISO,
+      date: `${year4}-${month0}-${day0}`,
+      time: `${hour24}:${minute}:${second}`,
+      datesort: `${year4}${month0}${day0}`,
+      timesort: `${hour24}${minute}${second}`,
+      year4,
+      month0,
+      day0,
+      hour24,
+      minute,
+      dow3,
+      gmtoffset: getTimezoneOffsetCompact(now),
+      tag: String(defaultTag)
+    };
+  }
+
   // Format draft content using unified template engine
   // Shared by background.js and settings.js (preview)
   function formatDraftContent(title, url, content, settings) {
@@ -411,17 +465,9 @@
     const outputFormat = settings?.outputFormat || DEFAULT_SETTINGS.outputFormat;
 
     const template = (outputFormat.template || '').trim() || DEFAULT_SETTINGS.outputFormat.template;
-    const timestampISO = new Date().toISOString();
-    const defaultTag = outputFormat.defaultTag || '';
-    const tokenValues = {
-      title: String(title ?? ''),
-      url: String(url ?? ''),
-      content: String(content ?? ''),
-      timestamp: timestampISO,
-      tag: String(defaultTag ?? '')
-    };
+    const tokenValues = buildTemplateTokenValues(title, url, content, outputFormat);
 
-    return template.replace(/\{(title|url|content|timestamp|tag)\}/g, (match, token) => {
+    return template.replace(TEMPLATE_TOKEN_RE, (match, token) => {
       return tokenValues[token] ?? match;
     });
   }
@@ -429,6 +475,7 @@
   // Expose globally for background and settings pages
   root.NATIVE_APP_ID = NATIVE_APP_ID;
   root.DRAFTS_APP_STORE = DRAFTS_APP_STORE;
+  root.TEMPLATE_PLACEHOLDER_TAGS = TEMPLATE_PLACEHOLDER_TAGS;
   root.DEFAULT_SETTINGS = DEFAULT_SETTINGS;
   root.getDefaultSettings = getDefaultSettings;
   root.migrateSettings = migrateSettings;

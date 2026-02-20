@@ -2,6 +2,23 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [2.1.1] - 2026-02-20
+
+### Added
+- Expanded template time/date token support beyond `{timestamp}` with additional Photo Mechanic-style placeholders
+- Hover examples for expanded template tags so users can see token output without extra explanatory rows
+- App Store Connect API submission runbook for dual-platform (iOS + macOS) release submissions
+
+### Changed
+- Reworked template placeholder UI to a compact caret-based accordion that shows default tags when collapsed and all tags when expanded
+- Auto-resize behavior for the template textarea so full template content remains visible while editing
+- Unified accordion markup/CSS for template placeholders and Advanced Settings, including matching text sizing and caret styling
+- Hardened extension settings/runtime assumptions by removing compatibility fallback layers and relying on required core modules
+
+### Fixed
+- Tightened spacing/layout consistency between accordion sections and Save Settings actions
+- Clarified GitHub release artifact policy in release documentation (macOS notarized binary only)
+
 ## [2.1.0] - 2026-02-20
 
 ### Added
