@@ -38,7 +38,7 @@ TOKEN="$(
 ## Required IDs per release
 
 1. `APP_ID` (Cat Scratches app id): `6749605278`
-2. `VERSION_STRING` (example): `2.1.0`
+2. `VERSION_STRING` (example): `2.1.1`
 3. `IOS_BUILD_ID` and `MAC_BUILD_ID` for the uploaded builds
 4. Optional: `WHATS_NEW_TEXT` for `en-US`
 

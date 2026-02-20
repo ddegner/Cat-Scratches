@@ -20,7 +20,6 @@ import SafariServices
 
 struct MainSettingsView: View {
     @StateObject private var extensionManager = ExtensionManager()
-    @State private var isHelpExpanded = false
     #if os(iOS)
     @State private var showingExtensionInstructions = false
     #endif
@@ -33,7 +32,7 @@ struct MainSettingsView: View {
             settingsList
         }
         #if os(macOS)
-        .frame(minWidth: 480, minHeight: 520)
+        .frame(minWidth: 560, minHeight: 700)
         #endif
         #if os(iOS)
         .alert("Enable Safari Extension", isPresented: $showingExtensionInstructions) {
@@ -50,153 +49,128 @@ struct MainSettingsView: View {
     // MARK: - Settings List (Shared)
 
     private var settingsList: some View {
+        #if os(iOS)
         List {
-            // App Icon and Title Header
-            Section {
-                HStack {
-                    Spacer()
-                    VStack(spacing: 12) {
-                        Image("LargeIcon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 64, height: 64)
-
-                        Text("Clip web content to Drafts")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    Spacer()
+            settingsSections
+        }
+        .listRowSeparator(.hidden)
+        .listStyle(.insetGrouped)
+        .navigationBarHidden(true)
+        #else
+        Form {
+            settingsSections
+        }
+        .formStyle(.grouped)
+        #endif
+    }
+    
+    @ViewBuilder
+    private var settingsSections: some View {
+        // App Icon and Title Header
+        Section {
+            HStack {
+                Spacer()
+                VStack(spacing: 12) {
+                    Image("LargeIcon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 64, height: 64)
+                    
+                    Text("Clip web content to Drafts")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
-                .padding(.vertical, 20)
-                .listRowBackground(Color.clear)
-
+                Spacer()
             }
-
+            .padding(.vertical, 20)
+            
+        }
+        
+        if !extensionManager.isDraftsInstalled {
             // System Status
             Section {
                 HStack(spacing: 12) {
                     Image(systemName: "doc.text")
-                        .foregroundColor(extensionManager.isDraftsInstalled ? .green : .secondary)
+                        .foregroundColor(.secondary)
                         .frame(width: 24)
-
+                    
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Drafts Application")
                             .foregroundColor(.primary)
-                        Text(extensionManager.isDraftsInstalled ? "Installed" : "Not Detected")
+                        Text("Not Detected")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
-
+                    
                     Spacer()
-
-                    if extensionManager.isDraftsInstalled {
-                        Image(systemName: "checkmark")
-                            .foregroundColor(.green)
-                    } else {
-                        Button("Get") {
-                            extensionManager.openDraftsAppStore()
-                        }
-                        #if os(macOS)
-                        .buttonStyle(.link)
-                        #else
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                        #endif
+                    
+                    Button("Get") {
+                        extensionManager.openDraftsAppStore()
                     }
+                    #if os(macOS)
+                    .buttonStyle(.link)
+                    #else
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    #endif
                 }
             } header: {
                 Text("System Check")
             }
-
-            // Setup Section
-            Section {
-                Button(action: openExtensionSettings) {
-                    SettingsRow(
-                        icon: "safari",
-                        iconColor: .blue,
-                        title: "Open Extension Settings",
-                        subtitle: platformSubtitle(
-                            ios: "Safari → Extensions → Cat Scratches",
-                            mac: "Extensions → Cat Scratches → Settings"
-                        )
-                    )
-                }
-                .buttonStyle(.plain)
-            } header: {
-                Text("Setup")
-            }
-
-            // Help Section
-            Section {
-                DisclosureGroup(isExpanded: $isHelpExpanded) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        InstructionRow(number: 1, text: "Open Extension Settings and enable Cat Scratches")
-                        InstructionRow(number: 2, text: "Visit any webpage in Safari")
-                        #if os(iOS)
-                        InstructionRow(number: 3, text: "Tap the Extensions button (puzzle icon)")
-                        InstructionRow(number: 4, text: "Select Cat Scratches to clip the page")
-                        #else
-                        InstructionRow(number: 3, text: "Click the Cat Scratches icon in the toolbar")
-                        InstructionRow(number: 4, text: "Content is clipped to Drafts")
-                        #endif
-
-                        Divider()
-                            .padding(.vertical, 4)
-
-                        Text("Settings Sync")
-                            .font(.subheadline.bold())
-                        Text("Extension settings sync automatically via iCloud between Safari on all your devices.")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-
-                        Text("Edit Rules")
-                            .font(.subheadline.bold())
-                        #if os(iOS)
-                        // swiftlint:disable:next line_length
-                        Text("To change templates, capture rules, or filtering rules, go to Settings → Safari → Extensions → Cat Scratches → Settings.")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                        #else
-                        // swiftlint:disable:next line_length
-                        Text("To change templates, capture rules, or filtering rules, go to Safari → Settings → Extensions → Cat Scratches → Settings.")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                        #endif
-                    }
-                    .padding(.vertical, 8)
-                } label: {
-                    Text("Setup steps, sync, and troubleshooting")
-                }
-                .padding(.vertical, 4)
-            } header: {
-                Text("Help")
-            }
-
-            // Connect Section
-            Section {
-                Link(destination: URL(string: "https://github.com/ddegner/cat-scratches")!) {
-                    SettingsLinkRow(
-                        icon: "chevron.left.forwardslash.chevron.right",
-                        title: "View on GitHub"
-                    )
-                }
-
-                Link(destination: URL(string: "https://www.daviddegner.com")!) {
-                    SettingsLinkRow(
-                        icon: "person.circle",
-                        title: "Created by David Degner"
-                    )
-                }
-            } header: {
-                Text("Connect")
-            }
         }
-        #if os(iOS)
-        .listStyle(.insetGrouped)
-        .navigationBarHidden(true)
-        #else
-        .listStyle(.inset)
-        #endif
+        
+        // Setup Section
+        Section {
+            Button(action: openExtensionSettings) {
+                SettingsRow(
+                    icon: "safari",
+                    iconColor: .blue,
+                    title: "Open Extension Settings",
+                    subtitle: platformSubtitle(
+                        ios: "Safari → Extensions → Cat Scratches → Settings · Syncs via iCloud",
+                        mac: "Extensions → Cat Scratches → Settings · Syncs via iCloud"
+                    )
+                )
+            }
+            .buttonStyle(.plain)
+        } header: {
+            Text("Setup")
+        }
+        
+        // Connect Section
+        Section {
+            Link(destination: URL(string: "https://github.com/ddegner/cat-scratches")!) {
+                SettingsLinkRow(
+                    icon: "chevron.left.forwardslash.chevron.right",
+                    title: "View on GitHub"
+                )
+            }
+            
+            Link(destination: URL(string: "https://www.daviddegner.com")!) {
+                SettingsLinkRow(
+                    icon: "person.circle",
+                    title: "Created by David Degner"
+                )
+            }
+        } header: {
+            Text("Connect")
+        }
+        
+        // Help Section
+        Section {
+            VStack(alignment: .leading, spacing: 12) {
+                InstructionRow(number: 1, text: "Enable Cat Scratches in Extension Settings")
+                InstructionRow(number: 2, text: "Open any page in Safari")
+                #if os(iOS)
+                InstructionRow(number: 3, text: "Use Extensions (puzzle) for Cat Scratches, or press ⇧⌘D")
+                #else
+                InstructionRow(number: 3, text: "Click Cat Scratches in the toolbar, or press ⇧⌘D")
+                #endif
+            }
+            .padding(.vertical, 8)
+        } header: {
+            Text("Help")
+        }
     }
 
     // MARK: - Drafts Not Installed Banner (Cross-Platform)

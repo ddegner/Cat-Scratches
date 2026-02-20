@@ -6,13 +6,13 @@ The fastest and most elegant way to capture content from the web and send it dir
 **Website:** [daviddegner.com](https://www.daviddegner.com)
 **Source Code, bugs, and feature requests:** [github.com/ddegner/cat-scratches](https://github.com/ddegner/cat-scratches)
 
-## App Store Update (v2.1.0)
+## App Store Update (v2.1.1)
 
 Over the past month, I have been improving Cat Scratches in many small but important ways.
 
 I use it daily to save articles for later, send clean text to Drafts for AI actions, and capture readable content from cluttered pages.
 
-Version 2.1.0 is now available in the App Store:
+Version 2.1.1 is now available in the App Store:
 [Cat Scratches on the App Store](https://apps.apple.com/us/app/cat-scratches/id6749605278)
 
 The macOS extension is still here, and its update should be approved soon:
