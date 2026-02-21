@@ -94,6 +94,16 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
                 os_log(.info, "Drafts installed check: unknown (extension limitation)")
             }
 
+        case "getExtensionVersion":
+            let version = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? ""
+            if !version.isEmpty {
+                response["version"] = version
+                os_log(.info, "Returning extension version: %{public}@", version)
+            } else {
+                response["version"] = NSNull()
+                os_log(.error, "Could not read extension version from bundle")
+            }
+
         default:
             os_log(.info, "Ignoring action: %{public}@", action)
         }

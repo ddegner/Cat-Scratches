@@ -12,6 +12,8 @@ const PLACEHOLDER_TAGS = TEMPLATE_PLACEHOLDER_TAGS;
 
 // Initialize settings page
 document.addEventListener('DOMContentLoaded', async () => {
+    await updateHeaderVersion();
+
     // Load current settings
     await loadSettings();
 
@@ -32,6 +34,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setDirtyState(false);
 });
+
+async function updateHeaderVersion() {
+    const versionElement = document.getElementById('settingsVersion');
+    if (!versionElement) {
+        return;
+    }
+
+    let version = '';
+
+    try {
+        if (typeof browser !== 'undefined' && browser.runtime?.sendNativeMessage) {
+            const response = await browser.runtime.sendNativeMessage(NATIVE_APP_ID, {
+                action: 'getExtensionVersion'
+            });
+            const bundleVersion = response?.version;
+            if (typeof bundleVersion === 'string' && bundleVersion.trim().length > 0) {
+                version = bundleVersion.trim();
+            }
+        }
+    } catch (error) {
+        console.log('Could not load bundle version:', error.message);
+    }
+
+    if (!version) {
+        try {
+            let manifest = null;
+
+            if (typeof browser !== 'undefined' && browser.runtime?.getManifest) {
+                manifest = browser.runtime.getManifest();
+            } else if (typeof chrome !== 'undefined' && chrome.runtime?.getManifest) {
+                manifest = chrome.runtime.getManifest();
+            }
+
+            const manifestVersion = manifest?.version;
+            if (typeof manifestVersion === 'string' && manifestVersion.trim().length > 0) {
+                version = manifestVersion.trim();
+            }
+        } catch (error) {
+            console.log('Could not load manifest version:', error.message);
+        }
+    }
+
+    versionElement.textContent = version ? `Version ${version}` : '';
+}
 
 // Load settings using shared storage logic
 async function loadSettings() {

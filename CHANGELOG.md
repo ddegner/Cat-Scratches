@@ -2,6 +2,16 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [2.1.2] - 2026-02-21
+
+### Changed
+- Replaced the app settings header tagline with a dynamic app version label sourced from `CFBundleShortVersionString`
+- Simplified Help section formatting to plain numbered lines while keeping app-specific instructions
+- Updated extension settings header title from "Cat Scratches Settings" to "Settings" with a small version subtitle below it
+
+### Fixed
+- Wired extension settings version display to bundle version via native messaging (`getExtensionVersion`) with manifest fallback
+
 ## [2.1.1] - 2026-02-20
 
 ### Added

@@ -76,7 +76,7 @@ struct MainSettingsView: View {
                         .scaledToFit()
                         .frame(width: 64, height: 64)
                     
-                    Text("Clip web content to Drafts")
+                    Text(appVersionLabel)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -233,6 +233,15 @@ struct MainSettingsView: View {
         return mac
         #endif
     }
+
+    private var appVersionLabel: String {
+        if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
+           !version.isEmpty {
+            return "Cat Scratches version \(version)"
+        }
+
+        return "Cat Scratches"
+    }
 }
 
 // MARK: - Shared Helper Views
@@ -293,16 +302,9 @@ struct InstructionRow: View {
     let text: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Text("\(number)")
-                .font(.caption.bold())
-                .foregroundColor(.white)
-                .frame(width: 20, height: 20)
-                .background(Color.primary)
-                .clipShape(Circle())
-            Text(text)
-                .font(.subheadline)
-        }
+        Text("\(number). \(text)")
+            .font(.subheadline)
+            .foregroundColor(.primary)
     }
 }
 
