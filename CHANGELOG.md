@@ -2,6 +2,17 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [2.1.3] - 2026-02-22
+
+### Changed
+- Added explicit Selector Finder privacy disclosure in extension settings and documentation
+- Clarified privacy policy language for optional cloud-based Selector Finder analysis while keeping clipping local-first
+
+### Fixed
+- Hardened Selector Finder worker API with restricted CORS, trusted-origin checks, and simple client validation
+- Added per-IP rate limiting on Selector Finder analysis endpoint
+- Added SSRF protections in Selector Finder worker (blocked local/private/internal targets, non-standard ports, and unsafe redirects)
+
 ## [2.1.2] - 2026-02-21
 
 ### Changed
