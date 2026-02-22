@@ -2,6 +2,12 @@
 
 A Cloudflare Worker that analyzes article URLs and uses Google's Gemini AI to suggest CSS selectors for the Cat Scratches Safari extension.
 
+## Privacy
+
+- Selector Finder requests are processed transiently.
+- This worker does not persist submitted URLs or HTML payloads.
+- Gemini is called only to generate selector suggestions for each request.
+
 ## Setup
 
 ### 1. Get a Gemini API Key
@@ -46,6 +52,16 @@ After deployment, Wrangler will show your URL:
 https://selector-finder.<your-subdomain>.workers.dev
 ```
 
+### 7. Optional: allow additional trusted origins
+
+By default, the API accepts extension origins and localhost.  
+If you host this worker on a custom domain and use the built-in web UI there, add it in `wrangler.toml` under `[vars]`:
+
+```toml
+[vars]
+ALLOWED_ORIGINS = "https://selectors.example.com,https://selector-finder.catscratches.workers.dev"
+```
+
 ## Optional: Custom Domain
 
 To use `selectors.daviddegner.com` instead:
@@ -68,3 +84,10 @@ wrangler dev
 ```
 
 This runs the worker locally at `http://localhost:8787`
+
+## Security Defaults
+
+- CORS is restricted (no wildcard origins)
+- Simple client validation is enabled for extension calls
+- Rate limiting is enabled per client IP
+- SSRF protections block localhost/private network targets, non-standard ports, and unsafe redirects

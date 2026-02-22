@@ -1,7 +1,7 @@
 # Privacy Policy for Cat Scratches
 
 **Effective Date:** August 1, 2025  
-**Last Updated:** August 1, 2025
+**Last Updated:** February 22, 2026
 
 ## Overview
 
@@ -19,8 +19,8 @@ Cat Scratches is designed with privacy as a core principle. We want to be comple
 
 ### No Content Storage
 - We do not store or retain any content you capture from websites
-- All captured content is processed locally on your device and sent directly to the Drafts app
-- We never see, store, or have access to the content you capture
+- Core clipping content is processed locally on your device and sent directly to Drafts or Share Sheet
+- We do not store captured content, and we do not manually review Selector Finder request payloads
 
 ### No Analytics or Tracking
 - We do not use analytics services
@@ -28,19 +28,19 @@ Cat Scratches is designed with privacy as a core principle. We want to be comple
 - We do not collect usage statistics or performance data
 - We do not use cookies or similar tracking technologies
 
-### No Network Communication
-- The extension does not communicate with our servers
-- All processing happens locally on your Mac
-- Content is transferred directly from Safari to the Drafts app using local system APIs
+### Limited Network Communication (Optional Feature)
+- Core clipping (capture + format + send to Drafts/Share Sheet) runs locally on your device
+- If you use **Selector Finder** (an optional tool in Advanced Settings), the URL you enter and a processed copy of the target page HTML are sent to our Selector Finder service and Google's Gemini API to suggest selectors
+- Selector Finder requests are processed transiently and are **not saved by Cat Scratches**
 
 ## How the Extension Works
 
-Cat Scratches operates entirely on your local device:
+Cat Scratches primarily operates on your local device:
 
 1. **Content Processing**: When you use the extension, it processes the webpage content locally in Safari
 2. **Local Conversion**: The content is converted to Markdown format using local JavaScript libraries
 3. **Direct Transfer**: The formatted content is sent directly to the Drafts app using macOS URL schemes
-4. **No External Communication**: No data leaves your device except to go to the Drafts app
+4. **Optional Selector Finder**: If you run Selector Finder, the URL you provide and processed HTML are sent to the Selector Finder service and Gemini for analysis (not saved by Cat Scratches)
 
 ## Permissions We Request
 
@@ -54,7 +54,7 @@ These permissions are used exclusively to provide the extension's functionality 
 
 ## Data Security
 
-Since we don't collect any data, there is no data to secure on our end. However:
+Since we do not retain user content, there is no stored content database on our end. However:
 
 - All extension processing occurs locally on your device
 - Your captured content is handled according to the Drafts app's privacy policy once transferred
@@ -65,6 +65,8 @@ Since we don't collect any data, there is no data to secure on our end. However:
 Cat Scratches integrates with:
 
 - **Drafts App**: Content captured by our extension is sent to the Drafts app. Please refer to [Drafts' privacy policy](https://getdrafts.com/privacy/) for information about how they handle your data.
+- **Selector Finder Service (Optional)**: When you use Selector Finder, requests are sent to `selector-finder.catscratches.workers.dev` for analysis and relay to Gemini.
+- **Google Gemini API (Optional)**: Used only for Selector Finder analysis requests.
 
 We are not responsible for the privacy practices of third-party applications.
 
@@ -90,8 +92,8 @@ If you have any questions about this privacy policy or Cat Scratches, you can co
 
 ## Summary
 
-In simple terms: Cat Scratches doesn't collect, store, or transmit any of your personal data or browsing information. Everything happens locally on your device, and we have no way to see or access your data. Your privacy is completely protected.
+In simple terms: normal clipping runs locally. If you use Selector Finder, the URL and processed HTML are sent for AI analysis, but Cat Scratches does not save those requests.
 
 ---
 
-*This privacy policy is designed to be transparent and comprehensive. Cat Scratches is committed to protecting your privacy by simply not collecting any data in the first place.*
+*This privacy policy is designed to be transparent and comprehensive. Cat Scratches is committed to minimizing data use and not saving Selector Finder request content.*

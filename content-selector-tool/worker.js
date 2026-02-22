@@ -3,18 +3,42 @@
  * Analyzes article URLs and suggests CSS selectors using Gemini AI
  */
 
+const CLIENT_HEADER_NAME = 'X-Selector-Finder-Client';
+const EXPECTED_CLIENT_HEADER_VALUE = 'cat-scratches-extension';
+
+const MAX_HTML_BYTES = 1_000_000; // Hard cap for fetched page size before preprocessing
+const MAX_PROMPT_HTML_CHARS = 50_000; // Prompt-size cap after preprocessing
+const FETCH_TIMEOUT_MS = 10_000;
+const MAX_REDIRECTS = 5;
+
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 30;
+const rateLimitStore = new Map();
+
+const TRUSTED_STATIC_ORIGINS = new Set([
+    'https://selector-finder.catscratches.workers.dev'
+]);
+
+const BLOCKED_HOSTNAMES = new Set([
+    'localhost',
+    'metadata.google.internal',
+    '169.254.169.254',
+    '169.254.169.253',
+    '100.100.100.200'
+]);
+
 export default {
     async fetch(request, env) {
         const url = new URL(request.url);
+        const origin = request.headers.get('Origin');
 
         // Handle CORS preflight
         if (request.method === 'OPTIONS') {
+            if (!isAllowedOrigin(origin, env)) {
+                return new Response('Forbidden', { status: 403 });
+            }
             return new Response(null, {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                    'Access-Control-Allow-Headers': 'Content-Type',
-                },
+                headers: buildCorsHeaders(origin),
             });
         }
 
@@ -27,96 +51,419 @@ export default {
 
         // Handle API request
         if (request.method === 'POST' && url.pathname === '/api/analyze') {
-            return handleAnalyze(request, env);
+            return handleAnalyze(request, env, origin);
         }
 
         return new Response('Not Found', { status: 404 });
     },
 };
 
-async function handleAnalyze(request, env) {
-    const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-    };
+async function handleAnalyze(request, env, origin) {
+    if (!isAllowedOrigin(origin, env)) {
+        return jsonError(403, 'Origin not allowed');
+    }
+
+    if (!isTrustedClientRequest(request, origin, env)) {
+        return jsonError(403, 'Untrusted client', origin);
+    }
+
+    const contentType = request.headers.get('Content-Type') || '';
+    if (!contentType.toLowerCase().includes('application/json')) {
+        return jsonError(415, 'Content-Type must be application/json', origin);
+    }
+
+    const rateLimit = checkRateLimit(request);
+    if (!rateLimit.allowed) {
+        return jsonError(
+            429,
+            'Too many requests. Please wait and try again.',
+            origin,
+            { 'Retry-After': String(rateLimit.retryAfterSeconds) }
+        );
+    }
 
     try {
-        const { url: targetUrl } = await request.json();
+        const body = await request.json();
+        const targetUrl = typeof body?.url === 'string' ? body.url.trim() : '';
 
         if (!targetUrl) {
-            return new Response(JSON.stringify({ error: 'URL is required' }), {
-                status: 400,
-                headers: corsHeaders,
-            });
+            return jsonError(400, 'URL is required', origin);
         }
 
-        // Validate URL
-        let parsedUrl;
-        try {
-            parsedUrl = new URL(targetUrl);
-            if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-                throw new Error('Invalid protocol');
-            }
-        } catch {
-            return new Response(JSON.stringify({ error: 'Invalid URL format' }), {
-                status: 400,
-                headers: corsHeaders,
-            });
-        }
-
-        // Fetch the target page
-        let htmlContent;
-        try {
-            const response = await fetch(targetUrl, {
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            htmlContent = await response.text();
-        } catch (fetchError) {
-            return new Response(JSON.stringify({
-                error: `Could not fetch page: ${fetchError.message}`
-            }), {
-                status: 400,
-                headers: corsHeaders,
-            });
-        }
+        const parsedTargetUrl = validateTargetUrl(targetUrl);
+        const fetchedPage = await fetchTargetHtml(parsedTargetUrl.toString());
 
         // Preprocess HTML to reduce tokens and focus on structure
-        htmlContent = preprocessHtml(htmlContent);
-
-        // Truncate to avoid token limits (keep first 50KB of cleaned HTML)
-        const maxLength = 50000;
-        if (htmlContent.length > maxLength) {
-            htmlContent = htmlContent.substring(0, maxLength) + '\n<!-- truncated -->';
+        let htmlForPreview = preprocessHtml(fetchedPage.htmlContent);
+        if (htmlForPreview.length > MAX_PROMPT_HTML_CHARS) {
+            htmlForPreview = htmlForPreview.substring(0, MAX_PROMPT_HTML_CHARS) + '\n<!-- truncated -->';
         }
 
         // Call Gemini API
-        const geminiResponse = await analyzeWithGemini(htmlContent, parsedUrl.hostname, env.GEMINI_API_KEY);
+        const geminiResponse = await analyzeWithGemini(
+            htmlForPreview,
+            parsedTargetUrl.hostname,
+            env.GEMINI_API_KEY
+        );
 
-        return new Response(JSON.stringify({
-            success: true,
-            url: targetUrl,
-            html: htmlContent,  // Include HTML for client-side preview (avoids CORS issues)
-            ...geminiResponse,
-        }), {
-            headers: corsHeaders,
-        });
-
+        return jsonResponse(
+            200,
+            {
+                success: true,
+                url: targetUrl,
+                finalUrl: fetchedPage.finalUrl,
+                html: htmlForPreview, // Include sanitized HTML for client-side preview
+                ...geminiResponse,
+            },
+            origin
+        );
     } catch (error) {
-        return new Response(JSON.stringify({
-            error: error.message || 'Analysis failed'
-        }), {
-            status: 500,
-            headers: corsHeaders,
-        });
+        const message = error?.message || 'Analysis failed';
+        const status = error?.statusCode || 500;
+        return jsonError(status, message, origin);
     }
+}
+
+function buildCorsHeaders(origin) {
+    return {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': `Content-Type, ${CLIENT_HEADER_NAME}`,
+        'Access-Control-Max-Age': '86400',
+        'Vary': 'Origin'
+    };
+}
+
+function jsonResponse(status, payload, origin, extraHeaders = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        ...extraHeaders
+    };
+
+    if (origin) {
+        Object.assign(headers, buildCorsHeaders(origin));
+    }
+
+    return new Response(JSON.stringify(payload), { status, headers });
+}
+
+function jsonError(status, message, origin = null, extraHeaders = {}) {
+    return jsonResponse(status, { error: message }, origin, extraHeaders);
+}
+
+function normalizeOrigin(origin) {
+    return (origin || '').trim().replace(/\/+$/, '').toLowerCase();
+}
+
+function isLocalDevOrigin(origin) {
+    return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+}
+
+function isExtensionOrigin(origin) {
+    return /^(safari-web-extension|chrome-extension|moz-extension):\/\/[a-z0-9._-]+$/i.test(origin);
+}
+
+function isAllowedOrigin(origin, env) {
+    const normalized = normalizeOrigin(origin);
+    if (!normalized) {
+        // Require browser origins to reduce unauthenticated script/curl abuse.
+        return false;
+    }
+
+    if (isExtensionOrigin(normalized) || isLocalDevOrigin(normalized) || TRUSTED_STATIC_ORIGINS.has(normalized)) {
+        return true;
+    }
+
+    // Optional per-deployment allowlist, comma-separated.
+    const configuredOrigins = (env.ALLOWED_ORIGINS || '')
+        .split(',')
+        .map(value => normalizeOrigin(value))
+        .filter(Boolean);
+
+    return configuredOrigins.includes(normalized);
+}
+
+function isTrustedClientRequest(request, origin, env) {
+    const normalizedOrigin = normalizeOrigin(origin);
+
+    // The built-in tool page is trusted when served from a configured/known origin.
+    if (isLocalDevOrigin(normalizedOrigin) || TRUSTED_STATIC_ORIGINS.has(normalizedOrigin)) {
+        return true;
+    }
+
+    // Extension origins are already restricted by CORS + origin checks.
+    if (isExtensionOrigin(normalizedOrigin)) {
+        return true;
+    }
+
+    const configuredOrigins = (env.ALLOWED_ORIGINS || '')
+        .split(',')
+        .map(value => normalizeOrigin(value))
+        .filter(Boolean);
+
+    if (configuredOrigins.includes(normalizedOrigin)) {
+        return true;
+    }
+
+    const headerValue = request.headers.get(CLIENT_HEADER_NAME);
+    return headerValue === EXPECTED_CLIENT_HEADER_VALUE;
+}
+
+function checkRateLimit(request) {
+    const now = Date.now();
+    const clientIp = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const key = clientIp;
+    const existing = rateLimitStore.get(key) || [];
+
+    const activeWindow = existing.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW_MS);
+
+    if (activeWindow.length >= RATE_LIMIT_MAX_REQUESTS) {
+        const oldestTimestamp = activeWindow[0];
+        const retryAfterMs = Math.max(0, RATE_LIMIT_WINDOW_MS - (now - oldestTimestamp));
+        return {
+            allowed: false,
+            retryAfterSeconds: Math.ceil(retryAfterMs / 1000)
+        };
+    }
+
+    activeWindow.push(now);
+    rateLimitStore.set(key, activeWindow);
+
+    // Opportunistic cleanup to avoid unbounded growth in long-lived isolates.
+    if (rateLimitStore.size > 2000) {
+        for (const [storedKey, timestamps] of rateLimitStore.entries()) {
+            const filtered = timestamps.filter(timestamp => now - timestamp < RATE_LIMIT_WINDOW_MS);
+            if (filtered.length === 0) {
+                rateLimitStore.delete(storedKey);
+            } else {
+                rateLimitStore.set(storedKey, filtered);
+            }
+        }
+    }
+
+    return { allowed: true, retryAfterSeconds: 0 };
+}
+
+function validateTargetUrl(targetUrl) {
+    let parsedUrl;
+    try {
+        parsedUrl = new URL(targetUrl);
+    } catch {
+        const error = new Error('Invalid URL format');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        const error = new Error('Only HTTP(S) URLs are allowed');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (parsedUrl.username || parsedUrl.password) {
+        const error = new Error('URLs with embedded credentials are not allowed');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    // Restrict to standard web ports to reduce internal port-scanning abuse.
+    if (parsedUrl.port && !['80', '443'].includes(parsedUrl.port)) {
+        const error = new Error('Only standard web ports (80/443) are allowed');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    if (isBlockedHostname(parsedUrl.hostname)) {
+        const error = new Error('URL host is not allowed');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    return parsedUrl;
+}
+
+function isBlockedHostname(hostname) {
+    const normalized = (hostname || '').trim().toLowerCase().replace(/\.$/, '');
+
+    if (!normalized) {
+        return true;
+    }
+
+    if (
+        BLOCKED_HOSTNAMES.has(normalized) ||
+        normalized.endsWith('.localhost') ||
+        normalized.endsWith('.local') ||
+        normalized.endsWith('.internal') ||
+        normalized.endsWith('.home.arpa')
+    ) {
+        return true;
+    }
+
+    if (isIPv4Address(normalized)) {
+        return isPrivateOrReservedIPv4(normalized);
+    }
+
+    if (isIPv6Address(normalized)) {
+        return isPrivateOrReservedIPv6(normalized);
+    }
+
+    return false;
+}
+
+function isIPv4Address(hostname) {
+    const parts = hostname.split('.');
+    return (
+        parts.length === 4 &&
+        parts.every(part => /^\d+$/.test(part) && Number(part) >= 0 && Number(part) <= 255)
+    );
+}
+
+function isPrivateOrReservedIPv4(ipAddress) {
+    const [a, b, c] = ipAddress.split('.').map(Number);
+
+    if (a === 0 || a === 10 || a === 127) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true; // Carrier-grade NAT
+    if (a === 169 && b === 254) return true; // Link-local
+    if (a === 172 && b >= 16 && b <= 31) return true; // RFC1918
+    if (a === 192 && b === 168) return true; // RFC1918
+    if (a === 192 && b === 0 && c === 0) return true; // IETF protocol assignments
+    if (a === 198 && (b === 18 || b === 19)) return true; // Benchmark tests
+    if (a >= 224) return true; // Multicast + reserved
+
+    return false;
+}
+
+function isIPv6Address(hostname) {
+    return hostname.includes(':');
+}
+
+function isPrivateOrReservedIPv6(ipAddress) {
+    const normalized = ipAddress.toLowerCase().split('%')[0];
+
+    if (normalized === '::' || normalized === '::1') return true;
+    if (normalized.startsWith('fe80:')) return true; // Link-local
+    if (normalized.startsWith('fc') || normalized.startsWith('fd')) return true; // Unique local
+
+    if (normalized.startsWith('::ffff:')) {
+        const mappedIPv4 = normalized.slice('::ffff:'.length);
+        if (isIPv4Address(mappedIPv4)) {
+            return isPrivateOrReservedIPv4(mappedIPv4);
+        }
+    }
+
+    return false;
+}
+
+async function fetchTargetHtml(startUrl) {
+    let currentUrl = startUrl;
+    const visited = new Set();
+
+    for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+        const validatedUrl = validateTargetUrl(currentUrl);
+        const normalizedUrl = validatedUrl.toString();
+
+        if (visited.has(normalizedUrl)) {
+            const error = new Error('Redirect loop detected');
+            error.statusCode = 400;
+            throw error;
+        }
+        visited.add(normalizedUrl);
+
+        const timeoutController = new AbortController();
+        const timeoutId = setTimeout(() => timeoutController.abort(), FETCH_TIMEOUT_MS);
+
+        let response;
+        try {
+            response = await fetch(normalizedUrl, {
+                redirect: 'manual',
+                signal: timeoutController.signal,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                }
+            });
+        } catch (fetchError) {
+            const error = new Error(
+                fetchError?.name === 'AbortError'
+                    ? 'Request timed out while fetching page'
+                    : `Could not fetch page: ${fetchError.message}`
+            );
+            error.statusCode = 400;
+            throw error;
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
+        if (response.status >= 300 && response.status < 400) {
+            const location = response.headers.get('Location');
+            if (!location) {
+                const error = new Error('Redirect response missing Location header');
+                error.statusCode = 400;
+                throw error;
+            }
+
+            currentUrl = new URL(location, normalizedUrl).toString();
+            continue;
+        }
+
+        if (!response.ok) {
+            const error = new Error(`Could not fetch page: HTTP ${response.status}`);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const responseContentType = (response.headers.get('Content-Type') || '').toLowerCase();
+        if (
+            responseContentType &&
+            !responseContentType.includes('text/html') &&
+            !responseContentType.includes('application/xhtml+xml')
+        ) {
+            const error = new Error('Target URL did not return HTML');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const htmlContent = await readResponseBodyWithLimit(response, MAX_HTML_BYTES);
+        return { htmlContent, finalUrl: normalizedUrl };
+    }
+
+    const error = new Error('Too many redirects');
+    error.statusCode = 400;
+    throw error;
+}
+
+async function readResponseBodyWithLimit(response, maxBytes) {
+    if (!response.body || typeof response.body.getReader !== 'function') {
+        const text = await response.text();
+        if (new TextEncoder().encode(text).byteLength > maxBytes) {
+            const error = new Error(`Fetched page is too large (limit: ${maxBytes} bytes)`);
+            error.statusCode = 400;
+            throw error;
+        }
+        return text;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let totalBytes = 0;
+    let combinedText = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        totalBytes += value.byteLength;
+        if (totalBytes > maxBytes) {
+            const error = new Error(`Fetched page is too large (limit: ${maxBytes} bytes)`);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        combinedText += decoder.decode(value, { stream: true });
+    }
+
+    combinedText += decoder.decode();
+    return combinedText;
 }
 
 /**

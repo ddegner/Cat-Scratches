@@ -21,6 +21,7 @@ The macOS extension is still here, and its update should be approved soon:
 New in this update: Advanced settings now include a Drafts URL Scheme toggle (`Create URL` or `Action URL`) plus a Drafts action field, so you can run post-processing actions from Drafts.
 
 One useful feature: if a page is not parsing correctly, enter its URL under the Advanced tab to get new parsing suggestions.
+Selector Finder is optional and uses a cloud service + Gemini analysis for that specific request.
 
 If you run into issues or want to tinker, the source is here:
 [Cat Scratches on GitHub](https://github.com/ddegner/cat-scratches/tree/main)

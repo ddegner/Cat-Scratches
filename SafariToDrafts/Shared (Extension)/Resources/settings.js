@@ -561,7 +561,10 @@ async function handleAnalyze() {
         // Step 1: Get selectors from AI Worker
         const apiResponse = await fetch(SELECTOR_FINDER_API, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Selector-Finder-Client': 'cat-scratches-extension'
+            },
             body: JSON.stringify({ url }),
         });
 
