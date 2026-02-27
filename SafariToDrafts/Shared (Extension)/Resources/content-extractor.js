@@ -90,7 +90,7 @@
                         // Remove links to images
                         if (node.nodeName === 'A' && node.getAttribute('href')) {
                             const href = node.getAttribute('href').toLowerCase();
-                            if (href.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff?)(\?.*)?$/i)) {
+                            if (href.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp|tiff?)(\?.*)?$/)) {
                                 return true;
                             }
                         }
@@ -172,7 +172,7 @@
                                 if (element.getAttribute('itemtype')) score += 600;
 
                                 // Bonus for content-indicating classes/IDs
-                                const classAndId = ((element.className || '') + ' ' + (element.id || '')).toLowerCase();
+                                const classAndId = ((element.getAttribute('class') || '') + ' ' + (element.id || '')).toLowerCase();
                                 if (classAndId.includes('article') || classAndId.includes('content') ||
                                     classAndId.includes('post') || classAndId.includes('entry')) {
                                     score += 400;
@@ -258,7 +258,12 @@
             .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
             .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
             .replace(/&nbsp;/g, ' ')
-            .replace(/&[a-zA-Z]+;/g, ' ')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#0*39;/g, "'")
+            .replace(/&[a-zA-Z]+;/g, '')
             .trim();
 
         return {

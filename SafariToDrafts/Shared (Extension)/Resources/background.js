@@ -258,7 +258,7 @@ function getEncodedDraftTags(settings) {
 }
 
 function getDraftsURLMode(settings) {
-    return settings.draftsURL.mode;
+    return settings?.draftsURL?.mode || 'create';
 }
 
 function getEncodedDraftAction(settings) {

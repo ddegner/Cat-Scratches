@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check if Drafts is installed and show banner if not
     await checkDraftsInstallation();
 
+    // Initialize Selector Finder
+    setupSelectorFinder();
+
     setDirtyState(false);
 });
 
@@ -374,14 +377,16 @@ function setDirtyState(dirty) {
 }
 
 // Show status message
+let statusTimer = null;
 function showStatus(message, type) {
     const statusEl = document.getElementById('statusMessage');
     statusEl.textContent = message;
     statusEl.className = `status-message ${type || 'info'}`;
     statusEl.style.display = 'block';
 
+    clearTimeout(statusTimer);
     const timeout = type === 'error' ? 7000 : 5000;
-    setTimeout(() => {
+    statusTimer = setTimeout(() => {
         statusEl.style.display = 'none';
     }, timeout);
 }
@@ -505,8 +510,7 @@ let foundSelectors = {
     elementsToRemove: []
 };
 
-// Initialize Selector Finder when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+function setupSelectorFinder() {
     const analyzeBtn = document.getElementById('analyzeBtn');
     const addSelectorsBtn = document.getElementById('addSelectorsBtn');
     const finderUrl = document.getElementById('finderUrl');
@@ -527,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+}
 
 async function handleAnalyze() {
     const finderUrl = document.getElementById('finderUrl');

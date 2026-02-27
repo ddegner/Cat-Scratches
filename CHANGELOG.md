@@ -2,6 +2,17 @@
 
 All notable changes to Cat Scratches will be documented in this file.
 
+## [2.1.4] - 2026-02-27
+
+### Fixed
+- Fixed HTML entity cleanup replacing all entities with spaces instead of decoding them (e.g. `&amp;` becoming a space instead of `&`)
+- Fixed `element.className` producing garbage values on SVG elements during content scoring by using `getAttribute('class')`
+- Fixed status message timer overlap where rapid messages could be hidden prematurely
+- Added defensive optional chaining to `getDraftsURLMode()` to prevent crash when settings are not yet loaded
+- Removed dead `border: none` CSS declaration overwritten by later rule
+- Merged duplicate `DOMContentLoaded` listeners into single initialization path
+- Removed redundant case-insensitive regex flag on already-lowercased input
+
 ## [2.1.3] - 2026-02-22
 
 ### Changed

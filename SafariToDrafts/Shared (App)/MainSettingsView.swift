@@ -162,7 +162,12 @@ struct MainSettingsView: View {
                 InstructionRow(number: 1, text: "Enable Cat Scratches in Extension Settings")
                 InstructionRow(number: 2, text: "Open any page in Safari")
                 #if os(iOS)
-                InstructionRow(number: 3, text: "Use Extensions (puzzle) for Cat Scratches, or press ⇧⌘D")
+                InstructionRow(
+                    number: 3,
+                    text: Text("Use Extensions (")
+                        + Text(Image(systemName: "puzzlepiece.extension.fill"))
+                        + Text(") for Cat Scratches, or press ⇧⌘D")
+                )
                 #else
                 InstructionRow(number: 3, text: "Click Cat Scratches in the toolbar, or press ⇧⌘D")
                 #endif
@@ -299,10 +304,20 @@ struct SettingsLinkRow: View {
 
 struct InstructionRow: View {
     let number: Int
-    let text: String
+    private let text: Text
+
+    init(number: Int, text: String) {
+        self.number = number
+        self.text = Text(text)
+    }
+
+    init(number: Int, text: Text) {
+        self.number = number
+        self.text = text
+    }
 
     var body: some View {
-        Text("\(number). \(text)")
+        (Text("\(number). ") + text)
             .font(.subheadline)
             .foregroundColor(.primary)
     }
